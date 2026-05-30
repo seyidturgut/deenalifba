@@ -90,6 +90,7 @@ export default function Settings() {
         </View>
 
         <View className="flex-1" />
+        <JuicyButton label="Tanıtımı tekrar izle ▶" tone="accent" onPress={() => router.push("/onboarding")} />
         <JuicyButton label={t("common.close")} tone="primary" onPress={() => router.back()} />
       </View>
 
