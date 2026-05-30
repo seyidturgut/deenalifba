@@ -8,6 +8,7 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
+import { useTranslation } from "react-i18next";
 
 import { haptics } from "@/lib/haptics";
 import { images } from "@/lib/images";
@@ -70,12 +71,14 @@ function ConfettiPiece({ conf }: { conf: PieceConf }) {
 export function Celebration({
   visible,
   onDone,
-  title = "Aferin!",
+  title,
 }: {
   visible: boolean;
   onDone: () => void;
   title?: string;
 }) {
+  const { t: translate } = useTranslation();
+  const heading = title ?? translate("common.great");
   const hapticsEnabled = useSettingsStore((s) => s.hapticsEnabled);
 
   const pieces = useMemo<PieceConf[]>(
@@ -126,7 +129,7 @@ export function Celebration({
               textShadowRadius: 8,
             }}
           >
-            {title}
+            {heading}
           </Text>
         </Animated.View>
       </View>

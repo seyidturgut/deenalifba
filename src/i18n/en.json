@@ -1,0 +1,94 @@
+{
+  "common": {
+    "appName": "Alif",
+    "continue": "Continue",
+    "back": "Back",
+    "next": "Next",
+    "close": "Close",
+    "great": "Great job!",
+    "tryAgain": "Let's try again",
+    "cancel": "Cancel",
+    "ok": "OK"
+  },
+  "language": {
+    "label": "Language",
+    "tr": "Türkçe",
+    "en": "English"
+  },
+  "nav": {
+    "home": "Home",
+    "lessons": "Lessons",
+    "mosque": "My Mosque",
+    "settings": "Settings"
+  },
+  "onboarding": {
+    "welcomeTitle": "Welcome to Alif!",
+    "welcomeSubtitle": "Learn the letters, build your own mosque.",
+    "p1": "Hi! 👋 I'm Pırıl.\nLet's learn the letters together!",
+    "p2": "Your magical mosque grows as you learn each letter! 🕌✨",
+    "askName": "First, tell me your name 😊",
+    "namePlaceholder": "Type your name",
+    "done": "Wonderful, {{name}}! 🎉\nLet's begin! 🚀",
+    "friend": "friend",
+    "continue": "Continue ▶",
+    "ok": "OK",
+    "start": "Start! 🚀"
+  },
+  "home": {
+    "title": "Letters",
+    "greeting": "Hi, {{name}}!",
+    "hello": "Hi there!",
+    "subtitle": "Let's learn a new letter today!"
+  },
+  "letters": {
+    "title": "Letters"
+  },
+  "learn": {
+    "trace": "Trace",
+    "puzzle": "Puzzle",
+    "sounds": "Sounds",
+    "recall": "Review",
+    "traceHint": "Trace over the\nletter with your finger",
+    "soundsHint": "Listen to the sound\nand pick the letter",
+    "puzzleHint": "Put the letter\npieces together 🧩",
+    "recallHint": "Let's remember the\nletters we learned",
+    "redraw": "Redraw",
+    "soon": "Coming soon ✨"
+  },
+  "mosque": {
+    "title": "My Mosque",
+    "subtitle": "Your mosque grows as you learn new letters!",
+    "view": "See My Mosque",
+    "unlockedMinaret": "A new minaret unlocked!",
+    "unlockedDome": "A new dome unlocked!"
+  },
+  "parentGate": {
+    "title": "Parents' Gate",
+    "instruction": "Solve this to continue",
+    "wrong": "Wrong, try again",
+    "forParents": "This section is for grown-ups"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "sound": "Sound",
+    "music": "Music",
+    "haptics": "Haptics",
+    "parentArea": "Parents' Area",
+    "parentAreaDesc": "Subscription & privacy (parents only)",
+    "parentAreaUnlocked": "🔓 Unlocked — subscription coming soon.",
+    "parentLogin": "Parent Login 🔒",
+    "replayIntro": "Watch intro again ▶"
+  },
+  "a11y": {
+    "musicToggle": "Toggle music",
+    "soundToggle": "Toggle sound"
+  },
+  "freemium": {
+    "lockedTitle": "This letter is locked",
+    "freeLimit": "The first 6 letters are free",
+    "dailyLimit": "You've used today's new letter",
+    "comeBackTomorrow": "A new letter awaits you tomorrow!",
+    "unlockAll": "Unlock all"
+  }
+}

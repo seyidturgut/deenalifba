@@ -6,33 +6,59 @@
     "next": "İleri",
     "close": "Kapat",
     "great": "Aferin!",
-    "tryAgain": "Tekrar deneyelim"
+    "tryAgain": "Tekrar deneyelim",
+    "cancel": "Vazgeç",
+    "ok": "Tamam"
+  },
+  "language": {
+    "label": "Dil",
+    "tr": "Türkçe",
+    "en": "English"
+  },
+  "nav": {
+    "home": "Giriş",
+    "lessons": "Derslerim",
+    "mosque": "Camim",
+    "settings": "Ayarlar"
   },
   "onboarding": {
     "welcomeTitle": "Alif'e hoş geldin!",
     "welcomeSubtitle": "Harfleri öğren, kendi camini inşa et.",
-    "askName": "Adın ne?",
+    "p1": "Selam! 👋 Ben Pırıl.\nHadi birlikte harfleri öğrenelim!",
+    "p2": "Her harfi öğrendikçe sihirli camin büyüyecek! 🕌✨",
+    "askName": "Önce adını söyle bakalım 😊",
     "namePlaceholder": "Adını yaz",
-    "start": "Başla"
+    "done": "Çok güzel, {{name}}! 🎉\nHadi başlıyoruz! 🚀",
+    "friend": "arkadaşım",
+    "continue": "Devam ▶",
+    "ok": "Tamam",
+    "start": "Başla! 🚀"
   },
   "home": {
     "title": "Harfler",
     "greeting": "Merhaba, {{name}}!",
-    "myMosque": "Camim",
-    "letters": "Harfler"
+    "hello": "Merhaba!",
+    "subtitle": "Bugün yeni bir harf öğrenelim!"
+  },
+  "letters": {
+    "title": "Harfler"
   },
   "learn": {
     "trace": "Çiz",
     "puzzle": "Yapboz",
     "sounds": "Sesler",
     "recall": "Tekrar",
-    "traceHint": "Parmağınla harfin üzerinden geç",
-    "listenHint": "Sesi dinle ve doğru harfi seç",
-    "recallTitle": "Hadi eski harfleri hatırlayalım"
+    "traceHint": "Parmağınla harfin\nüzerinden geç",
+    "soundsHint": "Sesi dinle ve\ndoğru harfi seç",
+    "puzzleHint": "Harfin parçalarını\nbirleştir 🧩",
+    "recallHint": "Hadi eski harfleri\nhatırlayalım",
+    "redraw": "Yeniden çiz",
+    "soon": "Bu oyun yakında ✨"
   },
   "mosque": {
     "title": "Camim",
     "subtitle": "Yeni harfler öğrendikçe camin büyüyor!",
+    "view": "Camimi Gör",
     "unlockedMinaret": "Yeni bir minare açıldı!",
     "unlockedDome": "Yeni bir kubbe açıldı!"
   },
@@ -46,9 +72,17 @@
     "title": "Ayarlar",
     "language": "Dil",
     "sound": "Ses",
+    "music": "Müzik",
     "haptics": "Titreşim",
-    "subscription": "Abonelik",
-    "privacy": "Gizlilik"
+    "parentArea": "Ebeveyn Alanı",
+    "parentAreaDesc": "Abonelik ve gizlilik (yalnız ebeveyn)",
+    "parentAreaUnlocked": "🔓 Açık — abonelik yakında eklenecek.",
+    "parentLogin": "Ebeveyn Girişi 🔒",
+    "replayIntro": "Tanıtımı tekrar izle ▶"
+  },
+  "a11y": {
+    "musicToggle": "Müzik aç/kapat",
+    "soundToggle": "Ses aç/kapat"
   },
   "freemium": {
     "lockedTitle": "Bu harf kilitli",

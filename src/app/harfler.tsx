@@ -3,6 +3,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { FlatList, Pressable, Text, View } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
+import { useTranslation } from "react-i18next";
 
 import { GradientBg } from "@/components/ui/GradientBg";
 import { StarBadge } from "@/components/ui/StarBadge";
@@ -67,6 +68,7 @@ function LetterTile({ letter, index }: { letter: Letter; index: number }) {
 }
 
 export default function Harfler() {
+  const { t } = useTranslation();
   const router = useRouter();
   const starCount = useProgressStore((s) => LETTERS.filter((l) => s.isLetterComplete(l.id)).length);
 
@@ -81,7 +83,7 @@ export default function Harfler() {
         >
           <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 24, color: "#208AEF", marginTop: -2 }}>‹</Text>
         </Pressable>
-        <Text className="font-display text-2xl font-extrabold text-ink">Harfler</Text>
+        <Text className="font-display text-2xl font-extrabold text-ink">{t("letters.title")}</Text>
         <StarBadge count={starCount} />
       </View>
 

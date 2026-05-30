@@ -1,4 +1,5 @@
 import { Pressable, Text, View } from "react-native";
+import { useTranslation } from "react-i18next";
 
 import { playSfx, syncMusicWithSetting } from "@/lib/sfx";
 import { useSettingsStore } from "@/stores/settingsStore";
@@ -41,6 +42,7 @@ function ToggleButton({
 }
 
 export function SoundToggles() {
+  const { t } = useTranslation();
   const musicEnabled = useSettingsStore((s) => s.musicEnabled);
   const soundEnabled = useSettingsStore((s) => s.soundEnabled);
   const toggleMusic = useSettingsStore((s) => s.toggleMusic);
@@ -52,7 +54,7 @@ export function SoundToggles() {
         on={musicEnabled}
         iconOn="🎵"
         iconOff="🎵"
-        label="Müzik aç/kapat"
+        label={t("a11y.musicToggle")}
         onPress={() => {
           toggleMusic();
           // toggle sonrası güncel ayara göre müziği başlat/durdur
@@ -64,7 +66,7 @@ export function SoundToggles() {
         on={soundEnabled}
         iconOn="🔊"
         iconOff="🔇"
-        label="Ses aç/kapat"
+        label={t("a11y.soundToggle")}
         onPress={() => {
           const willBeOn = !soundEnabled;
           toggleSound();

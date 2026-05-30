@@ -11,6 +11,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import Svg, { Polyline } from "react-native-svg";
+import { useTranslation } from "react-i18next";
 
 import { GradientBg } from "@/components/ui/GradientBg";
 import { Mascot } from "@/components/ui/Mascot";
@@ -181,11 +182,12 @@ function TopBar() {
 /** Alt menü (4 sekme). */
 function BottomNav() {
   const router = useRouter();
+  const { t } = useTranslation();
   const items: { label: string; src: number; onPress: () => void }[] = [
-    { label: "Giriş", src: images.icHome, onPress: () => {} },
-    { label: "Derslerim", src: images.icLessons, onPress: () => router.push("/harfler") },
-    { label: "Camim", src: images.icMosque, onPress: () => router.push("/mosque") },
-    { label: "Ayarlar", src: images.icSettings, onPress: () => router.push("/settings") },
+    { label: t("nav.home"), src: images.icHome, onPress: () => {} },
+    { label: t("nav.lessons"), src: images.icLessons, onPress: () => router.push("/harfler") },
+    { label: t("nav.mosque"), src: images.icMosque, onPress: () => router.push("/mosque") },
+    { label: t("nav.settings"), src: images.icSettings, onPress: () => router.push("/settings") },
   ];
   return (
     <View
@@ -246,6 +248,7 @@ function XpChestCard() {
 }
 
 export default function Home() {
+  const { t } = useTranslation();
   const router = useRouter();
   const { width } = useWindowDimensions();
   const childName = useSettingsStore((s) => s.childName);
@@ -332,14 +335,14 @@ export default function Home() {
                   textShadowRadius: 4,
                 }}
               >
-                {childName ? `Merhaba, ${childName}!` : "Merhaba!"}
+                {childName ? t("home.greeting", { name: childName }) : t("home.hello")}
               </Text>
               <View
                 className="mt-1 self-start rounded-2xl rounded-tl-md bg-white/90 px-3 py-1.5"
                 style={{ shadowColor: "#1462B5", shadowOpacity: 0.08, shadowRadius: 4, shadowOffset: { width: 0, height: 2 } }}
               >
                 <Text style={{ fontFamily: "Nunito_600SemiBold", fontSize: 12, color: "rgba(42,42,51,0.65)" }}>
-                  Bugün yeni bir harf öğrenelim!
+                  {t("home.subtitle")}
                 </Text>
               </View>
             </View>

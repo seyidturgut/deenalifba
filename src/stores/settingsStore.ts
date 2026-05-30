@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
 import { zustandMMKVStorage } from "@/db/storage";
+import { type AppLanguage, setAppLanguage } from "@/i18n";
 import { setIsUnder13 } from "@/lib/analyticsGuard";
 
 /**
@@ -13,7 +14,7 @@ import { setIsUnder13 } from "@/lib/analyticsGuard";
 type SettingsState = {
   childName: string | null;
   isUnder13: boolean;
-  language: "tr";
+  language: AppLanguage;
   soundEnabled: boolean;
   musicEnabled: boolean;
   hapticsEnabled: boolean;
@@ -23,6 +24,7 @@ type SettingsState = {
 
   setChildName: (name: string) => void;
   setIsUnder13: (value: boolean) => void;
+  setLanguage: (lng: AppLanguage) => void;
   toggleSound: () => void;
   toggleMusic: () => void;
   toggleHaptics: () => void;
@@ -50,6 +52,10 @@ export const useSettingsStore = create<SettingsState>()(
         setIsUnder13(value); // analytics guard'ı senkronla
         set({ isUnder13: value });
       },
+      setLanguage: (lng) => {
+        setAppLanguage(lng); // i18n'i senkronla
+        set({ language: lng });
+      },
       toggleSound: () => set((s) => ({ soundEnabled: !s.soundEnabled })),
       toggleMusic: () => set((s) => ({ musicEnabled: !s.musicEnabled })),
       toggleHaptics: () => set((s) => ({ hapticsEnabled: !s.hapticsEnabled })),
@@ -66,8 +72,11 @@ export const useSettingsStore = create<SettingsState>()(
       name: "alif-settings",
       storage: createJSONStorage(() => zustandMMKVStorage),
       onRehydrateStorage: () => (state) => {
-        // Rehydrate sonrası analytics guard'ı güncel tut
-        if (state) setIsUnder13(state.isUnder13);
+        // Rehydrate sonrası analytics guard'ı ve dili güncel tut
+        if (state) {
+          setIsUnder13(state.isUnder13);
+          setAppLanguage(state.language);
+        }
       },
     }
   )

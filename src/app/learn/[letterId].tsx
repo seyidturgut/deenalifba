@@ -173,10 +173,10 @@ export default function LearnScreen() {
         <Text
           style={{ fontFamily: "Fredoka_600SemiBold", fontSize: 17, lineHeight: 23, textAlign: "center", color: "#34618C" }}
         >
-          {step === "trace" && "Parmağınla harfin\nüzerinden geç"}
-          {step === "sounds" && "Sesi dinle ve\ndoğru harfi seç"}
-          {step === "puzzle" && "Harfin parçalarını\nbirleştir 🧩"}
-          {step === "recall" && "Hadi eski harfleri\nhatırlayalım"}
+          {step === "trace" && t("learn.traceHint")}
+          {step === "sounds" && t("learn.soundsHint")}
+          {step === "puzzle" && t("learn.puzzleHint")}
+          {step === "recall" && t("learn.recallHint")}
         </Text>
       </View>
 
@@ -218,7 +218,7 @@ export default function LearnScreen() {
             style={{ shadowColor: "#1462B5", shadowOpacity: 0.15, shadowRadius: 6, shadowOffset: { width: 0, height: 3 } }}
           >
             <Text style={{ fontFamily: "Fredoka_600SemiBold", fontSize: 15, color: "rgba(42,42,51,0.6)" }}>
-              Bu oyun yakında ✨
+              {t("learn.soon")}
             </Text>
           </View>
         </View>
@@ -226,7 +226,7 @@ export default function LearnScreen() {
 
       {isTrace && (
         <View className="items-center pb-2">
-          <JuicyButton label="Yeniden çiz" tone="accent" onPress={() => setResetSignal((s) => s + 1)} />
+          <JuicyButton label={t("learn.redraw")} tone="accent" onPress={() => setResetSignal((s) => s + 1)} />
         </View>
       )}
 

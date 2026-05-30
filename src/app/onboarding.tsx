@@ -1,6 +1,7 @@
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { TextInput, View } from "react-native";
+import { useTranslation } from "react-i18next";
 
 import { GradientBg } from "@/components/ui/GradientBg";
 import { JuicyButton } from "@/components/ui/JuicyButton";
@@ -13,6 +14,7 @@ import { useSettingsStore } from "@/stores/settingsStore";
  * yönlendirir. Konuşma balonlarıyla anlatım + isim alma (PII, yalnız cihazda §4.B).
  */
 export default function Onboarding() {
+  const { t } = useTranslation();
   const router = useRouter();
   const setChildName = useSettingsStore((s) => s.setChildName);
   const completeOnboarding = useSettingsStore((s) => s.completeOnboarding);
@@ -26,26 +28,22 @@ export default function Onboarding() {
     router.replace("/home");
   };
 
-  const displayName = name.trim() || "arkadaşım";
+  const displayName = name.trim() || t("onboarding.friend");
 
   return (
     <GradientBg>
       <View className="flex-1 justify-between py-6">
         {/* Konuşma balonu (üstte) */}
         <View className="flex-1 items-center justify-center px-2">
-          {step === 0 && (
-            <SpeechBubble key="s0">Selam! 👋 Ben Pırıl.{"\n"}Hadi birlikte harfleri öğrenelim!</SpeechBubble>
-          )}
-          {step === 1 && (
-            <SpeechBubble key="s1">Her harfi öğrendikçe sihirli camin büyüyecek! 🕌✨</SpeechBubble>
-          )}
+          {step === 0 && <SpeechBubble key="s0">{t("onboarding.p1")}</SpeechBubble>}
+          {step === 1 && <SpeechBubble key="s1">{t("onboarding.p2")}</SpeechBubble>}
           {step === 2 && (
             <View className="items-center gap-5">
-              <SpeechBubble key="s2">Önce adını söyle bakalım 😊</SpeechBubble>
+              <SpeechBubble key="s2">{t("onboarding.askName")}</SpeechBubble>
               <TextInput
                 className="w-72 rounded-full border-2 border-white bg-white px-5 py-4 text-center"
                 style={{ fontFamily: "Fredoka_600SemiBold", fontSize: 22, color: "#2A2A33" }}
-                placeholder="Adını yaz"
+                placeholder={t("onboarding.namePlaceholder")}
                 placeholderTextColor="#A9B4C2"
                 value={name}
                 onChangeText={setName}
@@ -55,9 +53,7 @@ export default function Onboarding() {
               />
             </View>
           )}
-          {step === 3 && (
-            <SpeechBubble key="s3">Çok güzel, {displayName}! 🎉{"\n"}Hadi başlıyoruz! 🚀</SpeechBubble>
-          )}
+          {step === 3 && <SpeechBubble key="s3">{t("onboarding.done", { name: displayName })}</SpeechBubble>}
         </View>
 
         {/* Maskot (ortada, canlı; adıma göre poz değişir) */}
@@ -70,17 +66,17 @@ export default function Onboarding() {
 
         {/* Aksiyon (altta) */}
         <View className="items-center pt-4">
-          {step === 0 && <JuicyButton label="Devam ▶" tone="accent" onPress={() => setStep(1)} />}
-          {step === 1 && <JuicyButton label="Devam ▶" tone="accent" onPress={() => setStep(2)} />}
+          {step === 0 && <JuicyButton label={t("onboarding.continue")} tone="accent" onPress={() => setStep(1)} />}
+          {step === 1 && <JuicyButton label={t("onboarding.continue")} tone="accent" onPress={() => setStep(2)} />}
           {step === 2 && (
             <JuicyButton
-              label="Tamam"
+              label={t("onboarding.ok")}
               tone="success"
               disabled={name.trim().length === 0}
               onPress={() => setStep(3)}
             />
           )}
-          {step === 3 && <JuicyButton label="Başla! 🚀" tone="success" onPress={finish} />}
+          {step === 3 && <JuicyButton label={t("onboarding.start")} tone="success" onPress={finish} />}
         </View>
       </View>
     </GradientBg>
