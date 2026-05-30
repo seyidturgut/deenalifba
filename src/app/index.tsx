@@ -1,98 +1,63 @@
-import * as Device from 'expo-device';
-import { Platform, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Image } from "expo-image";
+import { useRouter } from "expo-router";
+import { useEffect } from "react";
+import { Text, View } from "react-native";
+import Animated, { FadeIn, FadeInDown, ZoomIn } from "react-native-reanimated";
+import { useTranslation } from "react-i18next";
 
-import { AnimatedIcon } from '@/components/animated-icon';
-import { HintRow } from '@/components/hint-row';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { WebBadge } from '@/components/web-badge';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
+import { Floating } from "@/components/ui/Floating";
+import { GradientBg } from "@/components/ui/GradientBg";
+import { images } from "@/lib/images";
+import { playSfx } from "@/lib/sfx";
+import { useSettingsStore } from "@/stores/settingsStore";
 
-function getDevMenuHint() {
-  if (Platform.OS === 'web') {
-    return <ThemedText type="small">use browser devtools</ThemedText>;
-  }
-  if (Device.isDevice) {
-    return (
-      <ThemedText type="small">
-        shake device or press <ThemedText type="code">m</ThemedText> in terminal
-      </ThemedText>
-    );
-  }
-  const shortcut = Platform.OS === 'android' ? 'cmd+m (or ctrl+m)' : 'cmd+d';
+/**
+ * Markalı animasyonlu açılış (intro). ~2.2sn oynar, sonra onboarding/home'a geçer.
+ * Premium his: maskot zıplayarak belirir, "Alif" başlık ve slogan akar.
+ */
+export default function Index() {
+  const router = useRouter();
+  const { t } = useTranslation();
+  const onboardingComplete = useSettingsStore((s) => s.onboardingComplete);
+
+  useEffect(() => {
+    playSfx("welcome");
+    const timer = setTimeout(() => {
+      router.replace(onboardingComplete ? "/home" : "/onboarding");
+    }, 2600);
+    return () => clearTimeout(timer);
+  }, [onboardingComplete, router]);
+
   return (
-    <ThemedText type="small">
-      press <ThemedText type="code">{shortcut}</ThemedText>
-    </ThemedText>
+    <GradientBg>
+      <View className="flex-1 items-center justify-center gap-3">
+        <Animated.View entering={ZoomIn.springify().damping(8).mass(0.8)}>
+          <Floating distance={12} duration={1400}>
+            <Image source={images.mascot} style={{ width: 150, height: 150 }} contentFit="contain" />
+          </Floating>
+        </Animated.View>
+
+        <Animated.Text
+          entering={FadeInDown.delay(350).springify()}
+          style={{
+            fontFamily: "Fredoka_700Bold",
+            fontSize: 64,
+            color: "#208AEF",
+            textShadowColor: "rgba(255,255,255,0.9)",
+            textShadowOffset: { width: 0, height: 2 },
+            textShadowRadius: 10,
+          }}
+        >
+          Alif
+        </Animated.Text>
+
+        <Animated.Text
+          entering={FadeIn.delay(750)}
+          style={{ fontFamily: "Nunito_600SemiBold", fontSize: 18, color: "rgba(42,42,51,0.7)" }}
+        >
+          {t("onboarding.welcomeSubtitle")}
+        </Animated.Text>
+      </View>
+    </GradientBg>
   );
 }
-
-export default function HomeScreen() {
-  return (
-    <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
-        <ThemedView style={styles.heroSection}>
-          <AnimatedIcon />
-          <ThemedText type="title" style={styles.title}>
-            Welcome to&nbsp;Expo
-          </ThemedText>
-        </ThemedView>
-
-        <ThemedText type="code" style={styles.code}>
-          get started
-        </ThemedText>
-
-        <ThemedView type="backgroundElement" style={styles.stepContainer}>
-          <HintRow
-            title="Try editing"
-            hint={<ThemedText type="code">src/app/index.tsx</ThemedText>}
-          />
-          <HintRow title="Dev tools" hint={getDevMenuHint()} />
-          <HintRow
-            title="Fresh start"
-            hint={<ThemedText type="code">npm run reset-project</ThemedText>}
-          />
-        </ThemedView>
-
-        {Platform.OS === 'web' && <WebBadge />}
-      </SafeAreaView>
-    </ThemedView>
-  );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    flexDirection: 'row',
-  },
-  safeArea: {
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    alignItems: 'center',
-    gap: Spacing.three,
-    paddingBottom: BottomTabInset + Spacing.three,
-    maxWidth: MaxContentWidth,
-  },
-  heroSection: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    gap: Spacing.four,
-  },
-  title: {
-    textAlign: 'center',
-  },
-  code: {
-    textTransform: 'uppercase',
-  },
-  stepContainer: {
-    gap: Spacing.three,
-    alignSelf: 'stretch',
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.four,
-    borderRadius: Spacing.four,
-  },
-});

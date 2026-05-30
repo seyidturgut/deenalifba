@@ -1,0 +1,60 @@
+{
+  "common": {
+    "appName": "Alif",
+    "continue": "Devam et",
+    "back": "Geri",
+    "next": "İleri",
+    "close": "Kapat",
+    "great": "Aferin!",
+    "tryAgain": "Tekrar deneyelim"
+  },
+  "onboarding": {
+    "welcomeTitle": "Alif'e hoş geldin!",
+    "welcomeSubtitle": "Harfleri öğren, kendi camini inşa et.",
+    "askName": "Adın ne?",
+    "namePlaceholder": "Adını yaz",
+    "start": "Başla"
+  },
+  "home": {
+    "title": "Harfler",
+    "greeting": "Merhaba, {{name}}!",
+    "myMosque": "Camim",
+    "letters": "Harfler"
+  },
+  "learn": {
+    "trace": "Çiz",
+    "puzzle": "Yapboz",
+    "sounds": "Sesler",
+    "recall": "Tekrar",
+    "traceHint": "Parmağınla harfin üzerinden geç",
+    "listenHint": "Sesi dinle ve doğru harfi seç",
+    "recallTitle": "Hadi eski harfleri hatırlayalım"
+  },
+  "mosque": {
+    "title": "Camim",
+    "subtitle": "Yeni harfler öğrendikçe camin büyüyor!",
+    "unlockedMinaret": "Yeni bir minare açıldı!",
+    "unlockedDome": "Yeni bir kubbe açıldı!"
+  },
+  "parentGate": {
+    "title": "Ebeveyn Kapısı",
+    "instruction": "Devam etmek için bu işlemi çöz",
+    "wrong": "Yanlış, tekrar dene",
+    "forParents": "Bu bölüm büyükler içindir"
+  },
+  "settings": {
+    "title": "Ayarlar",
+    "language": "Dil",
+    "sound": "Ses",
+    "haptics": "Titreşim",
+    "subscription": "Abonelik",
+    "privacy": "Gizlilik"
+  },
+  "freemium": {
+    "lockedTitle": "Bu harf kilitli",
+    "freeLimit": "İlk 6 harf ücretsiz",
+    "dailyLimit": "Bugünlük yeni harf hakkın doldu",
+    "comeBackTomorrow": "Yarın yeni bir harf seni bekliyor!",
+    "unlockAll": "Tümünü aç"
+  }
+}

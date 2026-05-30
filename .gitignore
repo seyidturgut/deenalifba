@@ -41,3 +41,10 @@ example
 # generated native folders
 /ios
 /android
+
+# Gizli anahtarlar
+.env
+.env.local
+
+# Üretilen placeholder asset'ler (commit edilmez, scriptle yeniden üretilir)
+assets/generated/
