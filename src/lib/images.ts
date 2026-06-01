@@ -51,6 +51,23 @@ export const images = {
   stepSounds: require("@/assets/illustrations/icons/ic_step_sounds.webp"),
   stepRecall: require("@/assets/illustrations/icons/ic_step_recall.webp"),
 
+  // Adım ikonları — v3 yazısız oyun havuzu (StepBar)
+  stepIntro: require("@/assets/illustrations/decor/ic_step_intro.webp"),
+  stepHearTap: require("@/assets/illustrations/decor/ic_step_heartap.webp"),
+  stepMatch: require("@/assets/illustrations/decor/ic_step_match.webp"),
+  stepDrag: require("@/assets/illustrations/decor/ic_step_drag.webp"),
+  stepBalloon: require("@/assets/illustrations/decor/ic_step_balloon.webp"),
+  stepCatch: require("@/assets/illustrations/decor/ic_step_catch.webp"),
+
+  // Pırıl sepeti tutuyor (Pırıl'a Ver oyununun hedefi)
+  pirilBasket: require("@/assets/illustrations/decor/piril_basket.webp"),
+
+  // v3 oyun asset'leri
+  cardBack: require("@/assets/illustrations/decor/card_back.webp"), // Eşleştir — kapalı kart
+  balloonPink: require("@/assets/illustrations/decor/balloon_pink.webp"), // Balon sprite
+  popBurst: require("@/assets/illustrations/decor/pop_burst.webp"), // Balon patlama
+  catchLane: require("@/assets/illustrations/decor/catch_lane.webp"), // Yakala şerit zemini
+
   // Yolculuk haritası düğümleri
   nodeTile: require("@/assets/illustrations/journey/node_tile.webp"),
   nodeCloud: require("@/assets/illustrations/journey/node_cloud.webp"),

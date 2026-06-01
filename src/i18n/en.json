@@ -8,7 +8,8 @@
     "great": "Great job!",
     "tryAgain": "Let's try again",
     "cancel": "Cancel",
-    "ok": "OK"
+    "ok": "OK",
+    "listen": "Listen"
   },
   "language": {
     "label": "Language",
@@ -46,17 +47,21 @@
   "learn": {
     "intro": "Learn",
     "trace": "Connect",
-    "puzzle": "Spot",
-    "sounds": "Sounds",
-    "recall": "Review",
-    "word": "Word",
+    "hearTap": "Hear & Tap",
+    "match": "Match",
+    "drag": "Give to Pırıl",
+    "balloon": "Balloons",
     "catch": "Catch",
+    "word": "Word",
+    "recall": "Review",
     "introHint": "Listen and meet the letter 👋",
     "traceHint": "Connect the stars in order ✨",
-    "soundsHint": "Listen to the sound\nand pick the letter",
-    "puzzleHint": "Spot the right letter 👀",
+    "hearTapHint": "Listen and tap the right letter 👂",
+    "matchHint": "Match the same letters 🃏",
+    "dragHint": "Give the right letter to Pırıl 🤲",
+    "balloonHint": "Pop the right letter balloons 🎈",
+    "catchHint": "Catch the right sliding letter 🫧",
     "wordHint": "Pick the right word 📖",
-    "catchHint": "Catch the right letter 🫧",
     "recallHint": "Let's remember the\nletters we learned",
     "redraw": "Redraw",
     "soon": "Coming soon ✨"

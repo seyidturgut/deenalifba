@@ -8,8 +8,9 @@ import { hasLetterSound } from "@/lib/sfx";
  * Sabit 4 adım yerine havuzdan deterministik (harfe göre) seçim → tekdüzelik kırılır.
  */
 
-// Pratik (pekiştirme) oyun havuzu — öğretmeden SONRA gelir
-const PRACTICE: ActivityKind[] = ["spot", "sounds", "word", "catch"];
+// Pratik (pekiştirme) oyun havuzu — öğretmeden SONRA gelir.
+// Hepsi YAZISIZ + sesli; "word" Faz B (illüstrasyon gelince).
+const PRACTICE: ActivityKind[] = ["hearTap", "match", "drag", "balloon", "catch", "word"];
 
 /**
  * Harf için ders etkinlik listesini üretir (deterministik).
@@ -19,11 +20,10 @@ const PRACTICE: ActivityKind[] = ["spot", "sounds", "word", "catch"];
 export function buildLesson(letterId: number): ActivityKind[] {
   const lesson: ActivityKind[] = ["intro", "trace"];
 
-  // Uygun pratik oyunları
+  // Uygun pratik oyunları — sesli oyunlar harf sesi gerektirir
   const practice = PRACTICE.filter((k) => {
-    if (k === "sounds" || k === "catch") return hasLetterSound(letterId);
     if (k === "word") return hasWordImage(letterId);
-    return true; // spot her zaman uygun
+    return hasLetterSound(letterId); // hearTap/match/drag/balloon/catch sesli
   });
 
   // 1-2 pratik, harfe göre kaydırılarak (ardışık harfler farklı oyun alır)
@@ -40,11 +40,13 @@ export function buildLesson(letterId: number): ActivityKind[] {
 
 /** Etkinlik → başlık i18n anahtarı + ikon (StepBar & banner). */
 export const ACTIVITY_META: Record<ActivityKind, { labelKey: string; icon?: number; emoji?: string }> = {
-  intro: { labelKey: "learn.intro", emoji: "👋" },
+  intro: { labelKey: "learn.intro", icon: images.stepIntro },
   trace: { labelKey: "learn.trace", icon: images.stepTrace },
-  spot: { labelKey: "learn.puzzle", icon: images.stepPuzzle },
-  sounds: { labelKey: "learn.sounds", icon: images.stepSounds },
-  recall: { labelKey: "learn.recall", icon: images.stepRecall },
+  hearTap: { labelKey: "learn.hearTap", icon: images.stepHearTap },
+  match: { labelKey: "learn.match", icon: images.stepMatch },
+  drag: { labelKey: "learn.drag", icon: images.stepDrag },
+  balloon: { labelKey: "learn.balloon", icon: images.stepBalloon },
+  catch: { labelKey: "learn.catch", icon: images.stepCatch },
   word: { labelKey: "learn.word", emoji: "📖" },
-  catch: { labelKey: "learn.catch", emoji: "🫧" },
+  recall: { labelKey: "learn.recall", icon: images.stepRecall },
 };

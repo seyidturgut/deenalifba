@@ -19,6 +19,7 @@ const SOURCES = {
   step_complete: require("@/assets/audio/step_complete.mp3"),
   letter_complete: require("@/assets/audio/letter_complete.mp3"),
   confetti_pop: require("@/assets/audio/confetti_pop.mp3"),
+  balloon_pop: require("@/assets/audio/balloon_pop.mp3"),
   mosque_build: require("@/assets/audio/mosque_build.mp3"),
   level_unlock: require("@/assets/audio/level_unlock.mp3"),
   daily_reward: require("@/assets/audio/daily_reward.mp3"),

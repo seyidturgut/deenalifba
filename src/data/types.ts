@@ -11,10 +11,27 @@ export const LEARNING_STEPS: LearningStep[] = [
 ];
 
 /**
- * Öğrenme döngüsü v2 etkinlik türleri.
- * Pedagoji: önce ÖĞRET (intro + trace), sonra PRATİK (spot/sounds/word/catch), sonra recall.
+ * Öğrenme döngüsü v3 etkinlik türleri.
+ * Pedagoji: önce ÖĞRET (intro + trace), sonra PRATİK, sonra recall.
+ * Pratik oyunları YAZISIZ tasarlanır — hedef Pırıl tarafından SESLİ söylenir,
+ * mekanik görsel olarak bariz (dokun/eşleştir/sürükle/patlat/yakala).
+ *   hearTap  → Duy & Dokun (sesi duy, doğru harfe dokun)
+ *   match    → Eşleştirme (hafıza, çiftleri bul)
+ *   drag     → Pırıl'a Ver (doğru harfi Pırıl'a sürükle)
+ *   balloon  → Balon Patlat (doğru harfli balonları patlat)
+ *   catch    → Yakala (harfler sağdan sola kayar, doğru olanı yakala)
+ *   word     → Kelime (harf→resim; Faz B, görseller gelince)
  */
-export type ActivityKind = "intro" | "trace" | "spot" | "sounds" | "word" | "catch" | "recall";
+export type ActivityKind =
+  | "intro"
+  | "trace"
+  | "hearTap"
+  | "match"
+  | "drag"
+  | "balloon"
+  | "catch"
+  | "word"
+  | "recall";
 
 /** Tek bir Arap harfi (Harf). 28 harf — bkz. letters.ts */
 export type Letter = {

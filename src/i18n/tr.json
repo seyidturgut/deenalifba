@@ -8,7 +8,8 @@
     "great": "Aferin!",
     "tryAgain": "Tekrar deneyelim",
     "cancel": "Vazgeç",
-    "ok": "Tamam"
+    "ok": "Tamam",
+    "listen": "Dinle"
   },
   "language": {
     "label": "Dil",
@@ -46,17 +47,21 @@
   "learn": {
     "intro": "Tanı",
     "trace": "Birleştir",
-    "puzzle": "Bul",
-    "sounds": "Sesler",
-    "recall": "Tekrar",
-    "word": "Kelime",
+    "hearTap": "Duy & Dokun",
+    "match": "Eşleştir",
+    "drag": "Pırıl'a Ver",
+    "balloon": "Balon",
     "catch": "Yakala",
+    "word": "Kelime",
+    "recall": "Tekrar",
     "introHint": "Harfi dinle ve tanı 👋",
     "traceHint": "Yıldızları sırayla birleştir ✨",
-    "soundsHint": "Sesi dinle ve\ndoğru harfi seç",
-    "puzzleHint": "Doğru harfi bul 👀",
+    "hearTapHint": "Dinle ve doğru harfe dokun 👂",
+    "matchHint": "Aynı harfleri eşleştir 🃏",
+    "dragHint": "Doğru harfi Pırıl'a ver 🤲",
+    "balloonHint": "Doğru harfli balonları patlat 🎈",
+    "catchHint": "Kayan harflerden doğrusunu yakala 🫧",
     "wordHint": "Doğru kelimeyi seç 📖",
-    "catchHint": "Doğru harfi yakala 🫧",
     "recallHint": "Hadi eski harfleri\nhatırlayalım",
     "redraw": "Yeniden çiz",
     "soon": "Bu oyun yakında ✨"

@@ -1,5 +1,5 @@
 import { Image } from "expo-image";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withSequence, withTiming } from "react-native-reanimated";
 import { useTranslation } from "react-i18next";
@@ -8,12 +8,12 @@ import { Mascot } from "@/components/ui/Mascot";
 import { getLetter, LETTERS } from "@/data/letters";
 import { haptics } from "@/lib/haptics";
 import { images } from "@/lib/images";
-import { playSfx } from "@/lib/sfx";
+import { playLetter, playSfx } from "@/lib/sfx";
 
 /**
- * "Harfi bul" oyunu: Pırıl bir harfin adını sorar (ör. "Be"), çocuk 4 Arapça
- * harften doğrusuna dokunur. Yanlışta kart nazikçe sallanır (ceza yok),
- * doğru seçimde yıldız + ses → onComplete.
+ * "Duy & Dokun" (hearTap): Pırıl harfin sesini SÖYLER (otomatik + 🔊 tekrar),
+ * çocuk 4 Arapça harften doğru duyduğuna dokunur. YAZISIZ — prompt sestir.
+ * Doğru → yıldız; yanlış → nazik sallanma (ceza yok).
  */
 const CARD = 130;
 const INNER = CARD * 0.6;
@@ -79,7 +79,7 @@ function OptionCard({
   );
 }
 
-export function SpotTheLetter({ letterId, onComplete }: { letterId: number; onComplete: () => void }) {
+export function HearTap({ letterId, onComplete }: { letterId: number; onComplete: () => void }) {
   const { t } = useTranslation();
   const target = getLetter(letterId);
   const [solved, setSolved] = useState(false);
@@ -100,6 +100,12 @@ export function SpotTheLetter({ letterId, onComplete }: { letterId: number; onCo
     return arr;
   }, [letterId, target]);
 
+  // Girişte hedefi SESLİ söyle (yazı yok → çocuk sesi dinler)
+  useEffect(() => {
+    const tt = setTimeout(() => playLetter(letterId), 400);
+    return () => clearTimeout(tt);
+  }, [letterId]);
+
   if (!target) return null;
 
   const handleSolved = () => {
@@ -109,18 +115,18 @@ export function SpotTheLetter({ letterId, onComplete }: { letterId: number; onCo
   };
 
   return (
-    <View className="flex-1 items-center justify-center gap-5">
-      {/* Soru: maskot + balon */}
-      <View className="flex-row items-center gap-2 px-2">
-        <Mascot size={56} />
-        <View
-          className="rounded-3xl rounded-bl-md bg-white/92 px-4 py-2"
-          style={{ shadowColor: "#1462B5", shadowOpacity: 0.1, shadowRadius: 5, shadowOffset: { width: 0, height: 3 } }}
+    <View className="flex-1 items-center justify-center gap-6">
+      {/* Pırıl + büyük Dinle butonu (tek prompt = ses) */}
+      <View className="flex-row items-center gap-3 px-2">
+        <Mascot size={64} pose="point" />
+        <Pressable
+          onPress={() => playLetter(letterId)}
+          className="flex-row items-center gap-2 rounded-full bg-primary px-6 py-4"
+          style={{ shadowColor: "#1462B5", shadowOpacity: 0.22, shadowRadius: 7, shadowOffset: { width: 0, height: 4 } }}
         >
-          <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 18, color: "#208AEF" }}>
-            {t("spot.prompt", { name: target.name })}
-          </Text>
-        </View>
+          <Text style={{ fontSize: 26 }}>🔊</Text>
+          <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 18, color: "white" }}>{t("common.listen")}</Text>
+        </Pressable>
       </View>
 
       {/* 4 seçenek (2×2) */}

@@ -8,13 +8,15 @@ import { Celebration } from "@/components/ui/Celebration";
 import { GradientBg } from "@/components/ui/GradientBg";
 import { JuicyButton } from "@/components/ui/JuicyButton";
 import { SoundToggles } from "@/components/ui/SoundToggles";
+import { BalloonPop } from "@/features/balloon/BalloonPop";
 import { SoundCatch } from "@/features/catch/SoundCatch";
 import { ConstellationTrace } from "@/features/constellation/ConstellationTrace";
+import { GiveToPiril } from "@/features/drag/GiveToPiril";
+import { HearTap } from "@/features/heartap/HearTap";
 import { LetterIntro } from "@/features/intro/LetterIntro";
+import { MatchGame } from "@/features/match/MatchGame";
 import { MosqueBuild } from "@/features/mosque/MosqueBuild";
 import { RecallGame } from "@/features/recall/RecallGame";
-import { SoundsGame } from "@/features/sounds/SoundsGame";
-import { SpotTheLetter } from "@/features/spot/SpotTheLetter";
 import { ACTIVITY_META } from "@/data/lesson";
 import { getLetter, TOTAL_LETTERS } from "@/data/letters";
 import type { ActivityKind } from "@/data/types";
@@ -28,10 +30,12 @@ import { useProgressStore } from "@/stores/progressStore";
 const HINT_KEY: Record<ActivityKind, string> = {
   intro: "learn.introHint",
   trace: "learn.traceHint",
-  spot: "learn.puzzleHint",
-  sounds: "learn.soundsHint",
-  word: "learn.wordHint",
+  hearTap: "learn.hearTapHint",
+  match: "learn.matchHint",
+  drag: "learn.dragHint",
+  balloon: "learn.balloonHint",
   catch: "learn.catchHint",
+  word: "learn.wordHint",
   recall: "learn.recallHint",
 };
 
@@ -215,13 +219,21 @@ export default function LearnScreen() {
             </View>
           </View>
         </View>
-      ) : kind === "spot" ? (
+      ) : kind === "hearTap" ? (
         <View className="flex-1 items-center justify-center">
-          <SpotTheLetter key={`spot-${id}`} letterId={id} onComplete={onCompleteStep} />
+          <HearTap key={`hearTap-${id}`} letterId={id} onComplete={onCompleteStep} />
         </View>
-      ) : kind === "sounds" ? (
+      ) : kind === "match" ? (
         <View className="flex-1 items-center justify-center">
-          <SoundsGame key={`sounds-${id}`} letterId={id} onComplete={onCompleteStep} />
+          <MatchGame key={`match-${id}`} letterId={id} onComplete={onCompleteStep} />
+        </View>
+      ) : kind === "drag" ? (
+        <View className="flex-1 items-center justify-center">
+          <GiveToPiril key={`drag-${id}`} letterId={id} onComplete={onCompleteStep} />
+        </View>
+      ) : kind === "balloon" ? (
+        <View className="flex-1 items-center justify-center">
+          <BalloonPop key={`balloon-${id}`} letterId={id} onComplete={onCompleteStep} />
         </View>
       ) : kind === "catch" ? (
         <View className="flex-1 items-center justify-center">
