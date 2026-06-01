@@ -111,7 +111,7 @@ export function Celebration({
   return (
     <View
       pointerEvents="none"
-      style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, zIndex: 50 }}
+      style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, zIndex: 50, backgroundColor: "rgba(10,42,80,0.55)" }}
     >
       {pieces.map((conf, i) => (
         <ConfettiPiece key={i} conf={conf} />

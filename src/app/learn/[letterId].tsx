@@ -115,6 +115,7 @@ export default function LearnScreen() {
   const goHome = () => router.replace("/home");
 
   const finishLetter = () => {
+    setCelebrate(false); // kutlamayı kapat → cami sahnesiyle çakışmasın
     const isComplete = useProgressStore.getState().isLetterComplete;
     let completed = 0;
     for (let i = 1; i <= TOTAL_LETTERS; i++) if (isComplete(i)) completed++;
