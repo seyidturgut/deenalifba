@@ -84,10 +84,22 @@ function LevelNode({
       }}
     >
       {locked ? (
-        /* Kilitli: bulut + kilit */
+        /* Kilitli: bulut + büyük seviye no + köşede kilit rozeti */
         <>
           <Image source={images.nodeCloud} style={{ position: "absolute", width: NODE + 16, height: NODE }} contentFit="contain" />
-          <Image source={images.icLock} style={{ position: "absolute", width: 38, height: 38, transform: [{ translateY: 4 }] }} contentFit="contain" />
+          <Text
+            style={{
+              fontFamily: "Fredoka_700Bold",
+              fontSize: NODE * 0.36,
+              color: "#8FA0B2",
+              textShadowColor: "rgba(255,255,255,0.95)",
+              textShadowOffset: { width: 0, height: 1 },
+              textShadowRadius: 3,
+            }}
+          >
+            {levelNo}
+          </Text>
+          <Image source={images.icLock} style={{ position: "absolute", right: 4, top: 6, width: 30, height: 30 }} contentFit="contain" />
         </>
       ) : (
         /* Açık / aktif / tamamlanan */
@@ -133,23 +145,6 @@ function LevelNode({
         </>
       )}
 
-      {/* Kilitli düğümde seviye numarası (bulutun altında) */}
-      {locked && (
-        <View style={{ position: "absolute", bottom: -18, alignItems: "center" }}>
-          <Text
-            style={{
-              fontFamily: "Fredoka_700Bold",
-              fontSize: 12,
-              color: "#8190A0",
-              textShadowColor: "rgba(255,255,255,0.95)",
-              textShadowOffset: { width: 0, height: 1 },
-              textShadowRadius: 4,
-            }}
-          >
-            {levelNo}
-          </Text>
-        </View>
-      )}
     </Pressable>
   );
 }
@@ -197,7 +192,7 @@ function BottomNav() {
       {items.map((it) => (
         <Pressable key={it.label} onPress={() => { playSfx("ui_tap"); it.onPress(); }} className="items-center" style={{ width: 64 }}>
           <Image source={it.src} style={{ width: 32, height: 32 }} contentFit="contain" />
-          <Text style={{ fontFamily: "Fredoka_600SemiBold", fontSize: 11, color: "#5B6470" }}>{it.label}</Text>
+          <Text style={{ fontFamily: "Fredoka_600SemiBold", fontSize: 13, color: "#4A5663" }}>{it.label}</Text>
         </Pressable>
       ))}
     </View>
@@ -298,7 +293,7 @@ export default function Home() {
                 className="mt-1 self-start rounded-2xl rounded-tl-md bg-white/90 px-3 py-1.5"
                 style={{ shadowColor: "#1462B5", shadowOpacity: 0.08, shadowRadius: 4, shadowOffset: { width: 0, height: 2 } }}
               >
-                <Text style={{ fontFamily: "Nunito_600SemiBold", fontSize: 12, color: "rgba(42,42,51,0.65)" }}>
+                <Text style={{ fontFamily: "Nunito_700Bold", fontSize: 15, color: "#5C6B7A" }}>
                   {t("home.subtitle")}
                 </Text>
               </View>
