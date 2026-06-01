@@ -77,30 +77,38 @@ export default function Mosque() {
             </Pressable>
           </View>
         ) : (
-          <Pressable onPress={startEdit} className="flex-row items-center gap-2">
-            <Text
-              numberOfLines={1}
-              style={{
-                fontFamily: "Fredoka_700Bold",
-                fontSize: 30,
-                color: "#0E5FC2",
-                textShadowColor: "rgba(255,255,255,0.9)",
-                textShadowOffset: { width: 0, height: 1 },
-                textShadowRadius: 4,
-                flexShrink: 1,
-              }}
-            >
-              {displayName}
-            </Text>
-            <View className="h-9 w-9 items-center justify-center rounded-full bg-white/85">
-              <Text style={{ fontSize: 16 }}>✏️</Text>
-            </View>
-          </Pressable>
+          <Text
+            numberOfLines={1}
+            style={{
+              fontFamily: "Fredoka_700Bold",
+              fontSize: 30,
+              color: "#0E5FC2",
+              textShadowColor: "rgba(255,255,255,0.9)",
+              textShadowOffset: { width: 0, height: 1 },
+              textShadowRadius: 4,
+            }}
+          >
+            {displayName}
+          </Text>
         )}
 
         <Text style={{ fontFamily: "Nunito_700Bold", fontSize: 15, color: "#5C6B7A", marginTop: 6 }}>
           {t("mosque.subtitle")}
         </Text>
+
+        {/* Açık etiketli isim butonu (çocuk anlasın) */}
+        {!editing && (
+          <Pressable
+            onPress={startEdit}
+            className="mt-2 flex-row items-center gap-2 self-start rounded-full bg-accent px-4 py-2"
+            style={{ shadowColor: "#1462B5", shadowOpacity: 0.18, shadowRadius: 5, shadowOffset: { width: 0, height: 3 } }}
+          >
+            <Text style={{ fontSize: 16 }}>✏️</Text>
+            <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 15, color: "white" }}>
+              {mosqueName ? t("mosque.rename") : t("mosque.nameIt")}
+            </Text>
+          </Pressable>
+        )}
 
         {/* Cami — süzülen inşa aşaması */}
         <View className="my-3 flex-1 items-center justify-center">
