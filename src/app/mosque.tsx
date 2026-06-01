@@ -5,6 +5,7 @@ import { Text, View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { useTranslation } from "react-i18next";
 
+import { Floating } from "@/components/ui/Floating";
 import { GradientBg } from "@/components/ui/GradientBg";
 import { JuicyButton } from "@/components/ui/JuicyButton";
 import { LETTERS } from "@/data/letters";
@@ -43,13 +44,15 @@ export default function Mosque() {
 
         {/* Cami — inşa aşaması (ilerlemeye göre frame-swap) */}
         <View className="my-2 items-center">
-          <Animated.View key={stageIdx} entering={FadeIn.duration(500)}>
-            <Image
-              source={images.mosqueStages[stageIdx]}
-              style={{ width: 280, height: 280, opacity: completed === 0 ? 0.4 : 1 }}
-              contentFit="contain"
-            />
-          </Animated.View>
+          <Floating distance={9} duration={2400}>
+            <Animated.View key={stageIdx} entering={FadeIn.duration(500)}>
+              <Image
+                source={images.mosqueStages[stageIdx]}
+                style={{ width: 280, height: 280, opacity: completed === 0 ? 0.4 : 1 }}
+                contentFit="contain"
+              />
+            </Animated.View>
+          </Floating>
         </View>
 
         {/* İlerleme çubuğu */}
