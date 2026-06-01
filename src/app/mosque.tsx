@@ -92,9 +92,14 @@ export default function Mosque() {
           </Text>
         )}
 
-        <Text style={{ fontFamily: "Nunito_700Bold", fontSize: 15, color: "#5C6B7A", marginTop: 6 }}>
-          {t("mosque.subtitle")}
-        </Text>
+        <View
+          className="mt-2 self-start rounded-2xl bg-white/85 px-4 py-2"
+          style={{ shadowColor: "#1462B5", shadowOpacity: 0.1, shadowRadius: 5, shadowOffset: { width: 0, height: 3 } }}
+        >
+          <Text style={{ fontFamily: "Nunito_700Bold", fontSize: 15, color: "#34618C" }}>
+            {t("mosque.subtitle")}
+          </Text>
+        </View>
 
         {/* Cami — süzülen inşa aşaması */}
         <View className="my-3 flex-1 items-center justify-center">
