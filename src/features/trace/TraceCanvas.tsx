@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { LayoutChangeEvent, View } from "react-native";
+import { LayoutChangeEvent, Text, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, { runOnJS } from "react-native-reanimated";
 import Svg, { ClipPath, Defs, Polyline, Rect, Text as SvgText } from "react-native-svg";
@@ -248,32 +248,29 @@ export function TraceCanvas({
           style={{ height: bare ? undefined : 260, flex: bare ? 1 : undefined }}
         >
           {size.w > 0 && (
-            <Svg width={size.w} height={size.h}>
-              {/* Kılavuz harf — "içeri göçük" (carved/oyuk) his: alt açık dudak + koyu oluk.
-                  Dikey ortalama: alignmentBaseline (iOS) + dominantBaseline (web), hafif yukarı nudge. */}
-              <SvgText
-                x={size.w / 2}
-                y={size.h * 0.46 + 4}
-                fontSize={size.h * 0.9}
-                fontFamily="Amiri_700Bold"
-                fill="rgba(255,255,255,0.92)"
-                textAnchor="middle"
-                alignmentBaseline="central"
+            <>
+              {/* Kılavuz harf — RN Text ile flex-ortalı (tüm harflerde GARANTİ ortalı).
+                  Beyaz gölge → hafif "carved" his. */}
+              <View
+                pointerEvents="none"
+                style={{ position: "absolute", left: 0, top: 0, right: 0, bottom: 0, alignItems: "center", justifyContent: "center" }}
               >
-                {letterChar}
-              </SvgText>
-              <SvgText
-                x={size.w / 2}
-                y={size.h * 0.46}
-                fontSize={size.h * 0.9}
-                fontFamily="Amiri_700Bold"
-                fill={done ? "#9FCFB6" : "#A6BBD2"}
-                textAnchor="middle"
-                alignmentBaseline="central"
-              >
-                {letterChar}
-              </SvgText>
+                <Text
+                  style={{
+                    fontFamily: "Amiri_700Bold",
+                    fontSize: Math.min(size.w, size.h) * 0.78,
+                    color: done ? "#9FCFB6" : "#A6BBD2",
+                    textShadowColor: "rgba(255,255,255,0.9)",
+                    textShadowOffset: { width: 0, height: 2 },
+                    textShadowRadius: 3,
+                    includeFontPadding: false,
+                  }}
+                >
+                  {letterChar}
+                </Text>
+              </View>
 
+              <Svg width={size.w} height={size.h}>
               {/* "Nasıl çizilir" demo — gerçek harf KESİK KESİK, yönlü açığa çıkar */}
               {showDemo && revealFrac > 0 && (
                 <>
@@ -293,8 +290,8 @@ export function TraceCanvas({
                   </Defs>
                   <SvgText
                     x={size.w / 2}
-                    y={size.h * 0.46}
-                    fontSize={size.h * 0.9}
+                    y={size.h / 2}
+                    fontSize={Math.min(size.w, size.h) * 0.78}
                     fontFamily="Amiri_700Bold"
                     fill="none"
                     stroke="#F5A524"
@@ -324,7 +321,8 @@ export function TraceCanvas({
                   />
                 ) : null
               )}
-            </Svg>
+              </Svg>
+            </>
           )}
 
         </View>
