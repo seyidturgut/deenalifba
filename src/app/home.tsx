@@ -20,7 +20,6 @@ import { LETTERS } from "@/data/letters";
 import type { Letter } from "@/data/types";
 import { images } from "@/lib/images";
 import { playSfx, syncMusicWithSetting } from "@/lib/sfx";
-import { MOSQUE_UNLOCK_THRESHOLDS } from "@/stores/mosqueStore";
 import { useProgressStore } from "@/stores/progressStore";
 import { useSettingsStore } from "@/stores/settingsStore";
 
@@ -32,12 +31,12 @@ const INNER = 0.6; // çerçevenin iç krem penceresi (NODE oranı)
 const WIN_DX = NODE * 0.023;
 const WIN_DY = NODE * -0.053;
 
-/** Cami inşası ilerleme yüzdesi (yolculuk üst barı). */
+/** Cami inşası ilerleme yüzdesi (üst bar) — 12 kümülatif aşamayla hizalı. */
+const MOSQUE_BUILD_STAGES = 12;
 function useCamiProgress() {
   return useProgressStore((s) => {
     const completed = LETTERS.filter((l) => s.isLetterComplete(l.id)).length;
-    const parts = MOSQUE_UNLOCK_THRESHOLDS.filter((t) => completed >= t.lettersRequired).length;
-    return Math.round((parts / MOSQUE_UNLOCK_THRESHOLDS.length) * 100);
+    return Math.round((Math.min(completed, MOSQUE_BUILD_STAGES) / MOSQUE_BUILD_STAGES) * 100);
   });
 }
 

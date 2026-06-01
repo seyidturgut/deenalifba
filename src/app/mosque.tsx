@@ -10,7 +10,6 @@ import { JuicyButton } from "@/components/ui/JuicyButton";
 import { LETTERS } from "@/data/letters";
 import { images } from "@/lib/images";
 import { playSfx } from "@/lib/sfx";
-import { MOSQUE_UNLOCK_THRESHOLDS, type MosquePart } from "@/stores/mosqueStore";
 import { useProgressStore } from "@/stores/progressStore";
 
 export default function Mosque() {
@@ -21,18 +20,18 @@ export default function Mosque() {
     LETTERS.filter((l) => s.isLetterComplete(l.id)).length
   );
 
-  const unlockedParts: MosquePart[] = MOSQUE_UNLOCK_THRESHOLDS.filter(
-    (th) => completed >= th.lettersRequired
-  ).map((th) => th.part);
+  // 12 kümülatif inşa aşaması (ana ekran/cutscene ile aynı formül)
+  const STAGES = images.mosqueStages.length;
+  const stageIdx = Math.min(STAGES - 1, Math.max(0, completed - 1));
+  const built = Math.min(completed, STAGES);
+  const progress = built / STAGES;
 
-  const progress = unlockedParts.length / MOSQUE_UNLOCK_THRESHOLDS.length;
-
-  // Yeni cami parçası belirince ses çal
-  const prevParts = useRef(unlockedParts.length);
+  // Aşama ilerleyince ses çal
+  const prevStage = useRef(stageIdx);
   useEffect(() => {
-    if (unlockedParts.length > prevParts.current) playSfx("mosque_build");
-    prevParts.current = unlockedParts.length;
-  }, [unlockedParts.length]);
+    if (completed > 0 && stageIdx > prevStage.current) playSfx("mosque_build");
+    prevStage.current = stageIdx;
+  }, [stageIdx, completed]);
 
   return (
     <GradientBg variant="skyWarm">
@@ -44,10 +43,10 @@ export default function Mosque() {
 
         {/* Cami — inşa aşaması (ilerlemeye göre frame-swap) */}
         <View className="my-2 items-center">
-          <Animated.View key={unlockedParts.length} entering={FadeIn.duration(500)}>
+          <Animated.View key={stageIdx} entering={FadeIn.duration(500)}>
             <Image
-              source={images.mosqueStages[Math.max(0, unlockedParts.length - 1)]}
-              style={{ width: 280, height: 280, opacity: unlockedParts.length === 0 ? 0.4 : 1 }}
+              source={images.mosqueStages[stageIdx]}
+              style={{ width: 280, height: 280, opacity: completed === 0 ? 0.4 : 1 }}
               contentFit="contain"
             />
           </Animated.View>
@@ -61,8 +60,7 @@ export default function Mosque() {
           />
         </View>
         <Text className="text-center font-display text-sm font-bold text-ink/70">
-          {completed} / {LETTERS.length} harf · {unlockedParts.length}/
-          {MOSQUE_UNLOCK_THRESHOLDS.length} parça
+          {completed} / {LETTERS.length} harf · {built}/{STAGES}
         </Text>
 
         <View className="flex-1" />

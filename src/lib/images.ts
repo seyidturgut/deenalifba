@@ -10,8 +10,8 @@ export const images = {
   mascotWave: require("@/assets/illustrations/mascot/piril_wave.webp"),
   mascotPoint: require("@/assets/illustrations/mascot/piril_point.webp"),
 
-  // Cami — inşa aşamaları (ilerlemeye göre frame-swap)
-  mosque: require("@/assets/illustrations/mosque/mosque_stage_7.webp"),
+  // Cami — 12 kümülatif inşa aşaması (her seviyede bir parça)
+  mosque: require("@/assets/illustrations/mosque/mosque_stage_12.webp"),
   mosqueStages: [
     require("@/assets/illustrations/mosque/mosque_stage_1.webp"),
     require("@/assets/illustrations/mosque/mosque_stage_2.webp"),
@@ -20,6 +20,11 @@ export const images = {
     require("@/assets/illustrations/mosque/mosque_stage_5.webp"),
     require("@/assets/illustrations/mosque/mosque_stage_6.webp"),
     require("@/assets/illustrations/mosque/mosque_stage_7.webp"),
+    require("@/assets/illustrations/mosque/mosque_stage_8.webp"),
+    require("@/assets/illustrations/mosque/mosque_stage_9.webp"),
+    require("@/assets/illustrations/mosque/mosque_stage_10.webp"),
+    require("@/assets/illustrations/mosque/mosque_stage_11.webp"),
+    require("@/assets/illustrations/mosque/mosque_stage_12.webp"),
   ],
 
   // Ödüller

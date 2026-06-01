@@ -118,10 +118,10 @@ export default function LearnScreen() {
     for (let i = 1; i <= TOTAL_LETTERS; i++) if (isComplete(i)) completed++;
     syncMosque(completed);
 
-    // Her seviye sonunda cami inşa kutsahnesi (kare sayısı arttıkça görsel de ilerler).
+    // Her seviye sonunda cami inşa kutsahnesi. İlk 12 seviye = birebir bir parça
+    // (12. seviyede cami tamamlanır); sonraki seviyeler tamamlanmış camiyi gösterir.
     const stages = images.mosqueStages.length;
-    const per = Math.max(1, Math.ceil(TOTAL_LETTERS / stages)); // aşama başına harf
-    const idxNow = completed >= 1 ? Math.min(stages - 1, Math.floor((completed - 1) / per)) : 0;
+    const idxNow = Math.min(stages - 1, Math.max(0, completed - 1));
     setBuildStage(idxNow);
     setBuildVisible(true);
   };
