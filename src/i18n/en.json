@@ -62,6 +62,8 @@
     "title": "My Mosque",
     "subtitle": "Your mosque grows as you learn new letters!",
     "view": "See My Mosque",
+    "building": "Your mosque is growing! 🧱",
+    "tapContinue": "Tap to continue",
     "unlockedMinaret": "A new minaret unlocked!",
     "unlockedDome": "A new dome unlocked!"
   },

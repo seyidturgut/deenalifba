@@ -10,9 +10,10 @@ import { Floating } from "@/components/ui/Floating";
 import { GradientBg } from "@/components/ui/GradientBg";
 import { JuicyButton } from "@/components/ui/JuicyButton";
 import { SoundToggles } from "@/components/ui/SoundToggles";
+import { MosqueBuild } from "@/features/mosque/MosqueBuild";
 import { SpotTheLetter } from "@/features/spot/SpotTheLetter";
 import { TraceCanvas } from "@/features/trace/TraceCanvas";
-import { getLetter } from "@/data/letters";
+import { getLetter, TOTAL_LETTERS } from "@/data/letters";
 import { getStrokes } from "@/data/letterStrokes";
 import { LEARNING_STEPS } from "@/data/types";
 import { haptics } from "@/lib/haptics";
@@ -87,6 +88,8 @@ export default function LearnScreen() {
 
   const [celebrate, setCelebrate] = useState(false);
   const [resetSignal, setResetSignal] = useState(0);
+  const [buildVisible, setBuildVisible] = useState(false);
+  const [buildStage, setBuildStage] = useState(0);
 
   useEffect(() => {
     startLetter(id);
@@ -107,12 +110,20 @@ export default function LearnScreen() {
   const isTrace = step === "trace";
   const isPuzzle = step === "puzzle";
 
+  const goHome = () => router.replace("/home");
+
   const finishLetter = () => {
-    const completedCount = useProgressStore
-      .getState()
-      .unlockedLetters.filter((lid) => useProgressStore.getState().isLetterComplete(lid)).length;
-    syncMosque(completedCount);
-    router.replace("/home");
+    const isComplete = useProgressStore.getState().isLetterComplete;
+    let completed = 0;
+    for (let i = 1; i <= TOTAL_LETTERS; i++) if (isComplete(i)) completed++;
+    syncMosque(completed);
+
+    // Her seviye sonunda cami inşa kutsahnesi (kare sayısı arttıkça görsel de ilerler).
+    const stages = images.mosqueStages.length;
+    const per = Math.max(1, Math.ceil(TOTAL_LETTERS / stages)); // aşama başına harf
+    const idxNow = completed >= 1 ? Math.min(stages - 1, Math.floor((completed - 1) / per)) : 0;
+    setBuildStage(idxNow);
+    setBuildVisible(true);
   };
 
   const onCompleteStep = () => {
@@ -237,6 +248,7 @@ export default function LearnScreen() {
       )}
 
       <Celebration visible={celebrate} onDone={finishLetter} />
+      <MosqueBuild visible={buildVisible} stageIndex={buildStage} onDone={goHome} />
     </GradientBg>
   );
 }
