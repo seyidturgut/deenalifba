@@ -9,15 +9,14 @@ import { GradientBg } from "@/components/ui/GradientBg";
 import { JuicyButton } from "@/components/ui/JuicyButton";
 import { SoundToggles } from "@/components/ui/SoundToggles";
 import { SoundCatch } from "@/features/catch/SoundCatch";
+import { ConstellationTrace } from "@/features/constellation/ConstellationTrace";
 import { LetterIntro } from "@/features/intro/LetterIntro";
 import { MosqueBuild } from "@/features/mosque/MosqueBuild";
 import { RecallGame } from "@/features/recall/RecallGame";
 import { SoundsGame } from "@/features/sounds/SoundsGame";
 import { SpotTheLetter } from "@/features/spot/SpotTheLetter";
-import { TraceCanvas } from "@/features/trace/TraceCanvas";
 import { ACTIVITY_META } from "@/data/lesson";
 import { getLetter, TOTAL_LETTERS } from "@/data/letters";
-import { getStrokes } from "@/data/letterStrokes";
 import type { ActivityKind } from "@/data/types";
 import { haptics } from "@/lib/haptics";
 import { images } from "@/lib/images";
@@ -206,15 +205,12 @@ export default function LearnScreen() {
           <View style={{ width: "100%", maxWidth: 420, aspectRatio: 0.9, alignSelf: "center" }}>
             <Image source={images.playPanel} style={StyleSheet.absoluteFill} contentFit="fill" />
             <View style={{ position: "absolute", left: "9%", right: "9%", top: "9%", bottom: "11%" }}>
-              <TraceCanvas
+              <ConstellationTrace
                 key={id}
-                bare
-                showDemo={id <= 3}
-                demoRTL={id !== 1}
-                resetSignal={resetSignal}
                 letterChar={letter.char}
-                strokes={getStrokes(id)}
-                onComplete={() => setTimeout(onCompleteStep, 450)}
+                letterId={id}
+                resetSignal={resetSignal}
+                onComplete={onCompleteStep}
               />
             </View>
           </View>
