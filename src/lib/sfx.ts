@@ -63,6 +63,64 @@ export function playSuccess() {
   playSfx("letter_complete");
 }
 
+// ---- Harf telaffuzları (Sesler oyunu) ----
+// Metro statik require ister; harf id → ses dosyası (btn_N.mp3).
+const LETTER_SOURCES: Record<number, number> = {
+  1: require("@/assets/audio/alifba/btn_1.mp3"),
+  2: require("@/assets/audio/alifba/btn_2.mp3"),
+  3: require("@/assets/audio/alifba/btn_3.mp3"),
+  4: require("@/assets/audio/alifba/btn_4.mp3"),
+  5: require("@/assets/audio/alifba/btn_5.mp3"),
+  6: require("@/assets/audio/alifba/btn_6.mp3"),
+  7: require("@/assets/audio/alifba/btn_7.mp3"),
+  8: require("@/assets/audio/alifba/btn_8.mp3"),
+  9: require("@/assets/audio/alifba/btn_9.mp3"),
+  10: require("@/assets/audio/alifba/btn_10.mp3"),
+  11: require("@/assets/audio/alifba/btn_11.mp3"),
+  12: require("@/assets/audio/alifba/btn_12.mp3"),
+  13: require("@/assets/audio/alifba/btn_13.mp3"),
+  14: require("@/assets/audio/alifba/btn_14.mp3"),
+  15: require("@/assets/audio/alifba/btn_15.mp3"),
+  16: require("@/assets/audio/alifba/btn_16.mp3"),
+  17: require("@/assets/audio/alifba/btn_17.mp3"),
+  18: require("@/assets/audio/alifba/btn_18.mp3"),
+  19: require("@/assets/audio/alifba/btn_19.mp3"),
+  20: require("@/assets/audio/alifba/btn_20.mp3"),
+  21: require("@/assets/audio/alifba/btn_21.mp3"),
+  22: require("@/assets/audio/alifba/btn_22.mp3"),
+  23: require("@/assets/audio/alifba/btn_23.mp3"),
+  24: require("@/assets/audio/alifba/btn_24.mp3"),
+  25: require("@/assets/audio/alifba/btn_25.mp3"),
+  26: require("@/assets/audio/alifba/btn_26.mp3"),
+  27: require("@/assets/audio/alifba/btn_27.mp3"),
+};
+
+const letterPlayers: Record<number, AudioPlayer> = {};
+
+/** Belirli bir harfin sesi var mı? */
+export function hasLetterSound(id: number): boolean {
+  return !!LETTER_SOURCES[id];
+}
+
+/** Harf telaffuzunu çal (Sesler oyunu). soundEnabled kapalıysa no-op. */
+export function playLetter(id: number, volume = 1) {
+  if (!soundOn()) return;
+  const src = LETTER_SOURCES[id];
+  if (!src) return;
+  try {
+    let p = letterPlayers[id];
+    if (!p) {
+      p = createAudioPlayer(src);
+      letterPlayers[id] = p;
+    }
+    p.volume = volume;
+    p.seekTo(0);
+    p.play();
+  } catch {
+    // ses kullanılamıyorsa sessizce geç
+  }
+}
+
 // ---- Arka plan müziği (dikişsiz loop, kısık) ----
 let music: AudioPlayer | null = null;
 

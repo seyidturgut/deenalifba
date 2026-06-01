@@ -58,6 +58,10 @@
   "spot": {
     "prompt": "Hangisi {{name}}?"
   },
+  "sounds": {
+    "prompt": "Hangi harfi duydun?",
+    "listen": "Dinle"
+  },
   "mosque": {
     "title": "Camim",
     "subtitle": "Yeni harfler öğrendikçe camin büyüyor!",

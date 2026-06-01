@@ -58,6 +58,10 @@
   "spot": {
     "prompt": "Which one is {{name}}?"
   },
+  "sounds": {
+    "prompt": "Which letter did you hear?",
+    "listen": "Listen"
+  },
   "mosque": {
     "title": "My Mosque",
     "subtitle": "Your mosque grows as you learn new letters!",

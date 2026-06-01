@@ -11,6 +11,7 @@ import { GradientBg } from "@/components/ui/GradientBg";
 import { JuicyButton } from "@/components/ui/JuicyButton";
 import { SoundToggles } from "@/components/ui/SoundToggles";
 import { MosqueBuild } from "@/features/mosque/MosqueBuild";
+import { SoundsGame } from "@/features/sounds/SoundsGame";
 import { SpotTheLetter } from "@/features/spot/SpotTheLetter";
 import { TraceCanvas } from "@/features/trace/TraceCanvas";
 import { getLetter, TOTAL_LETTERS } from "@/data/letters";
@@ -109,6 +110,7 @@ export default function LearnScreen() {
   const stepLabel = t(`learn.${step}`);
   const isTrace = step === "trace";
   const isPuzzle = step === "puzzle";
+  const isSounds = step === "sounds";
 
   const goHome = () => router.replace("/home");
 
@@ -214,6 +216,10 @@ export default function LearnScreen() {
         <View className="flex-1 items-center justify-center">
           <SpotTheLetter key={id} letterId={id} onComplete={onCompleteStep} />
         </View>
+      ) : isSounds ? (
+        <View className="flex-1 items-center justify-center">
+          <SoundsGame key={id} letterId={id} onComplete={onCompleteStep} />
+        </View>
       ) : (
         <View className="flex-1 items-center justify-center gap-5">
           <Floating distance={8}>
@@ -241,7 +247,7 @@ export default function LearnScreen() {
         </View>
       )}
 
-      {!isTrace && !isPuzzle && (
+      {!isTrace && !isPuzzle && !isSounds && (
         <View className="pb-2">
           <JuicyButton label={t("common.continue")} tone="success" onPress={onCompleteStep} />
         </View>
