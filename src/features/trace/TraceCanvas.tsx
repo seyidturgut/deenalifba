@@ -249,11 +249,12 @@ export function TraceCanvas({
         >
           {size.w > 0 && (
             <Svg width={size.w} height={size.h}>
-              {/* Kılavuz harf — "içeri göçük" (carved/oyuk) his: alt açık dudak + koyu oluk */}
+              {/* Kılavuz harf — "içeri göçük" (carved/oyuk) his: alt açık dudak + koyu oluk.
+                  Dikey ortalama: alignmentBaseline (iOS) + dominantBaseline (web), hafif yukarı nudge. */}
               <SvgText
                 x={size.w / 2}
-                y={size.h / 2 + 4}
-                fontSize={size.h * 0.82}
+                y={size.h * 0.46 + 4}
+                fontSize={size.h * 0.9}
                 fontFamily="Amiri_700Bold"
                 fill="rgba(255,255,255,0.92)"
                 textAnchor="middle"
@@ -263,8 +264,8 @@ export function TraceCanvas({
               </SvgText>
               <SvgText
                 x={size.w / 2}
-                y={size.h / 2}
-                fontSize={size.h * 0.82}
+                y={size.h * 0.46}
+                fontSize={size.h * 0.9}
                 fontFamily="Amiri_700Bold"
                 fill={done ? "#9FCFB6" : "#A6BBD2"}
                 textAnchor="middle"
@@ -292,8 +293,8 @@ export function TraceCanvas({
                   </Defs>
                   <SvgText
                     x={size.w / 2}
-                    y={size.h / 2}
-                    fontSize={size.h * 0.82}
+                    y={size.h * 0.46}
+                    fontSize={size.h * 0.9}
                     fontFamily="Amiri_700Bold"
                     fill="none"
                     stroke="#F5A524"
