@@ -146,15 +146,25 @@ export default function Index() {
           </View>
         </Animated.View>
 
-        {/* Slogan — yumuşak pill */}
-        <Animated.View
-          entering={FadeIn.delay(750)}
-          className="mt-3 rounded-full bg-white/80 px-5 py-2"
-          style={{ shadowColor: "#1462B5", shadowOpacity: 0.12, shadowRadius: 6, shadowOffset: { width: 0, height: 3 } }}
-        >
-          <Text style={{ fontFamily: "Nunito_700Bold", fontSize: 15, color: "#34618C" }}>
+        {/* Slogan + altın süslü ayraç */}
+        <Animated.View entering={FadeIn.delay(750)} className="mt-3 items-center">
+          <Text
+            style={{
+              fontFamily: "Nunito_700Bold",
+              fontSize: 16,
+              color: "#2E6DA4",
+              textShadowColor: "rgba(255,255,255,0.95)",
+              textShadowOffset: { width: 0, height: 1 },
+              textShadowRadius: 5,
+            }}
+          >
             {t("onboarding.welcomeSubtitle")}
           </Text>
+          <View className="mt-2.5 flex-row items-center gap-2">
+            <View style={{ width: 64, height: 2, borderRadius: 2, backgroundColor: "rgba(245,165,36,0.55)" }} />
+            <Text style={{ fontSize: 14, color: "#F5A524" }}>✦</Text>
+            <View style={{ width: 64, height: 2, borderRadius: 2, backgroundColor: "rgba(245,165,36,0.55)" }} />
+          </View>
         </Animated.View>
 
         {/* Yükleniyor */}
