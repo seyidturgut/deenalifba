@@ -41,14 +41,14 @@ function useCamiProgress() {
   });
 }
 
-function LetterNode({
-  letter,
+function LevelNode({
+  levelNo,
   cx,
   cy,
   state,
   onPress,
 }: {
-  letter: Letter;
+  levelNo: number;
   cx: number;
   cy: number;
   state: "done" | "active" | "open" | "locked";
@@ -105,7 +105,7 @@ function LetterNode({
           {/* Altın çerçeve */}
           <Image source={images.nodeTile} style={{ position: "absolute", width: NODE, height: NODE }} contentFit="contain" />
 
-          {/* İç krem pencerede harf */}
+          {/* İç krem pencerede seviye numarası */}
           <View
             style={{
               width: innerSize,
@@ -117,14 +117,13 @@ function LetterNode({
           >
             <Text
               style={{
-                fontFamily: "Amiri_700Bold",
-                fontSize: innerSize * 0.74,
-                lineHeight: innerSize * 0.92,
-                color: "#3A3A44",
+                fontFamily: "Fredoka_700Bold",
+                fontSize: innerSize * 0.5,
+                color: state === "done" ? "#3FB984" : "#3A3A44",
                 textAlign: "center",
               }}
             >
-              {letter.char}
+              {levelNo}
             </Text>
           </View>
 
@@ -135,21 +134,23 @@ function LetterNode({
         </>
       )}
 
-      {/* Harf adı — düğümün altında */}
-      <View style={{ position: "absolute", bottom: -20, alignItems: "center" }}>
-        <Text
-          style={{
-            fontFamily: "Fredoka_700Bold",
-            fontSize: 13,
-            color: locked ? "#8190A0" : "#46525E",
-            textShadowColor: "rgba(255,255,255,0.95)",
-            textShadowOffset: { width: 0, height: 1 },
-            textShadowRadius: 4,
-          }}
-        >
-          {letter.name}
-        </Text>
-      </View>
+      {/* Kilitli düğümde seviye numarası (bulutun altında) */}
+      {locked && (
+        <View style={{ position: "absolute", bottom: -18, alignItems: "center" }}>
+          <Text
+            style={{
+              fontFamily: "Fredoka_700Bold",
+              fontSize: 12,
+              color: "#8190A0",
+              textShadowColor: "rgba(255,255,255,0.95)",
+              textShadowOffset: { width: 0, height: 1 },
+              textShadowRadius: 4,
+            }}
+          >
+            {levelNo}
+          </Text>
+        </View>
+      )}
     </Pressable>
   );
 }
@@ -200,49 +201,6 @@ function BottomNav() {
           <Text style={{ fontFamily: "Fredoka_600SemiBold", fontSize: 11, color: "#5B6470" }}>{it.label}</Text>
         </Pressable>
       ))}
-    </View>
-  );
-}
-
-/** XP + seviye + günlük sandık — kompakt pill. */
-function XpChestCard() {
-  const totalSteps = useProgressStore((s) => Object.keys(s.completedSteps).length);
-  const xp = totalSteps * 25;
-  const SPAN = 200;
-  const level = Math.floor(xp / SPAN) + 1;
-  const into = xp % SPAN;
-  const pct = Math.round((into / SPAN) * 100);
-
-  const lastRewardDay = useSettingsStore((s) => s.lastRewardDay);
-  const claimDailyReward = useSettingsStore((s) => s.claimDailyReward);
-  const canClaim = lastRewardDay !== new Date().toDateString();
-
-  const pulse = useSharedValue(0);
-  useEffect(() => {
-    if (canClaim) pulse.value = withRepeat(withTiming(1, { duration: 700, easing: Easing.inOut(Easing.ease) }), -1, true);
-    else pulse.value = 0;
-  }, [canClaim]);
-  const chestStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: 1 + pulse.value * 0.1 }, { rotate: `${-4 + pulse.value * 8}deg` }],
-  }));
-
-  return (
-    <View
-      className="mt-1.5 flex-row items-center gap-2 rounded-full bg-white/90 px-2 py-1"
-      style={{ shadowColor: "#1462B5", shadowOpacity: 0.1, shadowRadius: 5, shadowOffset: { width: 0, height: 2 } }}
-    >
-      <View className="items-center justify-center rounded-full" style={{ width: 26, height: 26, backgroundColor: "#FFB020" }}>
-        <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 13, color: "white" }}>{level}</Text>
-      </View>
-      <View className="h-5 flex-1 justify-center overflow-hidden rounded-full bg-black/10">
-        <View className="absolute h-full rounded-full" style={{ width: `${pct}%`, backgroundColor: "#7BD66A", left: 0, top: 0 }} />
-        <Text style={{ fontFamily: "Fredoka_600SemiBold", fontSize: 11, color: "#46525E", textAlign: "center" }}>{into} / {SPAN} XP</Text>
-      </View>
-      <Pressable onPress={() => { if (claimDailyReward()) playSfx("star_earned"); else playSfx("ui_tap"); }}>
-        <Animated.View style={canClaim ? chestStyle : undefined}>
-          <Image source={images.gift} style={{ width: 28, height: 28, opacity: canClaim ? 1 : 0.45 }} contentFit="contain" />
-        </Animated.View>
-      </Pressable>
     </View>
   );
 }
@@ -347,7 +305,6 @@ export default function Home() {
               </View>
             </View>
           </View>
-          <XpChestCard />
         </View>
 
         {/* Yolculuk haritası */}
@@ -356,10 +313,10 @@ export default function Home() {
             <Polyline points={pathPoints} fill="none" stroke="#E8C766" strokeWidth={16} strokeLinecap="round" strokeLinejoin="round" />
             <Polyline points={pathPoints} fill="none" stroke="#FBE9A8" strokeWidth={6} strokeLinecap="round" strokeLinejoin="round" />
           </Svg>
-          {nodes.map((n) => (
-            <LetterNode
+          {nodes.map((n, i) => (
+            <LevelNode
               key={n.letter.id}
-              letter={n.letter}
+              levelNo={i + 1}
               cx={n.cx}
               cy={n.cy}
               state={stateOf(n.letter)}

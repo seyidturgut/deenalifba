@@ -39,7 +39,7 @@ export const useSettingsStore = create<SettingsState>()(
     (set, get) => ({
       childName: null,
       isUnder13: true, // fail-safe varsayım
-      language: "tr",
+      language: "en", // varsayılan EN (müşteri talebi); kullanıcı TR'ye geçebilir
       soundEnabled: true,
       musicEnabled: true,
       hapticsEnabled: true,

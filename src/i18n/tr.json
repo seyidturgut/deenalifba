@@ -45,15 +45,18 @@
   },
   "learn": {
     "trace": "Çiz",
-    "puzzle": "Yapboz",
+    "puzzle": "Bul",
     "sounds": "Sesler",
     "recall": "Tekrar",
     "traceHint": "Parmağınla harfin\nüzerinden geç",
     "soundsHint": "Sesi dinle ve\ndoğru harfi seç",
-    "puzzleHint": "Harfin parçalarını\nbirleştir 🧩",
+    "puzzleHint": "Doğru harfi bul 👀",
     "recallHint": "Hadi eski harfleri\nhatırlayalım",
     "redraw": "Yeniden çiz",
     "soon": "Bu oyun yakında ✨"
+  },
+  "spot": {
+    "prompt": "Hangisi {{name}}?"
   },
   "mosque": {
     "title": "Camim",

@@ -4,6 +4,9 @@
 module.exports = {
   content: ["./src/**/*.{js,jsx,ts,tsx}"],
   presets: [require("nativewind/preset")],
+  // Uygulama tek tema (aydınlık). darkMode "class" → NativeWind, OS koyu modunda
+  // renk şemasını otomatik set etmeye çalışıp hata fırlatmaz (media değil).
+  darkMode: "class",
   theme: {
     extend: {
       colors: {

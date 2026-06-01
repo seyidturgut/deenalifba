@@ -45,15 +45,18 @@
   },
   "learn": {
     "trace": "Trace",
-    "puzzle": "Puzzle",
+    "puzzle": "Spot",
     "sounds": "Sounds",
     "recall": "Review",
     "traceHint": "Trace over the\nletter with your finger",
     "soundsHint": "Listen to the sound\nand pick the letter",
-    "puzzleHint": "Put the letter\npieces together 🧩",
+    "puzzleHint": "Spot the right letter 👀",
     "recallHint": "Let's remember the\nletters we learned",
     "redraw": "Redraw",
     "soon": "Coming soon ✨"
+  },
+  "spot": {
+    "prompt": "Which one is {{name}}?"
   },
   "mosque": {
     "title": "My Mosque",

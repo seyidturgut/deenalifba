@@ -10,7 +10,7 @@ import { Floating } from "@/components/ui/Floating";
 import { GradientBg } from "@/components/ui/GradientBg";
 import { JuicyButton } from "@/components/ui/JuicyButton";
 import { SoundToggles } from "@/components/ui/SoundToggles";
-import { PuzzleGame } from "@/features/puzzle/PuzzleGame";
+import { SpotTheLetter } from "@/features/spot/SpotTheLetter";
 import { TraceCanvas } from "@/features/trace/TraceCanvas";
 import { getLetter } from "@/data/letters";
 import { getStrokes } from "@/data/letterStrokes";
@@ -201,7 +201,7 @@ export default function LearnScreen() {
         </View>
       ) : isPuzzle ? (
         <View className="flex-1 items-center justify-center">
-          <PuzzleGame key={id} char={letter.char} onComplete={onCompleteStep} />
+          <SpotTheLetter key={id} letterId={id} onComplete={onCompleteStep} />
         </View>
       ) : (
         <View className="flex-1 items-center justify-center gap-5">

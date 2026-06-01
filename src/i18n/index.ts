@@ -9,9 +9,9 @@ import tr from "./tr.json";
  * Türkçe terminoloji guardrail'i için bkz. ./lexicon.ts
  * (tr.json içeriği testte assertTurkishTerminology ile denetlenmeli — en.json hariç).
  */
-export const SUPPORTED_LANGUAGES = ["tr", "en"] as const;
+export const SUPPORTED_LANGUAGES = ["en", "tr"] as const;
 export type AppLanguage = (typeof SUPPORTED_LANGUAGES)[number];
-export const DEFAULT_LANGUAGE: AppLanguage = "tr";
+export const DEFAULT_LANGUAGE: AppLanguage = "en";
 
 void i18n.use(initReactI18next).init({
   resources: {
@@ -19,7 +19,7 @@ void i18n.use(initReactI18next).init({
     en: { translation: en },
   },
   lng: DEFAULT_LANGUAGE,
-  fallbackLng: DEFAULT_LANGUAGE,
+  fallbackLng: "en",
   interpolation: { escapeValue: false },
   // React Native'de Suspense kullanmıyoruz
   react: { useSuspense: false },
