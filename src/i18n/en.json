@@ -44,13 +44,19 @@
     "title": "Letters"
   },
   "learn": {
+    "intro": "Learn",
     "trace": "Trace",
     "puzzle": "Spot",
     "sounds": "Sounds",
     "recall": "Review",
+    "word": "Word",
+    "catch": "Catch",
+    "introHint": "Listen and meet the letter 👋",
     "traceHint": "Trace over the\nletter with your finger",
     "soundsHint": "Listen to the sound\nand pick the letter",
     "puzzleHint": "Spot the right letter 👀",
+    "wordHint": "Pick the right word 📖",
+    "catchHint": "Catch the right letter 🫧",
     "recallHint": "Let's remember the\nletters we learned",
     "redraw": "Redraw",
     "soon": "Coming soon ✨"
@@ -65,6 +71,17 @@
   "recall": {
     "prompt": "Which letter is this?",
     "none": "Nothing to review yet — keep going! 🎉"
+  },
+  "intro": {
+    "listen": "Listen",
+    "continue": "I'm ready ▶"
+  },
+  "catch": {
+    "prompt": "Hear it, catch the letter!",
+    "listen": "Listen"
+  },
+  "word": {
+    "prompt": "Which starts with {{name}}?"
   },
   "mosque": {
     "title": "My Mosque",

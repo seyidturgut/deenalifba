@@ -44,13 +44,19 @@
     "title": "Harfler"
   },
   "learn": {
+    "intro": "Tanı",
     "trace": "Çiz",
     "puzzle": "Bul",
     "sounds": "Sesler",
     "recall": "Tekrar",
+    "word": "Kelime",
+    "catch": "Yakala",
+    "introHint": "Harfi dinle ve tanı 👋",
     "traceHint": "Parmağınla harfin\nüzerinden geç",
     "soundsHint": "Sesi dinle ve\ndoğru harfi seç",
     "puzzleHint": "Doğru harfi bul 👀",
+    "wordHint": "Doğru kelimeyi seç 📖",
+    "catchHint": "Doğru harfi yakala 🫧",
     "recallHint": "Hadi eski harfleri\nhatırlayalım",
     "redraw": "Yeniden çiz",
     "soon": "Bu oyun yakında ✨"
@@ -65,6 +71,17 @@
   "recall": {
     "prompt": "Bu harf hangisi?",
     "none": "Şimdilik tekrar yok — devam! 🎉"
+  },
+  "intro": {
+    "listen": "Dinle",
+    "continue": "Hazırım ▶"
+  },
+  "catch": {
+    "prompt": "Sesi duy, harfi yakala!",
+    "listen": "Dinle"
+  },
+  "word": {
+    "prompt": "Hangisi {{name}} ile başlar?"
   },
   "mosque": {
     "title": "Camim",

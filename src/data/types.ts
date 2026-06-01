@@ -1,6 +1,6 @@
 /** Alif — temel domain tipleri */
 
-/** 4 adımlı öğrenme döngüsünün adımları (PROJECT PROFILE §3.A) */
+/** 4 adımlı öğrenme döngüsünün adımları (PROJECT PROFILE §3.A) — legacy/SRS göçü. */
 export type LearningStep = "trace" | "puzzle" | "sounds" | "recall";
 
 export const LEARNING_STEPS: LearningStep[] = [
@@ -9,6 +9,12 @@ export const LEARNING_STEPS: LearningStep[] = [
   "sounds",
   "recall",
 ];
+
+/**
+ * Öğrenme döngüsü v2 etkinlik türleri.
+ * Pedagoji: önce ÖĞRET (intro + trace), sonra PRATİK (spot/sounds/word/catch), sonra recall.
+ */
+export type ActivityKind = "intro" | "trace" | "spot" | "sounds" | "word" | "catch" | "recall";
 
 /** Tek bir Arap harfi (Harf). 28 harf — bkz. letters.ts */
 export type Letter = {

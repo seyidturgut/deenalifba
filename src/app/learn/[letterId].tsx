@@ -2,30 +2,42 @@ import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import Animated, { FadeIn } from "react-native-reanimated";
 import { useTranslation } from "react-i18next";
 
 import { Celebration } from "@/components/ui/Celebration";
 import { GradientBg } from "@/components/ui/GradientBg";
 import { JuicyButton } from "@/components/ui/JuicyButton";
 import { SoundToggles } from "@/components/ui/SoundToggles";
+import { SoundCatch } from "@/features/catch/SoundCatch";
+import { LetterIntro } from "@/features/intro/LetterIntro";
 import { MosqueBuild } from "@/features/mosque/MosqueBuild";
 import { RecallGame } from "@/features/recall/RecallGame";
 import { SoundsGame } from "@/features/sounds/SoundsGame";
 import { SpotTheLetter } from "@/features/spot/SpotTheLetter";
 import { TraceCanvas } from "@/features/trace/TraceCanvas";
+import { ACTIVITY_META } from "@/data/lesson";
 import { getLetter, TOTAL_LETTERS } from "@/data/letters";
 import { getStrokes } from "@/data/letterStrokes";
-import { LEARNING_STEPS } from "@/data/types";
+import type { ActivityKind } from "@/data/types";
 import { haptics } from "@/lib/haptics";
-import { images, STEP_ICON } from "@/lib/images";
+import { images } from "@/lib/images";
 import { playSfx } from "@/lib/sfx";
 import { useLearningStore } from "@/stores/learningStore";
 import { useMosqueStore } from "@/stores/mosqueStore";
 import { useProgressStore } from "@/stores/progressStore";
 
-/** 4 adım göstergesi — tek bir "raf/bar" üstünde. */
-function StepBar({ activeIndex }: { activeIndex: number }) {
+const HINT_KEY: Record<ActivityKind, string> = {
+  intro: "learn.introHint",
+  trace: "learn.traceHint",
+  spot: "learn.puzzleHint",
+  sounds: "learn.soundsHint",
+  word: "learn.wordHint",
+  catch: "learn.catchHint",
+  recall: "learn.recallHint",
+};
+
+/** Ders adımları göstergesi — değişken sayıda etkinlik (tek bir "raf" üstünde). */
+function StepBar({ activities, activeIndex }: { activities: ActivityKind[]; activeIndex: number }) {
   return (
     <View className="items-center py-1">
       <View
@@ -40,12 +52,13 @@ function StepBar({ activeIndex }: { activeIndex: number }) {
           shadowOffset: { width: 0, height: 4 },
         }}
       >
-        {LEARNING_STEPS.map((s, i) => {
+        {activities.map((k, i) => {
           const active = i === activeIndex;
           const done = i < activeIndex;
+          const meta = ACTIVITY_META[k];
           return (
             <View
-              key={s}
+              key={`${k}-${i}`}
               style={{
                 width: active ? 56 : 46,
                 height: active ? 56 : 46,
@@ -61,11 +74,15 @@ function StepBar({ activeIndex }: { activeIndex: number }) {
                 shadowOffset: { width: 0, height: 3 },
               }}
             >
-              <Image
-                source={STEP_ICON[s]}
-                style={{ width: active ? 40 : 32, height: active ? 40 : 32, opacity: active || done ? 1 : 0.5 }}
-                contentFit="contain"
-              />
+              {meta.icon ? (
+                <Image
+                  source={meta.icon}
+                  style={{ width: active ? 40 : 32, height: active ? 40 : 32, opacity: active || done ? 1 : 0.5 }}
+                  contentFit="contain"
+                />
+              ) : (
+                <Text style={{ fontSize: active ? 28 : 22, opacity: active || done ? 1 : 0.5 }}>{meta.emoji}</Text>
+              )}
             </View>
           );
         })}
@@ -81,10 +98,11 @@ export default function LearnScreen() {
   const id = Number(letterId);
   const letter = getLetter(id);
 
-  const activeStepIndex = useLearningStore((s) => s.activeStepIndex);
+  const activities = useLearningStore((s) => s.activities);
+  const activeIndex = useLearningStore((s) => s.activeIndex);
   const startLetter = useLearningStore((s) => s.startLetter);
   const nextStep = useLearningStore((s) => s.nextStep);
-  const completeStep = useProgressStore((s) => s.completeStep);
+  const completeLetter = useProgressStore((s) => s.completeLetter);
   const syncMosque = useMosqueStore((s) => s.syncWithProgress);
 
   const [celebrate, setCelebrate] = useState(false);
@@ -96,6 +114,31 @@ export default function LearnScreen() {
     startLetter(id);
   }, [id, startLetter]);
 
+  const goHome = () => router.replace("/home");
+
+  const finishLetter = () => {
+    setCelebrate(false); // kutlamayı kapat → cami sahnesiyle çakışmasın
+    const isComplete = useProgressStore.getState().isLetterComplete;
+    let completed = 0;
+    for (let i = 1; i <= TOTAL_LETTERS; i++) if (isComplete(i)) completed++;
+    syncMosque(completed);
+    const stages = images.mosqueStages.length;
+    const idxNow = Math.min(stages - 1, Math.max(0, completed - 1));
+    setBuildStage(idxNow);
+    setBuildVisible(true);
+  };
+
+  const onCompleteStep = () => {
+    haptics.success();
+    const advanced = nextStep();
+    if (advanced) {
+      playSfx("step_complete");
+    } else {
+      completeLetter(id);
+      setCelebrate(true);
+    }
+  };
+
   if (!letter) {
     return (
       <GradientBg>
@@ -106,39 +149,9 @@ export default function LearnScreen() {
     );
   }
 
-  const step = LEARNING_STEPS[activeStepIndex];
-  const stepLabel = t(`learn.${step}`);
-  const isTrace = step === "trace";
-  const isPuzzle = step === "puzzle";
-  const isSounds = step === "sounds";
-
-  const goHome = () => router.replace("/home");
-
-  const finishLetter = () => {
-    setCelebrate(false); // kutlamayı kapat → cami sahnesiyle çakışmasın
-    const isComplete = useProgressStore.getState().isLetterComplete;
-    let completed = 0;
-    for (let i = 1; i <= TOTAL_LETTERS; i++) if (isComplete(i)) completed++;
-    syncMosque(completed);
-
-    // Her seviye sonunda cami inşa kutsahnesi. İlk 12 seviye = birebir bir parça
-    // (12. seviyede cami tamamlanır); sonraki seviyeler tamamlanmış camiyi gösterir.
-    const stages = images.mosqueStages.length;
-    const idxNow = Math.min(stages - 1, Math.max(0, completed - 1));
-    setBuildStage(idxNow);
-    setBuildVisible(true);
-  };
-
-  const onCompleteStep = () => {
-    haptics.success();
-    completeStep(id, step);
-    const advanced = nextStep();
-    if (advanced) {
-      playSfx("step_complete");
-    } else {
-      setCelebrate(true);
-    }
-  };
+  const kind = activities[activeIndex];
+  const stepLabel = kind ? t(ACTIVITY_META[kind].labelKey) : "";
+  const isTrace = kind === "trace";
 
   return (
     <GradientBg>
@@ -160,9 +173,9 @@ export default function LearnScreen() {
         <SoundToggles />
       </View>
 
-      <StepBar activeIndex={activeStepIndex} />
+      <StepBar activities={activities} activeIndex={activeIndex} />
 
-      {/* Başlık banner — compact, yazı krem zemine oturuyor */}
+      {/* Başlık banner */}
       <View style={{ alignItems: "center" }}>
         <View style={{ width: 248, aspectRatio: 3.02 }}>
           <Image source={images.titleBanner} style={StyleSheet.absoluteFill} contentFit="contain" />
@@ -176,27 +189,20 @@ export default function LearnScreen() {
 
       <View
         className="mt-1 self-center rounded-full bg-white/65 px-6 py-2"
-        style={{
-          maxWidth: "92%",
-          shadowColor: "#1462B5",
-          shadowOpacity: 0.14,
-          shadowRadius: 7,
-          shadowOffset: { width: 0, height: 4 },
-        }}
+        style={{ maxWidth: "92%", shadowColor: "#1462B5", shadowOpacity: 0.14, shadowRadius: 7, shadowOffset: { width: 0, height: 4 } }}
       >
-        <Text
-          style={{ fontFamily: "Fredoka_600SemiBold", fontSize: 17, lineHeight: 23, textAlign: "center", color: "#34618C" }}
-        >
-          {step === "trace" && t("learn.traceHint")}
-          {step === "sounds" && t("learn.soundsHint")}
-          {step === "puzzle" && t("learn.puzzleHint")}
-          {step === "recall" && t("learn.recallHint")}
+        <Text style={{ fontFamily: "Fredoka_600SemiBold", fontSize: 17, lineHeight: 23, textAlign: "center", color: "#34618C" }}>
+          {kind ? t(HINT_KEY[kind]) : ""}
         </Text>
       </View>
 
-      {isTrace ? (
+      {/* Etkinlik */}
+      {kind === "intro" ? (
+        <View className="flex-1 items-center justify-center">
+          <LetterIntro key={`intro-${id}`} letterId={id} onComplete={onCompleteStep} />
+        </View>
+      ) : kind === "trace" ? (
         <View className="flex-1 items-center justify-center pb-1">
-          {/* Altın çerçeve + çizim alanı (büyük + dik, harf büyük) */}
           <View style={{ width: "100%", maxWidth: 420, aspectRatio: 0.9, alignSelf: "center" }}>
             <Image source={images.playPanel} style={StyleSheet.absoluteFill} contentFit="fill" />
             <View style={{ position: "absolute", left: "9%", right: "9%", top: "9%", bottom: "11%" }}>
@@ -213,18 +219,24 @@ export default function LearnScreen() {
             </View>
           </View>
         </View>
-      ) : isPuzzle ? (
+      ) : kind === "spot" ? (
         <View className="flex-1 items-center justify-center">
-          <SpotTheLetter key={id} letterId={id} onComplete={onCompleteStep} />
+          <SpotTheLetter key={`spot-${id}`} letterId={id} onComplete={onCompleteStep} />
         </View>
-      ) : isSounds ? (
+      ) : kind === "sounds" ? (
         <View className="flex-1 items-center justify-center">
-          <SoundsGame key={id} letterId={id} onComplete={onCompleteStep} />
+          <SoundsGame key={`sounds-${id}`} letterId={id} onComplete={onCompleteStep} />
+        </View>
+      ) : kind === "catch" ? (
+        <View className="flex-1 items-center justify-center">
+          <SoundCatch key={`catch-${id}`} letterId={id} onComplete={onCompleteStep} />
+        </View>
+      ) : kind === "recall" ? (
+        <View className="flex-1 items-center justify-center">
+          <RecallGame key={`recall-${id}`} letterId={id} onComplete={onCompleteStep} />
         </View>
       ) : (
-        <View className="flex-1 items-center justify-center">
-          <RecallGame key={id} letterId={id} onComplete={onCompleteStep} />
-        </View>
+        <View className="flex-1" />
       )}
 
       {isTrace && (
