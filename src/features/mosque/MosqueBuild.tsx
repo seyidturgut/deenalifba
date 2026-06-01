@@ -4,6 +4,7 @@ import { Dimensions, Pressable, Text, View } from "react-native";
 import Animated, {
   Easing,
   FadeIn,
+  ZoomIn,
   useAnimatedStyle,
   useSharedValue,
   withDelay,
@@ -75,45 +76,48 @@ export function MosqueBuild({
       }}
     >
       <Pressable onPress={onDone} style={{ alignItems: "center", justifyContent: "center", flex: 1, width: "100%" }}>
-        <Text
+        {/* Oyun-popup kartı */}
+        <Animated.View
+          entering={ZoomIn.springify().damping(10)}
           style={{
-            fontFamily: "Fredoka_700Bold",
-            fontSize: 24,
-            color: "white",
-            textAlign: "center",
-            marginBottom: 14,
-            textShadowColor: "rgba(0,0,0,0.25)",
-            textShadowOffset: { width: 0, height: 2 },
-            textShadowRadius: 6,
+            alignItems: "center",
+            backgroundColor: "#FFFDF7",
+            borderRadius: 34,
+            borderWidth: 4,
+            borderColor: "#FFD36B",
+            paddingTop: 16,
+            paddingBottom: 18,
+            paddingHorizontal: 20,
+            shadowColor: "#1462B5",
+            shadowOpacity: 0.3,
+            shadowRadius: 18,
+            shadowOffset: { width: 0, height: 10 },
           }}
         >
-          {t("mosque.building")}
-        </Text>
-
-        <View style={{ width: SCREEN_W * 0.74, height: SCREEN_W * 0.74, alignItems: "center", justifyContent: "center" }}>
-          {/* sıcak parıltı */}
-          <Animated.View
-            style={[
-              {
-                position: "absolute",
-                width: SCREEN_W * 0.7,
-                height: SCREEN_W * 0.7,
-                borderRadius: SCREEN_W * 0.35,
-                backgroundColor: "rgba(245,165,36,0.35)",
-              },
-              glowStyle,
-            ]}
-          />
-          <Animated.View style={imgStyle}>
-            <Image
-              source={images.mosqueStages[idx]}
-              style={{ width: SCREEN_W * 0.72, height: SCREEN_W * 0.72 }}
-              contentFit="contain"
+          <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 20, color: "#208AEF", textAlign: "center", marginBottom: 6 }}>
+            {t("mosque.building")}
+          </Text>
+          <View style={{ width: SCREEN_W * 0.6, height: SCREEN_W * 0.6, alignItems: "center", justifyContent: "center" }}>
+            {/* sıcak parıltı (kart içinde, camiyi öne çıkarır) */}
+            <Animated.View
+              style={[
+                {
+                  position: "absolute",
+                  width: SCREEN_W * 0.56,
+                  height: SCREEN_W * 0.56,
+                  borderRadius: SCREEN_W * 0.28,
+                  backgroundColor: "rgba(245,165,36,0.28)",
+                },
+                glowStyle,
+              ]}
             />
-          </Animated.View>
-        </View>
+            <Animated.View style={imgStyle}>
+              <Image source={images.mosqueStages[idx]} style={{ width: SCREEN_W * 0.58, height: SCREEN_W * 0.58 }} contentFit="contain" />
+            </Animated.View>
+          </View>
+        </Animated.View>
 
-        <Text style={{ fontFamily: "Nunito_700Bold", fontSize: 13, color: "rgba(255,255,255,0.8)", marginTop: 16 }}>
+        <Text style={{ fontFamily: "Nunito_700Bold", fontSize: 14, color: "rgba(255,255,255,0.9)", marginTop: 18 }}>
           {t("mosque.tapContinue")}
         </Text>
       </Pressable>

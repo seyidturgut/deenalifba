@@ -117,16 +117,30 @@ export function Celebration({
         <ConfettiPiece key={i} conf={conf} />
       ))}
       <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-        <Animated.View entering={ZoomIn.springify()} style={{ alignItems: "center" }}>
-          <Image source={images.star} style={{ width: 120, height: 120 }} contentFit="contain" />
+        <Animated.View
+          entering={ZoomIn.springify()}
+          style={{
+            alignItems: "center",
+            backgroundColor: "#FFFDF7",
+            borderRadius: 34,
+            borderWidth: 4,
+            borderColor: "#FFD36B",
+            paddingTop: 18,
+            paddingBottom: 24,
+            paddingHorizontal: 40,
+            shadowColor: "#1462B5",
+            shadowOpacity: 0.3,
+            shadowRadius: 18,
+            shadowOffset: { width: 0, height: 10 },
+          }}
+        >
+          <Image source={images.star} style={{ width: 130, height: 130 }} contentFit="contain" />
           <Text
             style={{
-              marginTop: 8,
-              fontSize: 38,
+              marginTop: 6,
+              fontSize: 36,
               fontFamily: "Fredoka_700Bold",
               color: "#F5A524",
-              textShadowColor: "rgba(255,255,255,0.9)",
-              textShadowRadius: 8,
             }}
           >
             {heading}

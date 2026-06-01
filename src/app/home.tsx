@@ -190,9 +190,9 @@ function BottomNav() {
       style={{ shadowColor: "#1462B5", shadowOpacity: 0.18, shadowRadius: 10, shadowOffset: { width: 0, height: -2 } }}
     >
       {items.map((it) => (
-        <Pressable key={it.label} onPress={() => { playSfx("ui_tap"); it.onPress(); }} className="items-center" style={{ width: 64 }}>
+        <Pressable key={it.label} onPress={() => { playSfx("ui_tap"); it.onPress(); }} className="items-center" style={{ width: 74 }}>
           <Image source={it.src} style={{ width: 32, height: 32 }} contentFit="contain" />
-          <Text style={{ fontFamily: "Fredoka_600SemiBold", fontSize: 13, color: "#4A5663" }}>{it.label}</Text>
+          <Text numberOfLines={1} style={{ fontFamily: "Fredoka_600SemiBold", fontSize: 12, color: "#4A5663", textAlign: "center" }}>{it.label}</Text>
         </Pressable>
       ))}
     </View>
