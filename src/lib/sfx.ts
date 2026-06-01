@@ -93,6 +93,7 @@ const LETTER_SOURCES: Record<number, number> = {
   25: require("@/assets/audio/alifba/btn_25.mp3"),
   26: require("@/assets/audio/alifba/btn_26.mp3"),
   27: require("@/assets/audio/alifba/btn_27.mp3"),
+  28: require("@/assets/audio/alifba/btn_28.mp3"),
 };
 
 const letterPlayers: Record<number, AudioPlayer> = {};
