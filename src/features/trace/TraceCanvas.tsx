@@ -259,11 +259,14 @@ export function TraceCanvas({
                   style={{
                     fontFamily: "Amiri_700Bold",
                     fontSize: Math.min(size.w, size.h) * 0.78,
+                    lineHeight: Math.min(size.w, size.h) * 0.78,
                     color: done ? "#9FCFB6" : "#A6BBD2",
                     textShadowColor: "rgba(255,255,255,0.9)",
                     textShadowOffset: { width: 0, height: 2 },
                     textShadowRadius: 3,
                     includeFontPadding: false,
+                    textAlignVertical: "center",
+                    transform: [{ translateY: -size.h * 0.085 }],
                   }}
                 >
                   {letterChar}
@@ -290,7 +293,7 @@ export function TraceCanvas({
                   </Defs>
                   <SvgText
                     x={size.w / 2}
-                    y={size.h / 2}
+                    y={size.h * 0.42}
                     fontSize={Math.min(size.w, size.h) * 0.78}
                     fontFamily="Amiri_700Bold"
                     fill="none"
