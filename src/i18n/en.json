@@ -62,6 +62,10 @@
     "prompt": "Which letter did you hear?",
     "listen": "Listen"
   },
+  "recall": {
+    "prompt": "Which letter is this?",
+    "none": "Nothing to review yet — keep going! 🎉"
+  },
   "mosque": {
     "title": "My Mosque",
     "subtitle": "Your mosque grows as you learn new letters!",

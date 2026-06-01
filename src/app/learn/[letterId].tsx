@@ -6,11 +6,11 @@ import Animated, { FadeIn } from "react-native-reanimated";
 import { useTranslation } from "react-i18next";
 
 import { Celebration } from "@/components/ui/Celebration";
-import { Floating } from "@/components/ui/Floating";
 import { GradientBg } from "@/components/ui/GradientBg";
 import { JuicyButton } from "@/components/ui/JuicyButton";
 import { SoundToggles } from "@/components/ui/SoundToggles";
 import { MosqueBuild } from "@/features/mosque/MosqueBuild";
+import { RecallGame } from "@/features/recall/RecallGame";
 import { SoundsGame } from "@/features/sounds/SoundsGame";
 import { SpotTheLetter } from "@/features/spot/SpotTheLetter";
 import { TraceCanvas } from "@/features/trace/TraceCanvas";
@@ -221,35 +221,14 @@ export default function LearnScreen() {
           <SoundsGame key={id} letterId={id} onComplete={onCompleteStep} />
         </View>
       ) : (
-        <View className="flex-1 items-center justify-center gap-5">
-          <Floating distance={8}>
-            <View style={{ width: 250, height: 250 }}>
-              <Image source={images.playPanel} style={StyleSheet.absoluteFill} contentFit="fill" />
-              <View style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, alignItems: "center", justifyContent: "center" }}>
-                <Text style={{ fontFamily: "Amiri_700Bold", fontSize: 120, color: "#2A2A33" }}>{letter.char}</Text>
-              </View>
-            </View>
-          </Floating>
-          <View
-            className="rounded-full bg-white/80 px-5 py-2"
-            style={{ shadowColor: "#1462B5", shadowOpacity: 0.15, shadowRadius: 6, shadowOffset: { width: 0, height: 3 } }}
-          >
-            <Text style={{ fontFamily: "Fredoka_600SemiBold", fontSize: 15, color: "rgba(42,42,51,0.6)" }}>
-              {t("learn.soon")}
-            </Text>
-          </View>
+        <View className="flex-1 items-center justify-center">
+          <RecallGame key={id} letterId={id} onComplete={onCompleteStep} />
         </View>
       )}
 
       {isTrace && (
         <View className="items-center pb-2">
           <JuicyButton label={t("learn.redraw")} tone="accent" onPress={() => setResetSignal((s) => s + 1)} />
-        </View>
-      )}
-
-      {!isTrace && !isPuzzle && !isSounds && (
-        <View className="pb-2">
-          <JuicyButton label={t("common.continue")} tone="success" onPress={onCompleteStep} />
         </View>
       )}
 

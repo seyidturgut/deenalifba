@@ -62,6 +62,10 @@
     "prompt": "Hangi harfi duydun?",
     "listen": "Dinle"
   },
+  "recall": {
+    "prompt": "Bu harf hangisi?",
+    "none": "Şimdilik tekrar yok — devam! 🎉"
+  },
   "mosque": {
     "title": "Camim",
     "subtitle": "Yeni harfler öğrendikçe camin büyüyor!",
