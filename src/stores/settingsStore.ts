@@ -13,6 +13,7 @@ import { setIsUnder13 } from "@/lib/analyticsGuard";
  */
 type SettingsState = {
   childName: string | null;
+  mosqueName: string | null;
   isUnder13: boolean;
   language: AppLanguage;
   soundEnabled: boolean;
@@ -23,6 +24,7 @@ type SettingsState = {
   lastRewardDay: string | null;
 
   setChildName: (name: string) => void;
+  setMosqueName: (name: string) => void;
   setIsUnder13: (value: boolean) => void;
   setLanguage: (lng: AppLanguage) => void;
   toggleSound: () => void;
@@ -38,6 +40,7 @@ export const useSettingsStore = create<SettingsState>()(
   persist(
     (set, get) => ({
       childName: null,
+      mosqueName: null,
       isUnder13: true, // fail-safe varsayım
       language: "en", // varsayılan EN (müşteri talebi); kullanıcı TR'ye geçebilir
       soundEnabled: true,
@@ -48,6 +51,7 @@ export const useSettingsStore = create<SettingsState>()(
       lastRewardDay: null,
 
       setChildName: (name) => set({ childName: name.trim() }),
+      setMosqueName: (name) => set({ mosqueName: name.trim() }),
       setIsUnder13: (value) => {
         setIsUnder13(value); // analytics guard'ı senkronla
         set({ isUnder13: value });

@@ -72,6 +72,10 @@
     "view": "Camimi Gör",
     "building": "Camin büyüyor! 🧱",
     "tapContinue": "Devam etmek için dokun",
+    "defaultName": "Camim",
+    "namePlaceholder": "Camine bir ad ver",
+    "parts": "{{built}} / {{total}} parça",
+    "lettersLearned": "{{n}} / {{total}} harf öğrenildi",
     "unlockedMinaret": "Yeni bir minare açıldı!",
     "unlockedDome": "Yeni bir kubbe açıldı!"
   },

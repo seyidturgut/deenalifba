@@ -72,6 +72,10 @@
     "view": "See My Mosque",
     "building": "Your mosque is growing! 🧱",
     "tapContinue": "Tap to continue",
+    "defaultName": "My Mosque",
+    "namePlaceholder": "Name your mosque",
+    "parts": "{{built}} / {{total}} parts",
+    "lettersLearned": "{{n}} / {{total}} letters learned",
     "unlockedMinaret": "A new minaret unlocked!",
     "unlockedDome": "A new dome unlocked!"
   },
