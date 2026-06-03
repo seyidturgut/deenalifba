@@ -46,7 +46,7 @@
   },
   "learn": {
     "intro": "Tanı",
-    "trace": "Birleştir",
+    "trace": "Çiz",
     "hearTap": "Duy & Dokun",
     "match": "Eşleştir",
     "drag": "Pırıl'a Ver",
@@ -55,7 +55,7 @@
     "word": "Kelime",
     "recall": "Tekrar",
     "introHint": "Harfi dinle ve tanı 👋",
-    "traceHint": "Yıldızları sırayla birleştir ✨",
+    "traceHint": "Pırıl'ı yolda gezdir ✏️",
     "hearTapHint": "Dinle ve doğru harfe dokun 👂",
     "matchHint": "Aynı harfleri eşleştir 🃏",
     "dragHint": "Doğru harfi Pırıl'a ver 🤲",

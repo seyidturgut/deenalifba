@@ -274,9 +274,15 @@ export default function Home() {
       >
         {/* Üst: maskot + (selam + balon) + XP */}
         <View className="px-1 pt-1">
-          <View className="flex-row items-center gap-2.5">
-            <Mascot size={64} />
-            <View className="flex-1">
+          <View className="flex-row items-end gap-2">
+            {/* Maskot — küçük buluta basar (havada kalmasın), selam verir */}
+            <View style={{ width: 98, height: 96, alignItems: "center", justifyContent: "flex-end" }}>
+              <Image source={images.nodeCloud} style={{ position: "absolute", bottom: 0, width: 98, height: 46 }} contentFit="contain" />
+              <View style={{ marginBottom: 8 }}>
+                <Mascot size={88} pose="wave" />
+              </View>
+            </View>
+            <View className="flex-1 pb-3">
               <Text
                 style={{
                   fontFamily: "Fredoka_700Bold",

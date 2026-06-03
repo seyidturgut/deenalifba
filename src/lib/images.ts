@@ -3,7 +3,9 @@
  * AI ile üretildi, tutarlı soft-2.5D stil. Final üründe tasarım ekibi güncelleyebilir.
  */
 export const images = {
-  // Maskot "Pırıl" — ifade seti (animasyon/anlatım için)
+  // Maskot "Pırıl" — Kâşif HÜDHÜD (idle pozu; splash vb. statik kullanım).
+  hudhud: require("@/assets/illustrations/mascot/Hudhud/hudhud_idle.webp"),
+  // Eski fener Pırıl ifadeleri (StaticMascot fallback — puppet aktifken kullanılmaz)
   mascot: require("@/assets/illustrations/mascot/piril_idle.webp"),
   mascotHappy: require("@/assets/illustrations/mascot/piril_happy.webp"),
   mascotCelebrate: require("@/assets/illustrations/mascot/piril_celebrate.webp"),
@@ -78,6 +80,7 @@ export const images = {
 
   // Arka plan
   bgSky: require("@/assets/illustrations/bg/bg_sky.webp"),
+  splashBg: require("@/assets/illustrations/ui/splash_bg.webp"),
 } as const;
 
 /** Öğrenme adımı → ikon eşlemesi */

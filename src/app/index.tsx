@@ -1,7 +1,7 @@
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
-import { Text, View } from "react-native";
+import { StyleSheet, Text, useWindowDimensions, View } from "react-native";
 import Animated, {
   Easing,
   FadeIn,
@@ -16,74 +16,27 @@ import Animated, {
 import { useTranslation } from "react-i18next";
 
 import { Floating } from "@/components/ui/Floating";
-import { GradientBg } from "@/components/ui/GradientBg";
 import { images } from "@/lib/images";
 import { playSfx } from "@/lib/sfx";
 import { useSettingsStore } from "@/stores/settingsStore";
 
-/** Oyun-tarzı açılış: parıltı halkası, parlayan logo, pırıltılar, yükleniyor noktaları. */
-
-/** Nabız atan altın parıltı halkası (logonun arkasında). */
-function GlowRing() {
-  const v = useSharedValue(0);
-  useEffect(() => {
-    v.value = withRepeat(withTiming(1, { duration: 1500, easing: Easing.inOut(Easing.ease) }), -1, true);
-  }, []);
-  const style = useAnimatedStyle(() => ({
-    transform: [{ scale: 0.82 + v.value * 0.26 }],
-    opacity: 0.45 + v.value * 0.45,
-  }));
-  return (
-    <Animated.Image
-      source={images.nodeGlow}
-      resizeMode="contain"
-      style={[{ position: "absolute", width: 320, height: 320 }, style]}
-    />
-  );
-}
-
-/** Pırıltı (yıldız) — yavaşça parlayıp söner. */
-function Sparkle({ x, y, size, delay }: { x: number; y: number; size: number; delay: number }) {
-  const v = useSharedValue(0);
-  useEffect(() => {
-    v.value = withDelay(
-      delay,
-      withRepeat(withSequence(withTiming(1, { duration: 700 }), withTiming(0.15, { duration: 700 })), -1, true)
-    );
-  }, []);
-  const style = useAnimatedStyle(() => ({ opacity: v.value, transform: [{ scale: 0.6 + v.value * 0.6 }] }));
-  return (
-    <Animated.Image
-      source={images.star}
-      resizeMode="contain"
-      style={[{ position: "absolute", left: x, top: y, width: size, height: size }, style]}
-    />
-  );
-}
-
 /** "Yükleniyor" zıplayan üç nokta. */
-function LoadingDots() {
-  return (
-    <View className="flex-row gap-2">
-      {[0, 1, 2].map((i) => <Dot key={i} delay={i * 160} />)}
-    </View>
-  );
-}
 function Dot({ delay }: { delay: number }) {
   const v = useSharedValue(0);
   useEffect(() => {
     v.value = withDelay(delay, withRepeat(withSequence(withTiming(1, { duration: 360 }), withTiming(0, { duration: 360 })), -1, false));
   }, []);
-  const style = useAnimatedStyle(() => ({ transform: [{ translateY: -v.value * 8 }], opacity: 0.5 + v.value * 0.5 }));
-  return <Animated.View style={[{ width: 12, height: 12, borderRadius: 6, backgroundColor: "white" }, style]} />;
+  const style = useAnimatedStyle(() => ({ transform: [{ translateY: -v.value * 7 }], opacity: 0.55 + v.value * 0.45 }));
+  return <Animated.View style={[{ width: 11, height: 11, borderRadius: 6, backgroundColor: "#FFFFFF" }, style]} />;
 }
 
+/** Açılış: tasarım arka planı (gökyüzü + ışıklı halka), halka içinde süzülen Hüdhüd + logo. */
 export default function Index() {
   const router = useRouter();
   const { t } = useTranslation();
+  const { width: W, height: H } = useWindowDimensions();
   const onboardingComplete = useSettingsStore((s) => s.onboardingComplete);
 
-  // Logo'da hafif nefes (pulse)
   const pulse = useSharedValue(0);
   useEffect(() => {
     pulse.value = withDelay(450, withRepeat(withTiming(1, { duration: 1400, easing: Easing.inOut(Easing.ease) }), -1, true));
@@ -98,80 +51,74 @@ export default function Index() {
     return () => clearTimeout(timer);
   }, [onboardingComplete, router]);
 
+  const birdSize = Math.round(Math.min(W * 0.46, 200));
+  const ringY = H * 0.37; // arka plandaki halkanın merkezi
+
   return (
-    <GradientBg>
-      <View className="flex-1 items-center justify-center">
-        {/* Pırıltılar */}
-        <Sparkle x={40} y={140} size={22} delay={0} />
-        <Sparkle x={300} y={90} size={16} delay={500} />
-        <Sparkle x={70} y={360} size={14} delay={900} />
-        <Sparkle x={290} y={330} size={20} delay={300} />
+    <View style={{ flex: 1, backgroundColor: "#BCD3F0" }}>
+      <Image source={images.splashBg} style={StyleSheet.absoluteFill} contentFit="cover" />
 
-        {/* Parıltı halkası + maskot */}
-        <View className="items-center justify-center" style={{ height: 280 }}>
-          <GlowRing />
-          <Animated.View entering={ZoomIn.springify().damping(9).mass(0.8)}>
-            <Floating distance={12} duration={1500}>
-              <Image source={images.mascot} style={{ width: 168, height: 168 }} contentFit="contain" />
-            </Floating>
-          </Animated.View>
-        </View>
+      {/* Halkanın içinde süzülen Hüdhüd */}
+      <Animated.View
+        entering={ZoomIn.springify().damping(9).mass(0.8)}
+        style={{ position: "absolute", top: ringY - birdSize / 2, left: 0, right: 0, alignItems: "center" }}
+      >
+        <Floating distance={10} duration={1600}>
+          <Image source={images.hudhud} style={{ width: birdSize, height: birdSize }} contentFit="contain" />
+        </Floating>
+      </Animated.View>
 
-        {/* Logo — sticker stili (arka navy + ön mavi + beyaz hâle) */}
-        <Animated.View entering={ZoomIn.delay(300).springify().damping(7)} style={[{ marginTop: 6 }, titleStyle]}>
-          <View style={{ alignItems: "center", justifyContent: "center" }}>
-            <Text
-              style={{
-                position: "absolute",
-                fontFamily: "Fredoka_700Bold",
-                fontSize: 78,
-                color: "#0B4FA6",
-                transform: [{ translateY: 4 }],
-              }}
-            >
-              Alif
-            </Text>
-            <Text
-              style={{
-                fontFamily: "Fredoka_700Bold",
-                fontSize: 78,
-                color: "#36A6FF",
-                textShadowColor: "rgba(255,255,255,0.95)",
-                textShadowOffset: { width: 0, height: 0 },
-                textShadowRadius: 8,
-              }}
-            >
-              Alif
-            </Text>
-          </View>
-        </Animated.View>
-
-        {/* Slogan + altın süslü ayraç */}
-        <Animated.View entering={FadeIn.delay(750)} className="mt-3 items-center">
+      {/* "Alif" logosu */}
+      <Animated.View
+        entering={ZoomIn.delay(300).springify().damping(7)}
+        style={[{ position: "absolute", top: H * 0.6, left: 0, right: 0, alignItems: "center" }, titleStyle]}
+      >
+        <View style={{ alignItems: "center", justifyContent: "center" }}>
+          <Text style={{ position: "absolute", fontFamily: "Fredoka_700Bold", fontSize: 78, color: "#0B4FA6", transform: [{ translateY: 4 }] }}>Alif</Text>
           <Text
             style={{
-              fontFamily: "Nunito_700Bold",
-              fontSize: 16,
-              color: "#2E6DA4",
+              fontFamily: "Fredoka_700Bold",
+              fontSize: 78,
+              color: "#36A6FF",
               textShadowColor: "rgba(255,255,255,0.95)",
-              textShadowOffset: { width: 0, height: 1 },
-              textShadowRadius: 5,
+              textShadowOffset: { width: 0, height: 0 },
+              textShadowRadius: 8,
             }}
           >
-            {t("onboarding.welcomeSubtitle")}
+            Alif
           </Text>
-          <View className="mt-2.5 flex-row items-center gap-2">
-            <View style={{ width: 64, height: 2, borderRadius: 2, backgroundColor: "rgba(245,165,36,0.55)" }} />
-            <Text style={{ fontSize: 14, color: "#F5A524" }}>✦</Text>
-            <View style={{ width: 64, height: 2, borderRadius: 2, backgroundColor: "rgba(245,165,36,0.55)" }} />
-          </View>
-        </Animated.View>
+        </View>
+      </Animated.View>
 
-        {/* Yükleniyor */}
-        <Animated.View entering={FadeIn.delay(1100)} style={{ position: "absolute", bottom: 60 }}>
-          <LoadingDots />
-        </Animated.View>
+      {/* Slogan + altın süslü ayraç */}
+      <Animated.View entering={FadeIn.delay(750)} style={{ position: "absolute", top: H * 0.6 + 78, left: 0, right: 0, alignItems: "center" }}>
+        <Text
+          style={{
+            fontFamily: "Nunito_700Bold",
+            fontSize: 16,
+            color: "#1F4E79",
+            textShadowColor: "rgba(255,255,255,0.95)",
+            textShadowOffset: { width: 0, height: 1 },
+            textShadowRadius: 5,
+          }}
+        >
+          {t("onboarding.welcomeSubtitle")}
+        </Text>
+        <View className="mt-2.5 flex-row items-center gap-2">
+          <View style={{ width: 64, height: 2, borderRadius: 2, backgroundColor: "rgba(193,138,40,0.6)" }} />
+          <Text style={{ fontSize: 14, color: "#C18A28" }}>✦</Text>
+          <View style={{ width: 64, height: 2, borderRadius: 2, backgroundColor: "rgba(193,138,40,0.6)" }} />
+        </View>
+      </Animated.View>
+
+      {/* Yükleniyor */}
+      <View style={{ position: "absolute", bottom: H * 0.085, left: 0, right: 0, alignItems: "center" }}>
+        <View className="flex-row gap-2">
+          {[0, 1, 2].map((i) => (
+            <Dot key={i} delay={i * 160} />
+          ))}
+        </View>
       </View>
-    </GradientBg>
+    </View>
   );
 }

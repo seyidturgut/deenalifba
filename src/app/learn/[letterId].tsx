@@ -6,11 +6,9 @@ import { useTranslation } from "react-i18next";
 
 import { Celebration } from "@/components/ui/Celebration";
 import { GradientBg } from "@/components/ui/GradientBg";
-import { JuicyButton } from "@/components/ui/JuicyButton";
 import { SoundToggles } from "@/components/ui/SoundToggles";
 import { BalloonPop } from "@/features/balloon/BalloonPop";
 import { SoundCatch } from "@/features/catch/SoundCatch";
-import { ConstellationTrace } from "@/features/constellation/ConstellationTrace";
 import { GiveToPiril } from "@/features/drag/GiveToPiril";
 import { HearTap } from "@/features/heartap/HearTap";
 import { LetterIntro } from "@/features/intro/LetterIntro";
@@ -109,7 +107,6 @@ export default function LearnScreen() {
   const syncMosque = useMosqueStore((s) => s.syncWithProgress);
 
   const [celebrate, setCelebrate] = useState(false);
-  const [resetSignal, setResetSignal] = useState(0);
   const [buildVisible, setBuildVisible] = useState(false);
   const [buildStage, setBuildStage] = useState(0);
 
@@ -154,7 +151,6 @@ export default function LearnScreen() {
 
   const kind = activities[activeIndex];
   const stepLabel = kind ? t(ACTIVITY_META[kind].labelKey) : "";
-  const isTrace = kind === "trace";
 
   return (
     <GradientBg>
@@ -204,21 +200,6 @@ export default function LearnScreen() {
         <View className="flex-1 items-center justify-center">
           <LetterIntro key={`intro-${id}`} letterId={id} onComplete={onCompleteStep} />
         </View>
-      ) : kind === "trace" ? (
-        <View className="flex-1 items-center justify-center pb-1">
-          <View style={{ width: "100%", maxWidth: 420, aspectRatio: 0.9, alignSelf: "center" }}>
-            <Image source={images.playPanel} style={StyleSheet.absoluteFill} contentFit="fill" />
-            <View style={{ position: "absolute", left: "9%", right: "9%", top: "9%", bottom: "11%" }}>
-              <ConstellationTrace
-                key={id}
-                letterChar={letter.char}
-                letterId={id}
-                resetSignal={resetSignal}
-                onComplete={onCompleteStep}
-              />
-            </View>
-          </View>
-        </View>
       ) : kind === "hearTap" ? (
         <View className="flex-1 items-center justify-center">
           <HearTap key={`hearTap-${id}`} letterId={id} onComplete={onCompleteStep} />
@@ -245,12 +226,6 @@ export default function LearnScreen() {
         </View>
       ) : (
         <View className="flex-1" />
-      )}
-
-      {isTrace && (
-        <View className="items-center pb-2">
-          <JuicyButton label={t("learn.redraw")} tone="accent" onPress={() => setResetSignal((s) => s + 1)} />
-        </View>
       )}
 
       <Celebration visible={celebrate} onDone={finishLetter} />

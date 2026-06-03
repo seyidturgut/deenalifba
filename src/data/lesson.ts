@@ -18,7 +18,8 @@ const PRACTICE: ActivityKind[] = ["hearTap", "match", "drag", "balloon", "catch"
  * değişir → tekdüzelik kırılır), önceki harf varsa sonda kısa TEKRAR.
  */
 export function buildLesson(letterId: number): ActivityKind[] {
-  const lesson: ActivityKind[] = ["intro", "trace"];
+  // Çizim adımı kaldırıldı → önce ÖĞRET (intro), sonra 2-3 değişen yazısız oyun, sonra tekrar.
+  const lesson: ActivityKind[] = ["intro"];
 
   // Uygun pratik oyunları — sesli oyunlar harf sesi gerektirir
   const practice = PRACTICE.filter((k) => {
@@ -26,9 +27,9 @@ export function buildLesson(letterId: number): ActivityKind[] {
     return hasLetterSound(letterId); // hearTap/match/drag/balloon/catch sesli
   });
 
-  // 1-2 pratik, harfe göre kaydırılarak (ardışık harfler farklı oyun alır)
+  // 2-3 pratik, harfe göre kaydırılarak (ardışık harfler farklı oyun alır → tekdüzelik yok)
   if (practice.length > 0) {
-    const n = Math.min(2, practice.length);
+    const n = Math.min(3, practice.length);
     const start = (letterId - 1) % practice.length;
     for (let i = 0; i < n; i++) lesson.push(practice[(start + i) % practice.length]);
   }

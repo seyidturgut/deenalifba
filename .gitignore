@@ -48,3 +48,7 @@ example
 
 # Üretilen placeholder asset'ler (commit edilmez, scriptle yeniden üretilir)
 assets/generated/
+
+# Üretilen sunum/rapor artefaktları (script ile yeniden üretilir)
+docs/*.html
+docs/*.pdf
