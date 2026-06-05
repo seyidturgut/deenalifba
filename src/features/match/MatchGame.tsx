@@ -4,11 +4,11 @@ import { Pressable, Text, View } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withSequence, withTiming } from "react-native-reanimated";
 import { useTranslation } from "react-i18next";
 
-import { Mascot } from "@/components/ui/Mascot";
 import { getLetter, LETTERS } from "@/data/letters";
 import { haptics } from "@/lib/haptics";
 import { images } from "@/lib/images";
 import { playLetter, playSfx } from "@/lib/sfx";
+import { useStageStore } from "@/stores/stageStore";
 
 /**
  * "Eşleştirme" (match): 6 kapalı kart = 3 çift (biri mevcut harf + 2 çeldirici).
@@ -137,6 +137,7 @@ export function MatchGame({ letterId, onComplete }: { letterId: number; onComple
           setLocked(false);
           haptics.success();
           playSfx("correct_ding");
+          useStageStore.getState().cheer();
           if (nm.length >= cards.length && !finishedRef.current) {
             finishedRef.current = true;
             playSfx("star_earned");
@@ -145,6 +146,7 @@ export function MatchGame({ letterId, onComplete }: { letterId: number; onComple
         }, 420);
       } else {
         playSfx("gentle_try_again");
+        useStageStore.getState().oops();
         setTimeout(() => {
           setFlipped([]);
           setLocked(false);
@@ -160,9 +162,8 @@ export function MatchGame({ letterId, onComplete }: { letterId: number; onComple
 
   return (
     <View className="flex-1 items-center justify-center gap-5">
-      {/* Pırıl + Dinle */}
+      {/* Dinle */}
       <View className="flex-row items-center gap-3 px-2">
-        <Mascot size={58} />
         <Pressable
           onPress={() => playLetter(letterId)}
           className="flex-row items-center gap-2 rounded-full bg-primary px-6 py-3.5"

@@ -4,12 +4,12 @@ import { Pressable, Text, View } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withSequence, withTiming } from "react-native-reanimated";
 import { useTranslation } from "react-i18next";
 
-import { Mascot } from "@/components/ui/Mascot";
 import { getLetter, LETTERS } from "@/data/letters";
 import { haptics } from "@/lib/haptics";
 import { images } from "@/lib/images";
 import { playSfx } from "@/lib/sfx";
 import { useProgressStore } from "@/stores/progressStore";
+import { useStageStore } from "@/stores/stageStore";
 import { useSrsStore } from "@/stores/srsStore";
 
 /**
@@ -118,7 +118,7 @@ export function RecallGame({ letterId, onComplete }: { letterId: number; onCompl
   if (questions.length === 0) {
     return (
       <View className="flex-1 items-center justify-center gap-3">
-        <Mascot size={72} pose="celebrate" />
+        <Text style={{ fontSize: 40 }}>🎉</Text>
         <View
           className="rounded-3xl bg-white/90 px-5 py-3"
           style={{ shadowColor: "#1462B5", shadowOpacity: 0.1, shadowRadius: 6, shadowOffset: { width: 0, height: 3 } }}
@@ -136,6 +136,7 @@ export function RecallGame({ letterId, onComplete }: { letterId: number; onCompl
     grade(q.id, quality, Date.now());
     haptics.success();
     playSfx("correct_ding");
+    useStageStore.getState().cheer();
     if (qi + 1 < questions.length) {
       setTimeout(() => {
         setQi(qi + 1);
@@ -150,12 +151,12 @@ export function RecallGame({ letterId, onComplete }: { letterId: number; onCompl
     setWrong((w) => w + 1);
     haptics.tap();
     playSfx("gentle_try_again");
+    useStageStore.getState().oops();
   };
 
   return (
     <View className="flex-1 items-center justify-center gap-4">
       <View className="flex-row items-center gap-2 px-2">
-        <Mascot size={52} />
         <View
           className="rounded-3xl rounded-bl-md bg-white/92 px-4 py-2"
           style={{ shadowColor: "#1462B5", shadowOpacity: 0.1, shadowRadius: 5, shadowOffset: { width: 0, height: 3 } }}

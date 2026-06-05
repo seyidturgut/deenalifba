@@ -13,7 +13,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { useTranslation } from "react-i18next";
 
-import { Mascot } from "@/components/ui/Mascot";
+import { useStageStore } from "@/stores/stageStore";
 import { getLetter, LETTERS } from "@/data/letters";
 import { haptics } from "@/lib/haptics";
 import { images } from "@/lib/images";
@@ -86,6 +86,7 @@ function Balloon({
       tx.value = withSequence(withTiming(-7, { duration: 45 }), withTiming(7, { duration: 45 }), withTiming(0, { duration: 45 }));
       haptics.tap();
       playSfx("gentle_try_again");
+      useStageStore.getState().oops();
       onPop(false);
     }
   };
@@ -200,6 +201,7 @@ export function BalloonPop({ letterId, onComplete }: { letterId: number; onCompl
     const n = count + 1;
     setCount(n);
     playSfx("correct_ding", 0.7);
+    useStageStore.getState().cheer();
     if (n >= NEED && !finishedRef.current) {
       finishedRef.current = true;
       setDone(true);
@@ -210,9 +212,8 @@ export function BalloonPop({ letterId, onComplete }: { letterId: number; onCompl
 
   return (
     <View className="flex-1 items-center gap-2 pt-1">
-      {/* Pırıl + Dinle */}
+      {/* Dinle */}
       <View className="flex-row items-center gap-3 px-2">
-        <Mascot size={52} />
         <Pressable
           onPress={() => playLetter(letterId)}
           className="flex-row items-center gap-2 rounded-full bg-primary px-5 py-3"

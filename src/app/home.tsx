@@ -1,6 +1,6 @@
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Pressable, Text, useWindowDimensions, View } from "react-native";
 import Animated, {
   Easing,
@@ -207,6 +207,7 @@ export default function Home() {
   const musicEnabled = useSettingsStore((s) => s.musicEnabled);
   const unlocked = useProgressStore((s) => s.unlockedLetters);
   const isLetterComplete = useProgressStore((s) => s.isLetterComplete);
+  const scrollRef = useRef<any>(null);
 
   useEffect(() => {
     syncMusicWithSetting();
@@ -221,10 +222,31 @@ export default function Home() {
   const nodes = LETTERS.map((l, i) => ({
     letter: l,
     cx: X_PATTERN[i % X_PATTERN.length] * contentW,
-    cy: 60 + i * V_GAP,
+    cy: 88 + i * V_GAP,
   }));
-  const mapHeight = 60 + (LETTERS.length - 1) * V_GAP + 80;
+  const mapHeight = 88 + (LETTERS.length - 1) * V_GAP + 80;
   const pathPoints = nodes.map((n) => `${n.cx},${n.cy}`).join(" ");
+
+  // Rehber karakterin durduğu aktif düğüm (hepsi bittiyse son düğüm)
+  const activeIndex = LETTERS.findIndex((l) => l.id === activeId);
+  const activeNode = activeIndex >= 0 ? nodes[activeIndex] : nodes[nodes.length - 1];
+  // Rehber Hüdhüd yerleşimi: düğümün boş tarafında, kendi bulutunda, büyük
+  const GUIDE = 124;
+  const guideSide = activeNode && activeNode.cx <= contentW / 2 ? 1 : -1;
+  const guideX = activeNode ? activeNode.cx + guideSide * (NODE * 0.74) : 0;
+  const guideTop = activeNode ? Math.max(4, activeNode.cy - GUIDE * 0.5) : 0;
+
+  // Açılışta (ve aktif harf değişince) rehberi/aktif seviyeyi görünür yere kaydır
+  useEffect(() => {
+    if (!activeNode) return;
+    const tmr = setTimeout(() => {
+      const GREETING_H = 96; // selam bloğu ~yüksekliği
+      const y = Math.max(0, GREETING_H + 8 + activeNode.cy - 260);
+      scrollRef.current?.scrollTo?.({ y, animated: true });
+    }, 350);
+    return () => clearTimeout(tmr);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeId]);
 
   const stateOf = (l: Letter): "done" | "active" | "open" | "locked" => {
     if (isLetterComplete(l.id)) return "done";
@@ -267,21 +289,15 @@ export default function Home() {
       <TopBar />
 
       <Animated.ScrollView
+        ref={scrollRef}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 96 }}
         onScroll={onScroll}
         scrollEventThrottle={16}
       >
-        {/* Üst: maskot + (selam + balon) + XP */}
+        {/* Üst: selam (maskot artık haritada rehber olarak duruyor) */}
         <View className="px-1 pt-1">
           <View className="flex-row items-end gap-2">
-            {/* Maskot — küçük buluta basar (havada kalmasın), selam verir */}
-            <View style={{ width: 98, height: 96, alignItems: "center", justifyContent: "flex-end" }}>
-              <Image source={images.nodeCloud} style={{ position: "absolute", bottom: 0, width: 98, height: 46 }} contentFit="contain" />
-              <View style={{ marginBottom: 8 }}>
-                <Mascot size={88} pose="wave" />
-              </View>
-            </View>
             <View className="flex-1 pb-3">
               <Text
                 style={{
@@ -326,6 +342,17 @@ export default function Home() {
               }}
             />
           ))}
+
+          {/* Rehber Hüdhüd — aktif seviyenin YANINDA kendi bulutunda; ilerledikçe taşınır */}
+          {activeNode && (
+            <View
+              pointerEvents="none"
+              style={{ position: "absolute", left: guideX - GUIDE / 2, top: guideTop, width: GUIDE, height: GUIDE, alignItems: "center", justifyContent: "flex-end" }}
+            >
+              <Image source={images.nodeCloud} style={{ position: "absolute", bottom: 0, width: GUIDE * 0.96, height: GUIDE * 0.4 }} contentFit="contain" />
+              <Mascot size={GUIDE} pose="point" />
+            </View>
+          )}
         </View>
       </Animated.ScrollView>
 

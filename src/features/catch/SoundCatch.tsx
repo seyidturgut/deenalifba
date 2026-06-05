@@ -4,7 +4,7 @@ import { Pressable, Text, useWindowDimensions, View } from "react-native";
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming } from "react-native-reanimated";
 import { useTranslation } from "react-i18next";
 
-import { Mascot } from "@/components/ui/Mascot";
+import { useStageStore } from "@/stores/stageStore";
 import { getLetter, LETTERS } from "@/data/letters";
 import { haptics } from "@/lib/haptics";
 import { images } from "@/lib/images";
@@ -122,10 +122,12 @@ export function SoundCatch({ letterId, onComplete }: { letterId: number; onCompl
     if (!isTarget) {
       haptics.tap();
       playSfx("gentle_try_again");
+      useStageStore.getState().oops();
       return;
     }
     haptics.success();
     playSfx("correct_ding");
+    useStageStore.getState().cheer();
     const nc = [...caught, key];
     setCaught(nc);
     if (nc.length >= NEED && !finishedRef.current) {
@@ -139,7 +141,6 @@ export function SoundCatch({ letterId, onComplete }: { letterId: number; onCompl
   return (
     <View className="flex-1 items-center justify-center gap-3">
       <View className="flex-row items-center gap-3 px-2">
-        <Mascot size={52} />
         <Pressable
           onPress={() => playLetter(letterId)}
           className="flex-row items-center gap-2 rounded-full bg-primary px-5 py-3"

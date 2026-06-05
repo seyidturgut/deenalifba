@@ -5,8 +5,10 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 
 import { Celebration } from "@/components/ui/Celebration";
+import { CheerOverlay } from "@/components/ui/CheerOverlay";
 import { GradientBg } from "@/components/ui/GradientBg";
 import { SoundToggles } from "@/components/ui/SoundToggles";
+import { StageHost } from "@/components/ui/StageHost";
 import { BalloonPop } from "@/features/balloon/BalloonPop";
 import { SoundCatch } from "@/features/catch/SoundCatch";
 import { GiveToPiril } from "@/features/drag/GiveToPiril";
@@ -24,6 +26,7 @@ import { playSfx } from "@/lib/sfx";
 import { useLearningStore } from "@/stores/learningStore";
 import { useMosqueStore } from "@/stores/mosqueStore";
 import { useProgressStore } from "@/stores/progressStore";
+import { useStageStore } from "@/stores/stageStore";
 
 const HINT_KEY: Record<ActivityKind, string> = {
   intro: "learn.introHint",
@@ -112,6 +115,7 @@ export default function LearnScreen() {
 
   useEffect(() => {
     startLetter(id);
+    useStageStore.getState().resetIdle();
   }, [id, startLetter]);
 
   const goHome = () => router.replace("/home");
@@ -133,6 +137,7 @@ export default function LearnScreen() {
     const advanced = nextStep();
     if (advanced) {
       playSfx("step_complete");
+      useStageStore.getState().celebrate(); // host kutlar + "Aferin!" overlay
     } else {
       completeLetter(id);
       setCelebrate(true);
@@ -151,6 +156,7 @@ export default function LearnScreen() {
 
   const kind = activities[activeIndex];
   const stepLabel = kind ? t(ACTIVITY_META[kind].labelKey) : "";
+  const FLOOR_H = 118; // alt sahne zemini (büyük host orada durur; oyunlar üstte)
 
   return (
     <GradientBg>
@@ -195,8 +201,24 @@ export default function LearnScreen() {
         </Text>
       </View>
 
-      {/* Etkinlik */}
-      {kind === "intro" ? (
+      {/* Görev paneli (çerçeve) + etkinlik — sahne zemininin ÜSTÜNDE */}
+      <View style={{ flex: 1, marginTop: 10 }}>
+        <View
+          pointerEvents="none"
+          style={{
+            position: "absolute",
+            left: 2,
+            right: 2,
+            top: 2,
+            bottom: FLOOR_H + 2,
+            borderRadius: 30,
+            backgroundColor: "rgba(255,255,255,0.24)",
+            borderWidth: 2,
+            borderColor: "rgba(255,255,255,0.6)",
+          }}
+        />
+        <View style={{ flex: 1, marginBottom: FLOOR_H }}>
+        {kind === "intro" ? (
         <View className="flex-1 items-center justify-center">
           <LetterIntro key={`intro-${id}`} letterId={id} onComplete={onCompleteStep} />
         </View>
@@ -227,6 +249,15 @@ export default function LearnScreen() {
       ) : (
         <View className="flex-1" />
       )}
+        </View>
+      </View>
+
+      {/* Sahne zemini (bulut bandı) + büyük host (sunucu) */}
+      <View pointerEvents="none" style={{ position: "absolute", left: -18, right: -18, bottom: 0, height: FLOOR_H + 6 }}>
+        <Image source={images.nodeCloud} style={{ position: "absolute", right: -6, bottom: -8, width: 196, height: 92, opacity: 0.8 }} contentFit="contain" />
+      </View>
+      <StageHost size={148} />
+      <CheerOverlay />
 
       <Celebration visible={celebrate} onDone={finishLetter} />
       <MosqueBuild visible={buildVisible} stageIndex={buildStage} onDone={goHome} />

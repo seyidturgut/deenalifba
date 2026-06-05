@@ -4,11 +4,11 @@ import { Pressable, Text, View } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withSequence, withTiming } from "react-native-reanimated";
 import { useTranslation } from "react-i18next";
 
-import { Mascot } from "@/components/ui/Mascot";
 import { getLetter, LETTERS } from "@/data/letters";
 import { haptics } from "@/lib/haptics";
 import { images } from "@/lib/images";
 import { playLetter, playSfx } from "@/lib/sfx";
+import { useStageStore } from "@/stores/stageStore";
 
 /**
  * "Duy & Dokun" (hearTap): Pırıl harfin sesini SÖYLER (otomatik + 🔊 tekrar),
@@ -41,6 +41,7 @@ function OptionCard({
       sc.value = withSequence(withTiming(1.1, { duration: 130 }), withTiming(1, { duration: 130 }));
       haptics.success();
       playSfx("correct_ding");
+      useStageStore.getState().cheer();
       onSolved();
     } else {
       tx.value = withSequence(
@@ -51,6 +52,7 @@ function OptionCard({
       );
       haptics.tap();
       playSfx("gentle_try_again");
+      useStageStore.getState().oops();
     }
   };
 
@@ -118,7 +120,6 @@ export function HearTap({ letterId, onComplete }: { letterId: number; onComplete
     <View className="flex-1 items-center justify-center gap-6">
       {/* Pırıl + büyük Dinle butonu (tek prompt = ses) */}
       <View className="flex-row items-center gap-3 px-2">
-        <Mascot size={64} pose="point" />
         <Pressable
           onPress={() => playLetter(letterId)}
           className="flex-row items-center gap-2 rounded-full bg-primary px-6 py-4"

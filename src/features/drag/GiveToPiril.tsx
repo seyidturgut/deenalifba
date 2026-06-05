@@ -19,6 +19,7 @@ import { getLetter, LETTERS } from "@/data/letters";
 import { haptics } from "@/lib/haptics";
 import { images } from "@/lib/images";
 import { playLetter, playSfx } from "@/lib/sfx";
+import { useStageStore } from "@/stores/stageStore";
 
 /**
  * "Pırıl'a Ver" (drag): Pırıl harfi SESLİ ister. Çocuk doğru harfi YUKARI, Pırıl'ın
@@ -195,10 +196,12 @@ export function GiveToPiril({ letterId, onComplete }: { letterId: number; onComp
     if (!correct) {
       haptics.tap();
       playSfx("gentle_try_again");
+      useStageStore.getState().oops();
       return;
     }
     haptics.success();
     playSfx("correct_ding");
+    useStageStore.getState().cheer();
     setLocked(true);
     if (round + 1 >= ROUNDS) {
       if (finishedRef.current) return;
@@ -233,10 +236,10 @@ export function GiveToPiril({ letterId, onComplete }: { letterId: number; onComp
           <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 15, color: "white" }}>{t("common.listen")}</Text>
         </Pressable>
 
-        {/* Pırıl sepeti tutuyor — drop hedefi (basket = alt kısım) */}
+        {/* Sepet — drop hedefi (nabızlı halka içinde) */}
         <View
-          onLayout={(e) => setBasketY(e.nativeEvent.layout.y + e.nativeEvent.layout.height * 0.66)}
-          style={{ width: 184, height: 210, alignItems: "center", justifyContent: "flex-end" }}
+          onLayout={(e) => setBasketY(e.nativeEvent.layout.y + e.nativeEvent.layout.height * 0.55)}
+          style={{ width: 184, height: 160, alignItems: "center", justifyContent: "flex-end" }}
         >
           {/* Sepet bölgesini saran nabızlı parıltı halkası */}
           <Animated.View
@@ -256,8 +259,8 @@ export function GiveToPiril({ letterId, onComplete }: { letterId: number; onComp
               ringStyle,
             ]}
           />
-          <Animated.View style={basketStyle}>
-            <Image source={images.pirilBasket} style={{ width: 150, aspectRatio: 0.72 }} contentFit="contain" />
+          <Animated.View style={[{ position: "absolute", left: 0, right: 0, bottom: 14, alignItems: "center" }, basketStyle]}>
+            <Text style={{ fontSize: 92 }}>🧺</Text>
           </Animated.View>
         </View>
       </View>
