@@ -215,8 +215,12 @@ export default function Home() {
 
   const contentW = width - 36; // GradientBg padding 18*2
 
-  // Aktif harf = sıradaki tamamlanmamış harf (Duolingo gibi parlar)
-  const activeId = LETTERS.find((l) => !isLetterComplete(l.id))?.id ?? LETTERS.length;
+  // Aktif/rehber düğüm = ULAŞILAN EN İLERİ nokta (tamamlananların hemen ardındaki harf).
+  // "İlk boşluğa" göre DEĞİL → çocuk bir harfi atlasa bile kuş geri seviyeye dönmez,
+  // hep en ileride durur (Duolingo gibi parlar).
+  const lastDoneIndex = LETTERS.reduce((m, l, i) => (isLetterComplete(l.id) ? i : m), -1);
+  const activeIndex = Math.min(lastDoneIndex + 1, LETTERS.length - 1);
+  const activeId = LETTERS[activeIndex].id;
 
   // Düğüm konumları (zig-zag)
   const nodes = LETTERS.map((l, i) => ({
@@ -227,9 +231,8 @@ export default function Home() {
   const mapHeight = 88 + (LETTERS.length - 1) * V_GAP + 80;
   const pathPoints = nodes.map((n) => `${n.cx},${n.cy}`).join(" ");
 
-  // Rehber karakterin durduğu aktif düğüm (hepsi bittiyse son düğüm)
-  const activeIndex = LETTERS.findIndex((l) => l.id === activeId);
-  const activeNode = activeIndex >= 0 ? nodes[activeIndex] : nodes[nodes.length - 1];
+  // Rehber karakterin durduğu aktif düğüm
+  const activeNode = nodes[activeIndex];
   // Rehber Hüdhüd yerleşimi: düğümün boş tarafında, kendi bulutunda, büyük
   const GUIDE = 124;
   const guideSide = activeNode && activeNode.cx <= contentW / 2 ? 1 : -1;
