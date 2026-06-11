@@ -1,6 +1,6 @@
 import { Image } from "expo-image";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { LayoutChangeEvent, Pressable, Text, View } from "react-native";
+import { LayoutChangeEvent, Text, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
   Easing,
@@ -13,7 +13,6 @@ import Animated, {
   withSpring,
   withTiming,
 } from "react-native-reanimated";
-import { useTranslation } from "react-i18next";
 
 import { getLetter, LETTERS } from "@/data/letters";
 import { haptics } from "@/lib/haptics";
@@ -133,7 +132,6 @@ function DraggableCard({
 }
 
 export function GiveToPiril({ letterId, onComplete }: { letterId: number; onComplete: () => void }) {
-  const { t } = useTranslation();
   const target = getLetter(letterId);
   const [round, setRound] = useState(0);
   const [locked, setLocked] = useState(false);
@@ -225,17 +223,8 @@ export function GiveToPiril({ letterId, onComplete }: { letterId: number; onComp
       onLayout={(e: LayoutChangeEvent) => setBox({ w: e.nativeEvent.layout.width, h: e.nativeEvent.layout.height })}
       style={{ justifyContent: "center", gap: 14, paddingVertical: 12 }}
     >
-      {/* ÜST: Dinle + Pırıl sepeti tutuyor (büyük hedef, nabızlı halka) */}
+      {/* ÜST: Sepet — drop hedefi (ses girişte otomatik çalar) */}
       <View className="items-center gap-1">
-        <Pressable
-          onPress={() => playLetter(letterId)}
-          className="flex-row items-center gap-1.5 rounded-full bg-primary px-5 py-2.5"
-          style={{ shadowColor: "#1462B5", shadowOpacity: 0.22, shadowRadius: 6, shadowOffset: { width: 0, height: 3 } }}
-        >
-          <Text style={{ fontSize: 20 }}>🔊</Text>
-          <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 15, color: "white" }}>{t("common.listen")}</Text>
-        </Pressable>
-
         {/* Sepet — drop hedefi (nabızlı halka içinde) */}
         <View
           onLayout={(e) => setBasketY(e.nativeEvent.layout.y + e.nativeEvent.layout.height * 0.55)}

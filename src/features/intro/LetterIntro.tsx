@@ -27,14 +27,14 @@ export function LetterIntro({ letterId, onComplete }: { letterId: number; onComp
 
   return (
     <View className="flex-1 items-center justify-center gap-5">
-      {/* Büyük harf kartı */}
+      {/* Büyük harf kartı — dokununca harfin sesi tekrar çalar (etiketsiz) */}
       <Floating distance={8} duration={2200}>
-        <View style={{ width: 250, height: 250 }}>
+        <Pressable onPress={() => playLetter(letterId)} style={{ width: 250, height: 250 }}>
           <Image source={images.playPanel} style={StyleSheet.absoluteFill} contentFit="fill" />
           <View style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, alignItems: "center", justifyContent: "center" }}>
             <Text style={{ fontFamily: "Amiri_700Bold", fontSize: 140, color: "#2A2A33" }}>{letter.char}</Text>
           </View>
-        </View>
+        </Pressable>
       </Floating>
 
       {/* Harfin adı */}
@@ -50,16 +50,6 @@ export function LetterIntro({ letterId, onComplete }: { letterId: number; onComp
       >
         {letter.name}
       </Text>
-
-      {/* Dinle */}
-      <Pressable
-        onPress={() => playLetter(letterId)}
-        className="flex-row items-center gap-2 rounded-full bg-primary px-6 py-3"
-        style={{ shadowColor: "#1462B5", shadowOpacity: 0.2, shadowRadius: 6, shadowOffset: { width: 0, height: 3 } }}
-      >
-        <Text style={{ fontSize: 24 }}>🔊</Text>
-        <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 18, color: "white" }}>{t("intro.listen")}</Text>
-      </Pressable>
 
       {/* Devam (öğretme adımı — açık devam butonu) */}
       <JuicyButton label={t("intro.continue")} tone="success" onPress={onComplete} />

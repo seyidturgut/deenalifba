@@ -46,7 +46,7 @@ function Puff({ seq, cx, cy }: { seq: number; cx: number; cy: number }) {
   );
 }
 
-export function StageHost({ size = 120 }: { size?: number }) {
+export function StageHost({ size = 120, onReplay }: { size?: number; onReplay?: () => void }) {
   const mood = useStageStore((s) => s.mood);
   const cheerN = useStageStore((s) => s.cheerN);
 
@@ -64,14 +64,14 @@ export function StageHost({ size = 120 }: { size?: number }) {
   const shakeStyle = useAnimatedStyle(() => ({ transform: [{ translateX: shake.value * 6 }] }));
 
   return (
-    <View pointerEvents="none" style={{ position: "absolute", left: -6, bottom: -8, width: size + 60, height: size + 72 }}>
+    <View pointerEvents="box-none" style={{ position: "absolute", left: -6, bottom: -8, width: size + 60, height: size + 72 }}>
       {/* zemin bulutu */}
-      <Image source={images.nodeCloud} style={{ position: "absolute", bottom: 6, left: 8, width: size * 1.02, height: size * 0.42 }} contentFit="contain" />
+      <Image pointerEvents="none" source={images.nodeCloud} style={{ position: "absolute", bottom: 6, left: 8, width: size * 1.02, height: size * 0.42 }} contentFit="contain" />
       {/* doğru cevap yıldız patlaması (baş hizası) */}
       <Puff seq={cheerN} cx={8 + size / 2} cy={size * 0.34} />
-      {/* host */}
+      {/* host — dokununca harf sesini tekrar çalar (etiketsiz replay) */}
       <Animated.View style={[{ position: "absolute", bottom: 20, left: 6 }, shakeStyle]}>
-        <Mascot size={size} pose={MOOD_POSE[mood]} />
+        <Mascot size={size} pose={MOOD_POSE[mood]} onTap={onReplay} />
       </Animated.View>
     </View>
   );

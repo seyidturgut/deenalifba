@@ -2,7 +2,6 @@ import { Image } from "expo-image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withSequence, withTiming } from "react-native-reanimated";
-import { useTranslation } from "react-i18next";
 
 import { getLetter, LETTERS } from "@/data/letters";
 import { haptics } from "@/lib/haptics";
@@ -86,7 +85,6 @@ function MatchCard({
 }
 
 export function MatchGame({ letterId, onComplete }: { letterId: number; onComplete: () => void }) {
-  const { t } = useTranslation();
   const target = getLetter(letterId);
 
   // 3 çift: hedef harf + 2 çeldirici → 6 kart, karışık
@@ -162,18 +160,6 @@ export function MatchGame({ letterId, onComplete }: { letterId: number; onComple
 
   return (
     <View className="flex-1 items-center justify-center gap-5">
-      {/* Dinle */}
-      <View className="flex-row items-center gap-3 px-2">
-        <Pressable
-          onPress={() => playLetter(letterId)}
-          className="flex-row items-center gap-2 rounded-full bg-primary px-6 py-3.5"
-          style={{ shadowColor: "#1462B5", shadowOpacity: 0.22, shadowRadius: 7, shadowOffset: { width: 0, height: 4 } }}
-        >
-          <Text style={{ fontSize: 24 }}>🔊</Text>
-          <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 18, color: "white" }}>{t("common.listen")}</Text>
-        </Pressable>
-      </View>
-
       {/* İlerleme — kaç çift bulundu (kaç çift kaldığı bariz olsun) */}
       <View className="flex-row items-center gap-2">
         {Array.from({ length: totalPairs }).map((_, i) => (

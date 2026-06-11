@@ -17,12 +17,13 @@ import { LetterIntro } from "@/features/intro/LetterIntro";
 import { MatchGame } from "@/features/match/MatchGame";
 import { MosqueBuild } from "@/features/mosque/MosqueBuild";
 import { RecallGame } from "@/features/recall/RecallGame";
+import { PaintTrace } from "@/features/trace/PaintTrace";
 import { ACTIVITY_META } from "@/data/lesson";
 import { getLetter, TOTAL_LETTERS } from "@/data/letters";
 import type { ActivityKind } from "@/data/types";
 import { haptics } from "@/lib/haptics";
 import { images } from "@/lib/images";
-import { playSfx } from "@/lib/sfx";
+import { playLetter, playSfx } from "@/lib/sfx";
 import { useLearningStore } from "@/stores/learningStore";
 import { useMosqueStore } from "@/stores/mosqueStore";
 import { useProgressStore } from "@/stores/progressStore";
@@ -222,6 +223,15 @@ export default function LearnScreen() {
         <View className="flex-1 items-center justify-center">
           <LetterIntro key={`intro-${id}`} letterId={id} onComplete={onCompleteStep} />
         </View>
+      ) : kind === "trace" ? (
+        <View className="flex-1 items-center justify-center pb-1">
+          <View style={{ width: "100%", maxWidth: 400, aspectRatio: 0.96, alignSelf: "center" }}>
+            <Image source={images.playPanel} style={StyleSheet.absoluteFill} contentFit="fill" />
+            <View style={{ position: "absolute", left: "9%", right: "9%", top: "9%", bottom: "11%" }}>
+              <PaintTrace key={`trace-${id}`} letterId={id} onComplete={onCompleteStep} />
+            </View>
+          </View>
+        </View>
       ) : kind === "hearTap" ? (
         <View className="flex-1 items-center justify-center">
           <HearTap key={`hearTap-${id}`} letterId={id} onComplete={onCompleteStep} />
@@ -256,7 +266,7 @@ export default function LearnScreen() {
       <View pointerEvents="none" style={{ position: "absolute", left: -18, right: -18, bottom: 0, height: FLOOR_H + 6 }}>
         <Image source={images.nodeCloud} style={{ position: "absolute", right: -6, bottom: -8, width: 196, height: 92, opacity: 0.8 }} contentFit="contain" />
       </View>
-      <StageHost size={148} />
+      <StageHost size={148} onReplay={() => playLetter(id)} />
       <CheerOverlay />
 
       <Celebration visible={celebrate} onDone={finishLetter} />

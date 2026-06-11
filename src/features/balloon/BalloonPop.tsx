@@ -11,7 +11,6 @@ import Animated, {
   withSequence,
   withTiming,
 } from "react-native-reanimated";
-import { useTranslation } from "react-i18next";
 
 import { useStageStore } from "@/stores/stageStore";
 import { getLetter, LETTERS } from "@/data/letters";
@@ -150,7 +149,6 @@ function Balloon({
 }
 
 export function BalloonPop({ letterId, onComplete }: { letterId: number; onComplete: () => void }) {
-  const { t } = useTranslation();
   const { width } = useWindowDimensions();
   const target = getLetter(letterId);
   const [count, setCount] = useState(0);
@@ -212,18 +210,6 @@ export function BalloonPop({ letterId, onComplete }: { letterId: number; onCompl
 
   return (
     <View className="flex-1 items-center gap-2 pt-1">
-      {/* Dinle */}
-      <View className="flex-row items-center gap-3 px-2">
-        <Pressable
-          onPress={() => playLetter(letterId)}
-          className="flex-row items-center gap-2 rounded-full bg-primary px-5 py-3"
-          style={{ shadowColor: "#1462B5", shadowOpacity: 0.22, shadowRadius: 6, shadowOffset: { width: 0, height: 3 } }}
-        >
-          <Text style={{ fontSize: 22 }}>🔊</Text>
-          <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 16, color: "white" }}>{t("common.listen")}</Text>
-        </Pressable>
-      </View>
-
       {/* İlerleme (yıldız) */}
       <View className="flex-row gap-1.5">
         {Array.from({ length: NEED }).map((_, i) => (

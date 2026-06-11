@@ -2,7 +2,6 @@ import { Image } from "expo-image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Pressable, Text, useWindowDimensions, View } from "react-native";
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming } from "react-native-reanimated";
-import { useTranslation } from "react-i18next";
 
 import { useStageStore } from "@/stores/stageStore";
 import { getLetter, LETTERS } from "@/data/letters";
@@ -70,7 +69,6 @@ function CatchTile({
 }
 
 export function SoundCatch({ letterId, onComplete }: { letterId: number; onComplete: () => void }) {
-  const { t } = useTranslation();
   const { width } = useWindowDimensions();
   const target = getLetter(letterId);
   const [caught, setCaught] = useState<number[]>([]);
@@ -140,17 +138,6 @@ export function SoundCatch({ letterId, onComplete }: { letterId: number; onCompl
 
   return (
     <View className="flex-1 items-center justify-center gap-3">
-      <View className="flex-row items-center gap-3 px-2">
-        <Pressable
-          onPress={() => playLetter(letterId)}
-          className="flex-row items-center gap-2 rounded-full bg-primary px-5 py-3"
-          style={{ shadowColor: "#1462B5", shadowOpacity: 0.22, shadowRadius: 6, shadowOffset: { width: 0, height: 3 } }}
-        >
-          <Text style={{ fontSize: 22 }}>🔊</Text>
-          <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 16, color: "white" }}>{t("common.listen")}</Text>
-        </Pressable>
-      </View>
-
       {/* İlerleme (yakalananlar) */}
       <View className="flex-row gap-1.5">
         {Array.from({ length: NEED }).map((_, i) => (

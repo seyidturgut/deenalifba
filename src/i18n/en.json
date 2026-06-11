@@ -46,7 +46,7 @@
   },
   "learn": {
     "intro": "Learn",
-    "trace": "Trace",
+    "trace": "Paint",
     "hearTap": "Hear & Tap",
     "match": "Match",
     "drag": "Give to Pırıl",
@@ -55,7 +55,7 @@
     "word": "Word",
     "recall": "Review",
     "introHint": "Listen and meet the letter 👋",
-    "traceHint": "Trace the path with Pırıl ✏️",
+    "traceHint": "Paint the letter with your finger ✨",
     "hearTapHint": "Listen and tap the right letter 👂",
     "matchHint": "Match the same letters 🃏",
     "dragHint": "Give the right letter to Pırıl 🤲",
