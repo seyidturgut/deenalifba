@@ -4,19 +4,25 @@ import Animated, { Easing, useAnimatedStyle, useSharedValue, withDelay, withSequ
 import { useTranslation } from "react-i18next";
 
 import { useStageStore } from "@/stores/stageStore";
+import { Motif, type MotifKind, REWARD_COLORS } from "./IslamicMotifs";
 
 /**
- * CheerOverlay — oyun/tur sonu coşkulu geri bildirim: büyük "Aferin!" + konfeti.
- * stageStore.celebrate() çağrılınca kısa süre (≈1.3sn) görünür. pointerEvents none.
+ * CheerOverlay — oyun/tur sonu coşkulu geri bildirim: büyük "Aferin!" + İslami motif
+ * konfetisi (hilal, girih yıldızı, parıltı). stageStore.celebrate() çağrılınca kısa
+ * süre (≈1.3sn) görünür. pointerEvents none.
  */
-const COLORS = ["#FF8FA3", "#6FB1FF", "#7ED99B", "#FFD166", "#C792EA", "#FF9F5A"];
+const KINDS: MotifKind[] = ["star8", "crescent", "sparkle4", "star8"];
 
-function Piece({ prog, x, color, rot, sy, H }: { prog: any; x: number; color: number | string; rot: number; sy: number; H: number }) {
+function Piece({ prog, x, color, kind, sz, rot, sy, H }: { prog: any; x: number; color: string; kind: MotifKind; sz: number; rot: number; sy: number; H: number }) {
   const st = useAnimatedStyle(() => ({
     opacity: 1 - prog.value * prog.value,
     transform: [{ translateX: x }, { translateY: sy + prog.value * (H * 0.72) }, { rotate: `${prog.value * rot * 360}deg` }],
   }));
-  return <Animated.View style={[{ position: "absolute", left: 0, top: 0, width: 12, height: 16, borderRadius: 3, backgroundColor: color as string }, st]} />;
+  return (
+    <Animated.View style={[{ position: "absolute", left: 0, top: 0 }, st]}>
+      <Motif kind={kind} size={sz} color={color} />
+    </Animated.View>
+  );
 }
 
 export function CheerOverlay() {
@@ -43,7 +49,15 @@ export function CheerOverlay() {
   }, [celebrateN]);
 
   const pieces = useMemo(
-    () => Array.from({ length: 16 }, (_, i) => ({ x: (i * 53) % Math.max(1, Math.round(width)), color: COLORS[i % COLORS.length], rot: (i % 2 ? 1 : -1) * (1 + (i % 3)), sy: -24 - (i % 5) * 28 })),
+    () =>
+      Array.from({ length: 16 }, (_, i) => ({
+        x: (i * 53) % Math.max(1, Math.round(width)),
+        color: REWARD_COLORS[i % REWARD_COLORS.length],
+        kind: KINDS[i % KINDS.length],
+        sz: 22 + (i % 4) * 6,
+        rot: (i % 2 ? 1 : -1) * (1 + (i % 3)),
+        sy: -24 - (i % 5) * 28,
+      })),
     [width, celebrateN]
   );
 
@@ -54,7 +68,7 @@ export function CheerOverlay() {
   return (
     <View pointerEvents="none" style={StyleSheet.absoluteFill}>
       {pieces.map((p, i) => (
-        <Piece key={i} prog={prog} x={p.x} color={p.color} rot={p.rot} sy={p.sy} H={height} />
+        <Piece key={i} prog={prog} x={p.x} color={p.color} kind={p.kind} sz={p.sz} rot={p.rot} sy={p.sy} H={height} />
       ))}
       <Animated.View style={[{ position: "absolute", left: 0, right: 0, top: height * 0.3, alignItems: "center" }, textStyle]}>
         <Text

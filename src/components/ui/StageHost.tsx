@@ -5,6 +5,7 @@ import Animated, { Easing, useAnimatedStyle, useSharedValue, withSequence, withT
 
 import { images } from "@/lib/images";
 import { Mascot, type MascotPose } from "./Mascot";
+import { Motif, type MotifKind } from "./IslamicMotifs";
 import { useStageStore } from "@/stores/stageStore";
 
 /**
@@ -12,15 +13,19 @@ import { useStageStore } from "@/stores/stageStore";
  * ruh haline göre tepki verir (idle/sevinç/kutlama/sallanma) + doğru cevapta yıldız patlaması.
  * pointerEvents none → oyun dokunuşlarını engellemez.
  */
-const A = Animated.createAnimatedComponent(Image);
 const MOOD_POSE: Record<string, MascotPose> = { idle: "point", happy: "happy", celebrate: "celebrate", oops: "idle" };
+const PUFF_COLORS = ["#F5A524", "#2E8B9E", "#2FA869", "#E0A93B"];
 
-function PuffStar({ p, cx, cy, dx, dy }: { p: any; cx: number; cy: number; dx: number; dy: number }) {
+function PuffStar({ p, cx, cy, dx, dy, kind, color }: { p: any; cx: number; cy: number; dx: number; dy: number; kind: MotifKind; color: string }) {
   const st = useAnimatedStyle(() => ({
     opacity: 1 - p.value,
-    transform: [{ translateX: dx * 42 * p.value }, { translateY: dy * 48 * p.value }, { scale: 0.4 + p.value * 0.7 }],
+    transform: [{ translateX: dx * 42 * p.value }, { translateY: dy * 48 * p.value }, { scale: 0.4 + p.value * 0.7 }, { rotate: `${p.value * 120}deg` }],
   }));
-  return <A source={images.star} style={[{ position: "absolute", left: cx - 12, top: cy - 12, width: 24, height: 24 }, st]} contentFit="contain" />;
+  return (
+    <Animated.View style={[{ position: "absolute", left: cx - 11, top: cy - 11 }, st]}>
+      <Motif kind={kind} size={22} color={color} />
+    </Animated.View>
+  );
 }
 
 function Puff({ seq, cx, cy }: { seq: number; cx: number; cy: number }) {
@@ -31,16 +36,16 @@ function Puff({ seq, cx, cy }: { seq: number; cx: number; cy: number }) {
       p.value = withTiming(1, { duration: 700, easing: Easing.out(Easing.quad) });
     }
   }, [seq]);
-  const dirs: [number, number][] = [
-    [-1, -1],
-    [0, -1.3],
-    [1, -0.9],
-    [0.6, -0.3],
+  const dirs: [number, number, MotifKind][] = [
+    [-1, -1, "star8"],
+    [0, -1.3, "crescent"],
+    [1, -0.9, "star8"],
+    [0.6, -0.3, "sparkle4"],
   ];
   return (
     <>
-      {dirs.map(([dx, dy], i) => (
-        <PuffStar key={i} p={p} cx={cx} cy={cy} dx={dx} dy={dy} />
+      {dirs.map(([dx, dy, kind], i) => (
+        <PuffStar key={i} p={p} cx={cx} cy={cy} dx={dx} dy={dy} kind={kind} color={PUFF_COLORS[i % PUFF_COLORS.length]} />
       ))}
     </>
   );

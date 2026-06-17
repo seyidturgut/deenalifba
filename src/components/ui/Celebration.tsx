@@ -1,4 +1,3 @@
-import { Image } from "expo-image";
 import { useEffect, useMemo } from "react";
 import { Dimensions, Text, View } from "react-native";
 import Animated, {
@@ -11,17 +10,18 @@ import Animated, {
 import { useTranslation } from "react-i18next";
 
 import { haptics } from "@/lib/haptics";
-import { images } from "@/lib/images";
 import { playSfx } from "@/lib/sfx";
 import { useSettingsStore } from "@/stores/settingsStore";
+import { Motif, type MotifKind, RewardEmblem, REWARD_COLORS } from "./IslamicMotifs";
 
 const { width: SCREEN_W } = Dimensions.get("window");
-const COLORS = ["#F5A524", "#37ACFF", "#3FB984", "#FF6B9D", "#FFD93D", "#8B5CF6"];
+const KINDS: MotifKind[] = ["star8", "crescent", "sparkle4"];
 const PIECE_COUNT = 28;
 
 type PieceConf = {
   startX: number;
   color: string;
+  kind: MotifKind;
   size: number;
   vx: number;
   vy: number;
@@ -47,20 +47,9 @@ function ConfettiPiece({ conf }: { conf: PieceConf }) {
   });
 
   return (
-    <Animated.View
-      style={[
-        {
-          position: "absolute",
-          top: 120,
-          left: conf.startX,
-          width: conf.size,
-          height: conf.size * 0.6,
-          backgroundColor: conf.color,
-          borderRadius: 2,
-        },
-        style,
-      ]}
-    />
+    <Animated.View style={[{ position: "absolute", top: 120, left: conf.startX }, style]}>
+      <Motif kind={conf.kind} size={conf.size} color={conf.color} />
+    </Animated.View>
   );
 }
 
@@ -85,8 +74,9 @@ export function Celebration({
     () =>
       Array.from({ length: PIECE_COUNT }, () => ({
         startX: SCREEN_W * 0.5 + (Math.random() - 0.5) * 60,
-        color: COLORS[Math.floor(Math.random() * COLORS.length)],
-        size: 8 + Math.random() * 8,
+        color: REWARD_COLORS[Math.floor(Math.random() * REWARD_COLORS.length)],
+        kind: KINDS[Math.floor(Math.random() * KINDS.length)],
+        size: 18 + Math.random() * 14,
         vx: (Math.random() - 0.5) * SCREEN_W * 1.1,
         vy: -180 - Math.random() * 220,
         rot: (Math.random() - 0.5) * 720,
@@ -134,7 +124,7 @@ export function Celebration({
             shadowOffset: { width: 0, height: 10 },
           }}
         >
-          <Image source={images.star} style={{ width: 130, height: 130 }} contentFit="contain" />
+          <RewardEmblem size={132} />
           <Text
             style={{
               marginTop: 6,
