@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next";
 import { Floating } from "@/components/ui/Floating";
 import { GradientBg } from "@/components/ui/GradientBg";
 import { JuicyButton } from "@/components/ui/JuicyButton";
+import { Mascot } from "@/components/ui/Mascot";
 import { LETTERS } from "@/data/letters";
 import { images } from "@/lib/images";
 import { playSfx } from "@/lib/sfx";
@@ -21,6 +22,7 @@ export default function Mosque() {
   const completed = useProgressStore((s) => LETTERS.filter((l) => s.isLetterComplete(l.id)).length);
   const mosqueName = useSettingsStore((s) => s.mosqueName);
   const setMosqueName = useSettingsStore((s) => s.setMosqueName);
+  const accentColor = useSettingsStore((s) => s.accentColor) ?? "#F5A524";
 
   // 12 kümülatif inşa aşaması (ana ekran/cutscene ile aynı formül)
   const STAGES = images.mosqueStages.length;
@@ -112,6 +114,13 @@ export default function Mosque() {
               />
             </Animated.View>
           </Floating>
+
+          {/* Pırıl camide "yaşar" — köşede bulutta, sahiplenme halesiyle (madde 1 & 5) */}
+          <View pointerEvents="none" style={{ position: "absolute", left: -6, bottom: -4, width: 138, height: 138, alignItems: "center", justifyContent: "flex-end" }}>
+            <View style={{ position: "absolute", bottom: 30, width: 94, height: 94, borderRadius: 47, backgroundColor: accentColor, opacity: 0.22 }} />
+            <Image source={images.nodeCloud} style={{ position: "absolute", bottom: 0, width: 126, height: 52 }} contentFit="contain" />
+            <Mascot size={118} pose={completed > 0 ? "celebrate" : "point"} />
+          </View>
         </View>
 
         {/* İlerleme */}
