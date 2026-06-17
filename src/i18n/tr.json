@@ -33,13 +33,18 @@
     "friend": "arkadaşım",
     "continue": "Devam ▶",
     "ok": "Tamam",
-    "start": "Başla! 🚀"
+    "start": "Başla! 🚀",
+    "customise": "Şimdi… beni KENDİNE ait kıl! 🎨",
+    "pickName": "Bana bir isim ver:",
+    "pickColor": "Rengimizi seç:",
+    "buddyReady": "Ben {{mascot}}! {{name}} ile hazırız! 🎉\nHadi başlıyoruz! 🚀"
   },
   "home": {
     "title": "Harfler",
     "greeting": "Merhaba, {{name}}!",
     "hello": "Merhaba!",
-    "subtitle": "Bugün yeni bir harf öğrenelim!"
+    "subtitle": "Bugün yeni bir harf öğrenelim!",
+    "companion": "{{mascot}} seninle keşfe hazır! 🐦"
   },
   "letters": {
     "title": "Harfler"

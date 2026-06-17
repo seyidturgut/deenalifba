@@ -204,6 +204,8 @@ export default function Home() {
   const router = useRouter();
   const { width } = useWindowDimensions();
   const childName = useSettingsStore((s) => s.childName);
+  const mascotName = useSettingsStore((s) => s.mascotName);
+  const accentColor = useSettingsStore((s) => s.accentColor) ?? "#F5A524";
   const musicEnabled = useSettingsStore((s) => s.musicEnabled);
   const unlocked = useProgressStore((s) => s.unlockedLetters);
   const isLetterComplete = useProgressStore((s) => s.isLetterComplete);
@@ -319,7 +321,7 @@ export default function Home() {
                 style={{ shadowColor: "#1462B5", shadowOpacity: 0.08, shadowRadius: 4, shadowOffset: { width: 0, height: 2 } }}
               >
                 <Text style={{ fontFamily: "Nunito_700Bold", fontSize: 15, color: "#5C6B7A" }}>
-                  {t("home.subtitle")}
+                  {mascotName ? t("home.companion", { mascot: mascotName }) : t("home.subtitle")}
                 </Text>
               </View>
             </View>
@@ -352,6 +354,8 @@ export default function Home() {
               pointerEvents="none"
               style={{ position: "absolute", left: guideX - GUIDE / 2, top: guideTop, width: GUIDE, height: GUIDE, alignItems: "center", justifyContent: "flex-end" }}
             >
+              {/* Çocuğun seçtiği aksan rengiyle hale (sahiplenme ipucu) */}
+              <View style={{ position: "absolute", bottom: GUIDE * 0.26, width: GUIDE * 0.82, height: GUIDE * 0.82, borderRadius: GUIDE * 0.41, backgroundColor: accentColor, opacity: 0.22 }} />
               <Image source={images.nodeCloud} style={{ position: "absolute", bottom: 0, width: GUIDE * 0.96, height: GUIDE * 0.4 }} contentFit="contain" />
               <Mascot size={GUIDE} pose="point" />
             </View>

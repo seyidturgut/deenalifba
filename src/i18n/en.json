@@ -33,13 +33,18 @@
     "friend": "friend",
     "continue": "Continue ▶",
     "ok": "OK",
-    "start": "Start! 🚀"
+    "start": "Start! 🚀",
+    "customise": "Now… make me YOURS! 🎨",
+    "pickName": "Give me a name:",
+    "pickColor": "Pick our colour:",
+    "buddyReady": "I'm {{mascot}}! {{name}} and I are ready! 🎉\nLet's begin! 🚀"
   },
   "home": {
     "title": "Letters",
     "greeting": "Hi, {{name}}!",
     "hello": "Hi there!",
-    "subtitle": "Let's learn a new letter today!"
+    "subtitle": "Let's learn a new letter today!",
+    "companion": "{{mascot}} is exploring with you! 🐦"
   },
   "letters": {
     "title": "Letters"
