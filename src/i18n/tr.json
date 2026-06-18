@@ -44,7 +44,9 @@
     "greeting": "Merhaba, {{name}}!",
     "hello": "Merhaba!",
     "subtitle": "Bugün yeni bir harf öğrenelim!",
-    "companion": "{{mascot}} seninle keşfe hazır! 🐦"
+    "companion": "{{mascot}} seninle keşfe hazır! 🐦",
+    "chain": "{{n}} gün istikamet",
+    "chainStart": "Bugün zincirini başlat"
   },
   "letters": {
     "title": "Harfler"
@@ -107,7 +109,8 @@
     "parts": "{{built}} / {{total}} parça",
     "lettersLearned": "{{n}} / {{total}} harf öğrenildi",
     "unlockedMinaret": "Yeni bir minare açıldı!",
-    "unlockedDome": "Yeni bir kubbe açıldı!"
+    "unlockedDome": "Yeni bir kubbe açıldı!",
+    "bestChain": "En iyi zincir: {{n}} gün"
   },
   "parentGate": {
     "title": "Ebeveyn Kapısı",

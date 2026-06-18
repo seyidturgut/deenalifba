@@ -9,11 +9,13 @@ import { Floating } from "@/components/ui/Floating";
 import { GradientBg } from "@/components/ui/GradientBg";
 import { JuicyButton } from "@/components/ui/JuicyButton";
 import { Mascot } from "@/components/ui/Mascot";
+import { Crescent } from "@/components/ui/IslamicMotifs";
 import { LETTERS } from "@/data/letters";
 import { images } from "@/lib/images";
 import { playSfx } from "@/lib/sfx";
 import { useProgressStore } from "@/stores/progressStore";
 import { useSettingsStore } from "@/stores/settingsStore";
+import { useStreakStore } from "@/stores/streakStore";
 
 export default function Mosque() {
   const { t } = useTranslation();
@@ -23,6 +25,9 @@ export default function Mosque() {
   const mosqueName = useSettingsStore((s) => s.mosqueName);
   const setMosqueName = useSettingsStore((s) => s.setMosqueName);
   const accentColor = useSettingsStore((s) => s.accentColor) ?? "#F5A524";
+  const bestChain = useStreakStore((s) => s.bestChain);
+  const currentChain = useStreakStore((s) => s.currentChain);
+  const bestChainEver = Math.max(bestChain, currentChain);
 
   // 12 kümülatif inşa aşaması (ana ekran/cutscene ile aynı formül)
   const STAGES = images.mosqueStages.length;
@@ -133,6 +138,15 @@ export default function Mosque() {
         <Text style={{ fontFamily: "Nunito_700Bold", fontSize: 13, color: "#7A8593", textAlign: "center", marginTop: 2 }}>
           {t("mosque.lettersLearned", { n: completed, total: LETTERS.length })}
         </Text>
+        {/* En iyi istikamet zinciri kupası */}
+        {bestChainEver > 0 && (
+          <View className="mt-2 flex-row items-center justify-center" style={{ gap: 6 }}>
+            <Crescent size={18} color={accentColor} />
+            <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 14, color: "#0E5FC2" }}>
+              {t("mosque.bestChain", { n: bestChainEver })}
+            </Text>
+          </View>
+        )}
 
         <View style={{ height: 14 }} />
         <View className="gap-2.5">

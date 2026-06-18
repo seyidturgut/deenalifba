@@ -44,7 +44,9 @@
     "greeting": "Hi, {{name}}!",
     "hello": "Hi there!",
     "subtitle": "Let's learn a new letter today!",
-    "companion": "{{mascot}} is exploring with you! 🐦"
+    "companion": "{{mascot}} is exploring with you! 🐦",
+    "chain": "{{n}} days of istiqama",
+    "chainStart": "Begin your chain today"
   },
   "letters": {
     "title": "Letters"
@@ -107,7 +109,8 @@
     "parts": "{{built}} / {{total}} parts",
     "lettersLearned": "{{n}} / {{total}} letters learned",
     "unlockedMinaret": "A new minaret unlocked!",
-    "unlockedDome": "A new dome unlocked!"
+    "unlockedDome": "A new dome unlocked!",
+    "bestChain": "Best chain: {{n}} days"
   },
   "parentGate": {
     "title": "Parents' Gate",

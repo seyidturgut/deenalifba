@@ -28,6 +28,7 @@ import { useLearningStore } from "@/stores/learningStore";
 import { useMosqueStore } from "@/stores/mosqueStore";
 import { useProgressStore } from "@/stores/progressStore";
 import { useStageStore } from "@/stores/stageStore";
+import { useStreakStore } from "@/stores/streakStore";
 
 const HINT_KEY: Record<ActivityKind, string> = {
   intro: "learn.introHint",
@@ -141,6 +142,7 @@ export default function LearnScreen() {
       useStageStore.getState().celebrate(); // host kutlar + "Aferin!" overlay
     } else {
       completeLetter(id);
+      useStreakStore.getState().recordPractice(Date.now()); // bugünü zincire ekle (istikamet)
       setCelebrate(true);
     }
   };
