@@ -13,7 +13,7 @@ import Animated, {
 import Svg, { Polyline } from "react-native-svg";
 import { useTranslation } from "react-i18next";
 
-import { Crescent } from "@/components/ui/IslamicMotifs";
+import { ChainBanner } from "@/components/ui/ChainBanner";
 import { GradientBg } from "@/components/ui/GradientBg";
 import { Mascot } from "@/components/ui/Mascot";
 import { StarBadge } from "@/components/ui/StarBadge";
@@ -23,7 +23,6 @@ import { images } from "@/lib/images";
 import { playSfx, syncMusicWithSetting } from "@/lib/sfx";
 import { useProgressStore } from "@/stores/progressStore";
 import { useSettingsStore } from "@/stores/settingsStore";
-import { useStreakStore } from "@/stores/streakStore";
 
 const NODE = 108;
 const V_GAP = 150; // düğümler arası dikey aralık (alt etikete yer)
@@ -209,11 +208,6 @@ export default function Home() {
   const mascotName = useSettingsStore((s) => s.mascotName);
   const accentColor = useSettingsStore((s) => s.accentColor) ?? "#F5A524";
   const musicEnabled = useSettingsStore((s) => s.musicEnabled);
-
-  // İstikamet zinciri — currentChain/lastPracticeDay'e abone ol (reaktivite), görünümü hesapla
-  useStreakStore((s) => s.currentChain);
-  useStreakStore((s) => s.lastPracticeDay);
-  const chainView = useStreakStore.getState().chainView(Date.now());
   const unlocked = useProgressStore((s) => s.unlockedLetters);
   const isLetterComplete = useProgressStore((s) => s.isLetterComplete);
   const scrollRef = useRef<any>(null);
@@ -334,29 +328,8 @@ export default function Home() {
             </View>
           </View>
 
-          {/* İstikamet zinciri — her gün pratikle büyür (ceza yok; duraklar) */}
-          <View
-            className="mt-2 flex-row items-center self-start rounded-full bg-white/85 px-3 py-1.5"
-            style={{ gap: 7, shadowColor: "#1462B5", shadowOpacity: 0.08, shadowRadius: 4, shadowOffset: { width: 0, height: 2 } }}
-          >
-            {chainView.current > 0 ? (
-              <>
-                <View className="flex-row" style={{ gap: 2 }}>
-                  {Array.from({ length: Math.min(chainView.current, 7) }).map((_, i) => (
-                    <Crescent key={i} size={16} color={accentColor} />
-                  ))}
-                </View>
-                <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 14, color: "#0E5FC2" }}>
-                  {t("home.chain", { n: chainView.current })}
-                </Text>
-              </>
-            ) : (
-              <>
-                <Crescent size={16} color={accentColor} />
-                <Text style={{ fontFamily: "Fredoka_600SemiBold", fontSize: 13, color: "#7A8593" }}>{t("home.chainStart")}</Text>
-              </>
-            )}
-          </View>
+          {/* İstikamet zinciri bandı (oyunsal) */}
+          <ChainBanner accentColor={accentColor} />
         </View>
 
         {/* Yolculuk haritası */}
