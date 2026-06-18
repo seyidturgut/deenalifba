@@ -64,6 +64,10 @@ export const images = {
   // Pırıl sepeti tutuyor (Pırıl'a Ver oyununun hedefi)
   pirilBasket: require("@/assets/illustrations/decor/piril_basket.webp"),
 
+  // İstikamet zinciri
+  chainBead: require("@/assets/illustrations/decor/chain_bead.webp"), // altın hilal boncuk (tekrarlanan)
+  chainMedallion: require("@/assets/illustrations/decor/chain_medallion.webp"), // gün sayısı madalyonu
+
   // v3 oyun asset'leri
   cardBack: require("@/assets/illustrations/decor/card_back.webp"), // Eşleştir — kapalı kart
   balloonPink: require("@/assets/illustrations/decor/balloon_pink.webp"), // Balon sprite
