@@ -18,6 +18,7 @@ import { useTranslation } from "react-i18next";
 import { Floating } from "@/components/ui/Floating";
 import { images } from "@/lib/images";
 import { playSfx } from "@/lib/sfx";
+import { APP_VERSION_LABEL } from "@/lib/version";
 import { useSettingsStore } from "@/stores/settingsStore";
 
 /** "Yükleniyor" zıplayan üç nokta. */
@@ -119,6 +120,11 @@ export default function Index() {
           ))}
         </View>
       </View>
+
+      {/* Sürüm — playtest'te hangi derlemenin test edildiğini görmek için */}
+      <Text style={{ position: "absolute", bottom: 14, left: 0, right: 0, textAlign: "center", fontFamily: "Nunito_700Bold", fontSize: 12, color: "rgba(91,107,122,0.7)" }}>
+        {APP_VERSION_LABEL}
+      </Text>
     </View>
   );
 }

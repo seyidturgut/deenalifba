@@ -8,6 +8,7 @@ import { JuicyButton } from "@/components/ui/JuicyButton";
 import { ParentGate } from "@/features/parent-gate/ParentGate";
 import type { AppLanguage } from "@/i18n";
 import { playSfx, syncMusicWithSetting } from "@/lib/sfx";
+import { APP_VERSION_LABEL } from "@/lib/version";
 import { useSettingsStore } from "@/stores/settingsStore";
 
 /**
@@ -107,6 +108,9 @@ export default function Settings() {
         </View>
 
         <View className="flex-1" />
+        <Text style={{ fontFamily: "Nunito_700Bold", fontSize: 13, color: "#7A8593", textAlign: "center", marginBottom: 8 }}>
+          {APP_VERSION_LABEL}
+        </Text>
         <JuicyButton label={t("settings.replayIntro")} tone="accent" onPress={() => router.push("/onboarding")} />
         <JuicyButton label={t("common.close")} tone="primary" onPress={() => router.back()} />
       </View>
