@@ -101,7 +101,7 @@ export function PaintTrace({ letterId, onComplete }: { letterId: number; onCompl
     haptics.success();
     playSfx("trace_success");
     playSfx("star_earned", 0.8);
-    useStageStore.getState().celebrate();
+    useStageStore.getState().cheer(); // hafif sevinç (büyük "Great Job!" yalnız ders sonunda)
     setTimeout(onComplete, 900);
   };
 

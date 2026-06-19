@@ -139,7 +139,7 @@ export default function LearnScreen() {
     const advanced = nextStep();
     if (advanced) {
       playSfx("step_complete");
-      useStageStore.getState().celebrate(); // host kutlar + "Aferin!" overlay
+      useStageStore.getState().cheer(); // ara adımda HAFİF sevinç (büyük "Great Job!" değil — yanıltmasın)
     } else {
       completeLetter(id);
       useStreakStore.getState().recordPractice(Date.now()); // bugünü zincire ekle (istikamet)
