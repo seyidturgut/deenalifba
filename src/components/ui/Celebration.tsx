@@ -91,7 +91,7 @@ export function Celebration({
     playSfx("letter_complete");
     playSfx("confetti_pop", 0.7);
     playSfx("star_earned", 0.8);
-    playSfx("mascot_giggle", 0.9); // Pırıl "Maşallah"ı sesli kutlar (gerçek söz klibi gelince değişir)
+    playSfx("mashallah", 1.0); // Pırıl "Maşallah" der (sesli kutlama)
     if (hapticsEnabled) haptics.celebrate();
     const t = setTimeout(onDone, 2600);
     return () => clearTimeout(t);

@@ -24,6 +24,7 @@ const SOURCES = {
   level_unlock: require("@/assets/audio/level_unlock.mp3"),
   daily_reward: require("@/assets/audio/daily_reward.mp3"),
   mascot_giggle: require("@/assets/audio/mascot_giggle.mp3"),
+  mashallah: require("@/assets/audio/mashallah.mp3"),
   mascot_jump: require("@/assets/audio/mascot_jump.mp3"),
   whoosh: require("@/assets/audio/whoosh.mp3"),
   welcome: require("@/assets/audio/welcome.mp3"),
