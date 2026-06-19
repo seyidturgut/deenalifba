@@ -16,10 +16,13 @@ import { haptics } from "@/lib/haptics";
 import { images } from "@/lib/images";
 import { playSfx } from "@/lib/sfx";
 import { useSettingsStore } from "@/stores/settingsStore";
+import { Mascot } from "@/components/ui/Mascot";
+import { Crescent, Star8 } from "@/components/ui/IslamicMotifs";
 
 const { width: SCREEN_W } = Dimensions.get("window");
-const HOLD = 850; // önceki aşamayı bu kadar göster, sonra büyümeye geç
-const GROW = 800; // geçiş süresi
+const HOLD = 1100; // önceki aşamayı göster (çocuk "öncesi"ni görsün), sonra büyümeye geç
+const GROW = 850; // geçiş süresi
+const ADMIRE = 2600; // yeni parça belirince hayran kalma süresi (Sohail #3: yavaşlat)
 
 /**
  * Seviye sonu cami inşa kutsahnesi: ÖNCE önceki aşama gösterilir, SONRA yeni parça
@@ -48,6 +51,7 @@ export function MosqueBuild({
   const pop = useSharedValue(0); // yeni aşama "yerine oturma"
   const glow = useSharedValue(0); // büyüme anı parıltısı
   const sparkle = useSharedValue(0); // yıldız parçacıkları
+  const piril = useSharedValue(0); // Pırıl kutlama girişi
 
   const idx = Math.min(Math.max(stageIndex, 0), images.mosqueStages.length - 1);
   const hasPrev = idx > 0;
@@ -68,6 +72,7 @@ export function MosqueBuild({
     pop.value = 0;
     glow.value = 0;
     sparkle.value = 0;
+    piril.value = 0;
 
     if (hasPrev) {
       newOpacity.value = withDelay(HOLD, withTiming(1, { duration: GROW, easing: Easing.out(Easing.cubic) }));
@@ -76,13 +81,16 @@ export function MosqueBuild({
         HOLD,
         withSequence(withTiming(1.1, { duration: 320, easing: Easing.out(Easing.back(2)) }), withSpring(1, { damping: 9 }))
       );
-      glow.value = withDelay(HOLD - 80, withSequence(withTiming(1, { duration: 360 }), withDelay(500, withTiming(0.5, { duration: 700 }))));
-      sparkle.value = withDelay(HOLD, withSequence(withTiming(1, { duration: 360 }), withDelay(450, withTiming(0, { duration: 700 }))));
+      glow.value = withDelay(HOLD - 80, withSequence(withTiming(1, { duration: 360 }), withDelay(900, withTiming(0.5, { duration: 1000 }))));
+      sparkle.value = withDelay(HOLD, withSequence(withTiming(1, { duration: 420 }), withDelay(900, withTiming(0, { duration: 800 }))));
+      // Pırıl yeni parça belirince zıplayarak kutlar
+      piril.value = withDelay(HOLD + 220, withSequence(withTiming(1.15, { duration: 300, easing: Easing.out(Easing.back(2)) }), withSpring(1, { damping: 8 })));
       const st = setTimeout(() => {
         playSfx("mosque_build");
+        playSfx("star_earned", 0.7);
         if (hapticsEnabled) haptics.celebrate();
       }, HOLD);
-      const tt = setTimeout(onDone, HOLD + GROW + 1500);
+      const tt = setTimeout(onDone, HOLD + GROW + ADMIRE);
       return () => {
         clearTimeout(st);
         clearTimeout(tt);
@@ -91,8 +99,9 @@ export function MosqueBuild({
       playSfx("mosque_build");
       if (hapticsEnabled) haptics.celebrate();
       pop.value = withSequence(withTiming(1.12, { duration: 360, easing: Easing.out(Easing.back(2)) }), withSpring(1, { damping: 9 }));
-      glow.value = withSequence(withTiming(1, { duration: 300 }), withDelay(500, withTiming(0.55, { duration: 600 })));
-      const tt = setTimeout(onDone, 2400);
+      glow.value = withSequence(withTiming(1, { duration: 300 }), withDelay(800, withTiming(0.55, { duration: 800 })));
+      piril.value = withDelay(360, withSequence(withTiming(1.15, { duration: 300, easing: Easing.out(Easing.back(2)) }), withSpring(1, { damping: 8 })));
+      const tt = setTimeout(onDone, 3400);
       return () => clearTimeout(tt);
     }
   }, [visible, stageIndex]);
@@ -102,7 +111,8 @@ export function MosqueBuild({
   const newStyle = useAnimatedStyle(() => ({ opacity: newOpacity.value, transform: [{ scale: 0.62 + pop.value * 0.38 }] }));
   const prevStyle = useAnimatedStyle(() => ({ opacity: prevOpacity.value }));
   const glowStyle = useAnimatedStyle(() => ({ opacity: glow.value, transform: [{ scale: 0.9 + glow.value * 0.3 }] }));
-  const sparkleStyle = useAnimatedStyle(() => ({ opacity: sparkle.value, transform: [{ scale: 0.6 + sparkle.value * 0.6 }] }));
+  const sparkleStyle = useAnimatedStyle(() => ({ opacity: sparkle.value, transform: [{ scale: 0.6 + sparkle.value * 0.6 }, { rotate: `${sparkle.value * 40}deg` }] }));
+  const pirilStyle = useAnimatedStyle(() => ({ opacity: piril.value > 0.02 ? 1 : 0, transform: [{ scale: piril.value }] }));
 
   if (!visible) return null;
 
@@ -158,17 +168,25 @@ export function MosqueBuild({
             <Animated.View style={[{ position: "absolute", width: IMG, height: IMG }, newStyle]}>
               <Image source={images.mosqueStages[idx]} style={{ width: IMG, height: IMG }} contentFit="contain" />
             </Animated.View>
-            {/* parıltı yıldızları (yeni parça vurgusu) */}
+            {/* İslami motif parıltıları (yeni parça vurgusu) */}
             {hasPrev && (
               <>
-                <Animated.View style={[{ position: "absolute", top: 6, right: BOX * 0.18 }, sparkleStyle]}>
-                  <Image source={images.star} style={{ width: 34, height: 34 }} contentFit="contain" />
+                <Animated.View style={[{ position: "absolute", top: 6, right: BOX * 0.16 }, sparkleStyle]}>
+                  <Star8 size={34} color="#F5A524" />
                 </Animated.View>
-                <Animated.View style={[{ position: "absolute", top: BOX * 0.3, left: BOX * 0.1 }, sparkleStyle]}>
-                  <Image source={images.star} style={{ width: 24, height: 24 }} contentFit="contain" />
+                <Animated.View style={[{ position: "absolute", top: BOX * 0.26, left: BOX * 0.08 }, sparkleStyle]}>
+                  <Crescent size={26} color="#2E8B9E" />
+                </Animated.View>
+                <Animated.View style={[{ position: "absolute", bottom: BOX * 0.2, right: BOX * 0.08 }, sparkleStyle]}>
+                  <Star8 size={22} color="#2FA869" />
                 </Animated.View>
               </>
             )}
+
+            {/* Pırıl yeni parçayı kutlar (Sohail #3: Pırıl celebrate) */}
+            <Animated.View style={[{ position: "absolute", bottom: -BOX * 0.04, right: -BOX * 0.04, width: BOX * 0.42, height: BOX * 0.42, alignItems: "center", justifyContent: "flex-end" }, pirilStyle]}>
+              <Mascot size={BOX * 0.42} pose="celebrate" />
+            </Animated.View>
           </View>
         </Animated.View>
 
