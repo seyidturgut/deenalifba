@@ -1,9 +1,10 @@
 import { Image } from "expo-image";
-import { useRouter } from "expo-router";
-import { useEffect, useRef } from "react";
+import { useFocusEffect, useRouter } from "expo-router";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Pressable, Text, useWindowDimensions, View } from "react-native";
 import Animated, {
   Easing,
+  runOnJS,
   useAnimatedScrollHandler,
   useAnimatedStyle,
   useSharedValue,
@@ -27,6 +28,8 @@ import { useSettingsStore } from "@/stores/settingsStore";
 const NODE = 108;
 const V_GAP = 150; // düğümler arası dikey aralık (alt etikete yer)
 const X_PATTERN = [0.5, 0.74, 0.5, 0.26]; // zig-zag (genişlik oranı)
+// Oturum boyunca son görülen aktif düğüm — harf tamamlanıp dönünce "uçuş" tetikler
+let lastSeenActiveIndex: number | null = null;
 const INNER = 0.6; // çerçevenin iç krem penceresi (NODE oranı)
 // Krem pencere görselin tam merkezinde değil (3D lip): sağa/yukarı kaydır
 const WIN_DX = NODE * 0.023;
@@ -242,6 +245,48 @@ export default function Home() {
   const guideX = activeNode ? activeNode.cx + guideSide * (NODE * 0.74) : 0;
   const guideTop = activeNode ? Math.max(4, activeNode.cy - GUIDE * 0.5) : 0;
 
+  // Bir düğüm konumunun "rehber" yerleşimi (uçuş başlangıcı için)
+  const guidePosOf = (i: number) => {
+    const n = nodes[i];
+    const side = n.cx <= contentW / 2 ? 1 : -1;
+    return { x: n.cx + side * (NODE * 0.74), top: Math.max(4, n.cy - GUIDE * 0.5) };
+  };
+
+  // Seviye geçiş uçuşu: aktif düğüm ilerleyince Pırıl önceki düğümden yenisine uçar
+  const fly = useSharedValue(1); // 1 = yerinde
+  const [flyFrom, setFlyFrom] = useState<number | null>(null);
+  // Ekran tekrar odaklanınca (harf bitip dönünce) aktif düğüm ilerlediyse Pırıl uçar.
+  // useFocusEffect → arka planda tetiklenip kaçırılmaz; kullanıcı dönünce görür.
+  useFocusEffect(
+    useCallback(() => {
+      const prev = lastSeenActiveIndex;
+      if (prev != null && activeIndex > prev) {
+        setFlyFrom(Math.max(0, activeIndex - 1));
+        fly.value = 0;
+        fly.value = withTiming(1, { duration: 1150, easing: Easing.inOut(Easing.cubic) }, (f) => {
+          if (f) runOnJS(setFlyFrom)(null);
+        });
+      }
+      lastSeenActiveIndex = activeIndex;
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [activeIndex])
+  );
+
+  const src = flyFrom != null ? guidePosOf(flyFrom) : null;
+  const flyStyle = useAnimatedStyle(() => {
+    if (src == null) return { transform: [{ translateX: 0 }, { translateY: 0 }] };
+    const t = fly.value;
+    const arc = -Math.sin(t * Math.PI) * 48; // yukarı kavis (uçuş hissi)
+    return {
+      transform: [
+        { translateX: (src.x - guideX) * (1 - t) },
+        { translateY: (src.top - guideTop) * (1 - t) + arc },
+        { scale: 1 + Math.sin(t * Math.PI) * 0.06 },
+      ],
+    };
+  });
+  const flying = flyFrom != null;
+
   // Açılışta (ve aktif harf değişince) rehberi/aktif seviyeyi görünür yere kaydır
   useEffect(() => {
     if (!activeNode) return;
@@ -352,17 +397,20 @@ export default function Home() {
             />
           ))}
 
-          {/* Rehber Hüdhüd — aktif seviyenin YANINDA kendi bulutunda; ilerledikçe taşınır */}
+          {/* Rehber Hüdhüd — aktif seviyenin YANINDA; seviye bitince yenisine UÇAR */}
           {activeNode && (
-            <View
+            <Animated.View
               pointerEvents="none"
-              style={{ position: "absolute", left: guideX - GUIDE / 2, top: guideTop, width: GUIDE, height: GUIDE, alignItems: "center", justifyContent: "flex-end" }}
+              style={[
+                { position: "absolute", left: guideX - GUIDE / 2, top: guideTop, width: GUIDE, height: GUIDE, alignItems: "center", justifyContent: "flex-end" },
+                flyStyle,
+              ]}
             >
               {/* Çocuğun seçtiği aksan rengiyle hale (sahiplenme ipucu) */}
               <View style={{ position: "absolute", bottom: GUIDE * 0.26, width: GUIDE * 0.82, height: GUIDE * 0.82, borderRadius: GUIDE * 0.41, backgroundColor: accentColor, opacity: 0.22 }} />
               <Image source={images.nodeCloud} style={{ position: "absolute", bottom: 0, width: GUIDE * 0.96, height: GUIDE * 0.4 }} contentFit="contain" />
-              <Mascot size={GUIDE} pose="point" />
-            </View>
+              <Mascot size={GUIDE} pose={flying ? "celebrate" : "point"} />
+            </Animated.View>
           )}
         </View>
       </Animated.ScrollView>
