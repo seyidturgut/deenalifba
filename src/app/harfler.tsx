@@ -102,7 +102,7 @@ export default function Harfler() {
           <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 24, color: "#208AEF", marginTop: -2 }}>‹</Text>
         </Pressable>
         <Text className="font-display text-2xl font-extrabold text-ink">{t("letters.title")}</Text>
-        <StarBadge count={starCount} />
+        <StarBadge count={starCount} total={LETTERS.length} />
       </View>
 
       <FlatList

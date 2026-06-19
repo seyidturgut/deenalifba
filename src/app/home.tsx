@@ -160,7 +160,7 @@ function TopBar() {
   const cami = useCamiProgress();
   return (
     <View className="flex-row items-center justify-between px-1 pt-1">
-      <StarBadge count={stars} />
+      <StarBadge count={stars} total={LETTERS.length} />
       <View
         className="flex-1 flex-row items-center gap-2 rounded-full bg-white/85 px-3 py-1.5"
         style={{ marginHorizontal: 8, shadowColor: "#1462B5", shadowOpacity: 0.12, shadowRadius: 5, shadowOffset: { width: 0, height: 3 } }}
