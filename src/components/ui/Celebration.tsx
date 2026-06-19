@@ -67,7 +67,7 @@ export function Celebration({
   title?: string;
 }) {
   const { t: translate } = useTranslation();
-  const heading = title ?? translate("common.great");
+  const heading = title ?? translate("common.mashallah");
   const hapticsEnabled = useSettingsStore((s) => s.hapticsEnabled);
 
   const pieces = useMemo<PieceConf[]>(
@@ -91,6 +91,7 @@ export function Celebration({
     playSfx("letter_complete");
     playSfx("confetti_pop", 0.7);
     playSfx("star_earned", 0.8);
+    playSfx("mascot_giggle", 0.9); // Pırıl "Maşallah"ı sesli kutlar (gerçek söz klibi gelince değişir)
     if (hapticsEnabled) haptics.celebrate();
     const t = setTimeout(onDone, 2600);
     return () => clearTimeout(t);
