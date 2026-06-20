@@ -30,6 +30,17 @@ const V_GAP = 150; // düğümler arası dikey aralık (alt etikete yer)
 const X_PATTERN = [0.5, 0.74, 0.5, 0.26]; // zig-zag (genişlik oranı)
 // Oturum boyunca son görülen aktif düğüm — harf tamamlanıp dönünce "uçuş" tetikler
 let lastSeenActiveIndex: number | null = null;
+
+// 28 harften sonraki BÜYÜK yolculuk aşamaları (kilitli, gelecek) — Elif'ten Namaz'a.
+// Haritada görünür → "28 harf" değil, hedefin Namaz olduğu bir macera hissi (Sohail #7).
+const JOURNEY_STAGES: { key: string; emoji: string; goal?: boolean }[] = [
+  { key: "harakat", emoji: "ﹶ" },
+  { key: "joining", emoji: "🔗" },
+  { key: "words", emoji: "📖" },
+  { key: "duas", emoji: "🤲" },
+  { key: "surahs", emoji: "📿" },
+  { key: "salah", emoji: "🕌", goal: true },
+];
 const INNER = 0.6; // çerçevenin iç krem penceresi (NODE oranı)
 // Krem pencere görselin tam merkezinde değil (3D lip): sağa/yukarı kaydır
 const WIN_DX = NODE * 0.023;
@@ -203,6 +214,33 @@ function BottomNav() {
   );
 }
 
+/** İleriki yolculuk aşaması — kilitli ama GÖRÜNÜR (merak uyandırır). goal=Namaz (hedef). */
+function StageGate({ cx, cy, emoji, name, goal, soon, goalLabel }: { cx: number; cy: number; emoji: string; name: string; goal?: boolean; soon: string; goalLabel: string }) {
+  const W = NODE + 44;
+  return (
+    <View pointerEvents="none" style={{ position: "absolute", left: cx - W / 2, top: cy - NODE / 2, width: W, alignItems: "center" }}>
+      {goal && (
+        <View style={{ position: "absolute", top: NODE * 0.04, width: NODE * 0.96, height: NODE * 0.96, borderRadius: NODE * 0.48, backgroundColor: "#F5C451", opacity: 0.3 }} />
+      )}
+      <View style={{ width: NODE, height: NODE * 0.82, alignItems: "center", justifyContent: "center" }}>
+        <Image source={images.nodeCloud} style={{ position: "absolute", width: NODE + 14, height: NODE * 0.78, opacity: goal ? 1 : 0.92 }} contentFit="contain" />
+        <Text style={{ fontSize: goal ? 38 : 30, opacity: goal ? 1 : 0.82 }}>{emoji}</Text>
+        {/* kilit rozeti */}
+        <Image source={images.icLock} style={{ position: "absolute", right: NODE * 0.1, top: NODE * 0.04, width: 26, height: 26, opacity: 0.9 }} contentFit="contain" />
+      </View>
+      <Text
+        numberOfLines={1}
+        style={{ fontFamily: "Fredoka_700Bold", fontSize: goal ? 15 : 13, color: goal ? "#C77F12" : "#7C8A99", marginTop: 1, textShadowColor: "rgba(255,255,255,0.9)", textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 3 }}
+      >
+        {name}
+      </Text>
+      <Text style={{ fontFamily: "Nunito_700Bold", fontSize: 10, color: goal ? "#D98A1E" : "#A9B4C2", letterSpacing: goal ? 1 : 0 }}>
+        {goal ? goalLabel : soon}
+      </Text>
+    </View>
+  );
+}
+
 export default function Home() {
   const { t } = useTranslation();
   const router = useRouter();
@@ -234,8 +272,14 @@ export default function Home() {
     cx: X_PATTERN[i % X_PATTERN.length] * contentW,
     cy: 88 + i * V_GAP,
   }));
-  const mapHeight = 88 + (LETTERS.length - 1) * V_GAP + 80;
-  const pathPoints = nodes.map((n) => `${n.cx},${n.cy}`).join(" ");
+  // 28 harften SONRA: büyük yolculuğun ileriki aşamaları (kilitli ama GÖRÜNÜR) — Sohail #7
+  const stageNodes = JOURNEY_STAGES.map((s, j) => {
+    const i = LETTERS.length + j;
+    return { ...s, cx: X_PATTERN[i % X_PATTERN.length] * contentW, cy: 88 + i * V_GAP };
+  });
+  const totalNodes = LETTERS.length + JOURNEY_STAGES.length;
+  const mapHeight = 88 + (totalNodes - 1) * V_GAP + 110;
+  const pathPoints = [...nodes, ...stageNodes].map((n) => `${n.cx},${n.cy}`).join(" ");
 
   // Rehber karakterin durduğu aktif düğüm
   const activeNode = nodes[activeIndex];
@@ -394,6 +438,20 @@ export default function Home() {
                 if (stateOf(n.letter) === "locked") playSfx("locked_tap");
                 else router.push(`/learn/${n.letter.id}`);
               }}
+            />
+          ))}
+
+          {/* 28 harften sonra: büyük yolculuğun ileriki aşamaları (kilitli, görünür) */}
+          {stageNodes.map((s) => (
+            <StageGate
+              key={s.key}
+              cx={s.cx}
+              cy={s.cy}
+              emoji={s.emoji}
+              name={t(`journey.${s.key}`)}
+              goal={s.goal}
+              soon={t("journey.soon")}
+              goalLabel={t("journey.goalLabel")}
             />
           ))}
 

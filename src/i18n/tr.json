@@ -141,5 +141,15 @@
     "dailyLimit": "Bugünlük yeni harf hakkın doldu",
     "comeBackTomorrow": "Yarın yeni bir harf seni bekliyor!",
     "unlockAll": "Tümünü aç"
+  },
+  "journey": {
+    "harakat": "Harekeler",
+    "joining": "Bitişen Harfler",
+    "words": "Kelimeler",
+    "duas": "Dualar",
+    "surahs": "Sureler",
+    "salah": "Namaz",
+    "goalLabel": "HEDEF",
+    "soon": "Yakında"
   }
 }

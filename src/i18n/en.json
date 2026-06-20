@@ -141,5 +141,15 @@
     "dailyLimit": "You've used today's new letter",
     "comeBackTomorrow": "A new letter awaits you tomorrow!",
     "unlockAll": "Unlock all"
+  },
+  "journey": {
+    "harakat": "Harakat",
+    "joining": "Joining Letters",
+    "words": "Words",
+    "duas": "Du'as",
+    "surahs": "Surahs",
+    "salah": "Salah",
+    "goalLabel": "GOAL",
+    "soon": "Soon"
   }
 }
