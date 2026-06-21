@@ -46,15 +46,6 @@ const INNER = 0.6; // çerçevenin iç krem penceresi (NODE oranı)
 const WIN_DX = NODE * 0.023;
 const WIN_DY = NODE * -0.053;
 
-/** Cami inşası ilerleme yüzdesi (üst bar) — 12 kümülatif aşamayla hizalı. */
-const MOSQUE_BUILD_STAGES = 12;
-function useCamiProgress() {
-  return useProgressStore((s) => {
-    const completed = LETTERS.filter((l) => s.isLetterComplete(l.id)).length;
-    return Math.round((Math.min(completed, MOSQUE_BUILD_STAGES) / MOSQUE_BUILD_STAGES) * 100);
-  });
-}
-
 function LevelNode({
   levelNo,
   cx,
@@ -164,24 +155,13 @@ function LevelNode({
   );
 }
 
-/** Üst bar: yıldız + "Cami İnşası %X" + ayar. */
+/** Üst bar: öğrenilen harf sayacı + ayar. (Cami ilerlemesi "My Mosque" kartında — tekrar yok.) */
 function TopBar() {
   const router = useRouter();
   const stars = useProgressStore((s) => LETTERS.filter((l) => s.isLetterComplete(l.id)).length);
-  const cami = useCamiProgress();
   return (
     <View className="flex-row items-center justify-between px-1 pt-1">
       <StarBadge count={stars} total={LETTERS.length} />
-      <View
-        className="flex-1 flex-row items-center gap-2 rounded-full bg-white/85 px-3 py-1.5"
-        style={{ marginHorizontal: 8, shadowColor: "#1462B5", shadowOpacity: 0.12, shadowRadius: 5, shadowOffset: { width: 0, height: 3 } }}
-      >
-        <Image source={images.icMosque} style={{ width: 26, height: 26 }} contentFit="contain" />
-        <View className="h-3 flex-1 overflow-hidden rounded-full bg-black/10">
-          <View className="h-full rounded-full bg-success" style={{ width: `${cami}%` }} />
-        </View>
-        <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 13, color: "#5B6470" }}>%{cami}</Text>
-      </View>
       <Pressable onPress={() => router.push("/settings")}>
         <Image source={images.icSettings} style={{ width: 42, height: 42 }} contentFit="contain" />
       </Pressable>
