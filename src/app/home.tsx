@@ -248,6 +248,7 @@ export default function Home() {
   const childName = useSettingsStore((s) => s.childName);
   const mascotName = useSettingsStore((s) => s.mascotName);
   const accentColor = useSettingsStore((s) => s.accentColor) ?? "#F5A524";
+  const mosqueName = useSettingsStore((s) => s.mosqueName);
   const musicEnabled = useSettingsStore((s) => s.musicEnabled);
   const unlocked = useProgressStore((s) => s.unlockedLetters);
   const isLetterComplete = useProgressStore((s) => s.isLetterComplete);
@@ -280,6 +281,12 @@ export default function Home() {
   const totalNodes = LETTERS.length + JOURNEY_STAGES.length;
   const mapHeight = 88 + (totalNodes - 1) * V_GAP + 110;
   const pathPoints = [...nodes, ...stageNodes].map((n) => `${n.cx},${n.cy}`).join(" ");
+
+  // Cami önizlemesi (büyüyen camiyi hatırlat — Sohail #1): mevcut aşama + ilerleme
+  const mosqueCompleted = LETTERS.filter((l) => isLetterComplete(l.id)).length;
+  const MOSQUE_STAGES = images.mosqueStages.length;
+  const mosqueIdx = Math.min(MOSQUE_STAGES - 1, Math.max(0, mosqueCompleted - 1));
+  const mosquePct = Math.round((Math.min(mosqueCompleted, MOSQUE_STAGES) / MOSQUE_STAGES) * 100);
 
   // Rehber karakterin durduğu aktif düğüm
   const activeNode = nodes[activeIndex];
@@ -330,6 +337,28 @@ export default function Home() {
     };
   });
   const flying = flyFrom != null;
+
+  // Pırıl'ın periyodik mini balonu — camiye/hedefe atıf (Sohail #1, ikon-ağırlıklı)
+  const TIPS = [t("home.tip1"), t("home.tip2"), t("home.tip3"), t("home.tip4")];
+  const [tipIdx, setTipIdx] = useState(0);
+  const [tipShown, setTipShown] = useState(false);
+  useEffect(() => {
+    let hideTimer: ReturnType<typeof setTimeout>;
+    const show = () => {
+      setTipShown(true);
+      hideTimer = setTimeout(() => setTipShown(false), 4500);
+    };
+    const first = setTimeout(show, 2500);
+    const interval = setInterval(() => {
+      setTipIdx((i) => (i + 1) % 4);
+      show();
+    }, 11000);
+    return () => {
+      clearTimeout(first);
+      clearTimeout(hideTimer);
+      clearInterval(interval);
+    };
+  }, []);
 
   // Açılışta (ve aktif harf değişince) rehberi/aktif seviyeyi görünür yere kaydır
   useEffect(() => {
@@ -419,6 +448,26 @@ export default function Home() {
 
           {/* İstikamet zinciri bandı (oyunsal) */}
           <ChainBanner accentColor={accentColor} />
+
+          {/* Büyüyen cami hatırlatıcısı — dokununca /mosque (Sohail #1) */}
+          <Pressable
+            onPress={() => { playSfx("ui_tap"); router.push("/mosque"); }}
+            className="mt-2 flex-row items-center self-start rounded-3xl bg-white/90 py-1.5 pl-1.5 pr-3.5"
+            style={{ gap: 9, shadowColor: "#1462B5", shadowOpacity: 0.12, shadowRadius: 6, shadowOffset: { width: 0, height: 3 } }}
+          >
+            <Image source={images.mosqueStages[mosqueIdx]} style={{ width: 46, height: 46, opacity: mosqueCompleted === 0 ? 0.6 : 1 }} contentFit="contain" />
+            <View style={{ gap: 4 }}>
+              <Text numberOfLines={1} style={{ fontFamily: "Fredoka_700Bold", fontSize: 13, color: "#0E5FC2" }}>
+                {mosqueName || t("mosque.defaultName")}
+              </Text>
+              <View className="flex-row items-center" style={{ gap: 6 }}>
+                <View style={{ width: 110, height: 8, borderRadius: 4, backgroundColor: "rgba(0,0,0,0.10)", overflow: "hidden" }}>
+                  <View style={{ width: `${mosquePct}%`, height: "100%", borderRadius: 4, backgroundColor: "#3FB984" }} />
+                </View>
+                <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 12, color: "#5B6470" }}>%{mosquePct}</Text>
+              </View>
+            </View>
+          </Pressable>
         </View>
 
         {/* Yolculuk haritası */}
@@ -464,6 +513,18 @@ export default function Home() {
                 flyStyle,
               ]}
             >
+              {/* Pırıl'ın mini balonu (camiye/hedefe atıf) — uçarken gizle */}
+              {tipShown && !flying && (
+                <View pointerEvents="none" style={{ position: "absolute", bottom: GUIDE * 0.88, left: -30, right: -30, alignItems: "center" }}>
+                  <View
+                    style={{ maxWidth: 192, backgroundColor: "#FFFFFF", borderRadius: 16, paddingHorizontal: 12, paddingVertical: 7, shadowColor: "#1462B5", shadowOpacity: 0.16, shadowRadius: 6, shadowOffset: { width: 0, height: 3 } }}
+                  >
+                    <Text numberOfLines={2} style={{ fontFamily: "Fredoka_600SemiBold", fontSize: 12.5, color: "#34414F", textAlign: "center" }}>
+                      {TIPS[tipIdx]}
+                    </Text>
+                  </View>
+                </View>
+              )}
               {/* Çocuğun seçtiği aksan rengiyle hale (sahiplenme ipucu) */}
               <View style={{ position: "absolute", bottom: GUIDE * 0.26, width: GUIDE * 0.82, height: GUIDE * 0.82, borderRadius: GUIDE * 0.41, backgroundColor: accentColor, opacity: 0.22 }} />
               <Image source={images.nodeCloud} style={{ position: "absolute", bottom: 0, width: GUIDE * 0.96, height: GUIDE * 0.4 }} contentFit="contain" />

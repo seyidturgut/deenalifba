@@ -47,7 +47,11 @@
     "subtitle": "Bugün yeni bir harf öğrenelim!",
     "companion": "{{mascot}} seninle keşfe hazır! 🐦",
     "chain": "{{n}} gün istikamet",
-    "chainStart": "Bugün zincirini başlat"
+    "chainStart": "Bugün zincirini başlat",
+    "tip1": "Camimizi büyütüyoruz! 🕌",
+    "tip2": "Her harf yeni bir parça ✨",
+    "tip3": "Hedefimiz Namaz 🌙",
+    "tip4": "Harikasın, devam! ⭐"
   },
   "letters": {
     "title": "Harfler"

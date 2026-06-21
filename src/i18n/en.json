@@ -47,7 +47,11 @@
     "subtitle": "Let's learn a new letter today!",
     "companion": "{{mascot}} is exploring with you! 🐦",
     "chain": "{{n}} days of istiqama",
-    "chainStart": "Begin your chain today"
+    "chainStart": "Begin your chain today",
+    "tip1": "We're growing our mosque! 🕌",
+    "tip2": "Each letter adds a piece ✨",
+    "tip3": "Our goal is Salah 🌙",
+    "tip4": "You're doing great! ⭐"
   },
   "letters": {
     "title": "Letters"
