@@ -35,7 +35,7 @@ export function ChainBanner({ accentColor = "#F5A524" }: { accentColor?: string 
 
   return (
     <View
-      className="mt-2 flex-row items-center self-start rounded-3xl px-3 py-2"
+      className="flex-row items-center self-start rounded-3xl px-3 py-2"
       style={{
         gap: 6,
         backgroundColor: "rgba(255,255,255,0.92)",

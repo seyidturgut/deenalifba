@@ -426,28 +426,31 @@ export default function Home() {
             </View>
           </View>
 
-          {/* İstikamet zinciri bandı (oyunsal) */}
-          <ChainBanner accentColor={accentColor} />
+          {/* Zincir + büyüyen cami: tek satırda yan yana (sığmazsa alt satıra sarar) */}
+          <View className="mt-2 flex-row flex-wrap items-start" style={{ gap: 8 }}>
+            {/* İstikamet zinciri bandı (oyunsal) */}
+            <ChainBanner accentColor={accentColor} />
 
-          {/* Büyüyen cami hatırlatıcısı — dokununca /mosque (Sohail #1) */}
-          <Pressable
-            onPress={() => { playSfx("ui_tap"); router.push("/mosque"); }}
-            className="mt-2 flex-row items-center self-start rounded-3xl bg-white/90 py-1.5 pl-1.5 pr-3.5"
-            style={{ gap: 9, shadowColor: "#1462B5", shadowOpacity: 0.12, shadowRadius: 6, shadowOffset: { width: 0, height: 3 } }}
-          >
-            <Image source={images.mosqueStages[mosqueIdx]} style={{ width: 46, height: 46, opacity: mosqueCompleted === 0 ? 0.6 : 1 }} contentFit="contain" />
-            <View style={{ gap: 4 }}>
-              <Text numberOfLines={1} style={{ fontFamily: "Fredoka_700Bold", fontSize: 13, color: "#0E5FC2" }}>
-                {mosqueName || t("mosque.defaultName")}
-              </Text>
-              <View className="flex-row items-center" style={{ gap: 6 }}>
-                <View style={{ width: 110, height: 8, borderRadius: 4, backgroundColor: "rgba(0,0,0,0.10)", overflow: "hidden" }}>
-                  <View style={{ width: `${mosquePct}%`, height: "100%", borderRadius: 4, backgroundColor: "#3FB984" }} />
+            {/* Büyüyen cami hatırlatıcısı — dokununca /mosque (Sohail #1) */}
+            <Pressable
+              onPress={() => { playSfx("ui_tap"); router.push("/mosque"); }}
+              className="flex-row items-center rounded-3xl bg-white/90 py-1.5 pl-1.5 pr-3"
+              style={{ gap: 8, shadowColor: "#1462B5", shadowOpacity: 0.12, shadowRadius: 6, shadowOffset: { width: 0, height: 3 } }}
+            >
+              <Image source={images.mosqueStages[mosqueIdx]} style={{ width: 44, height: 44, opacity: mosqueCompleted === 0 ? 0.6 : 1 }} contentFit="contain" />
+              <View style={{ gap: 4 }}>
+                <Text numberOfLines={1} style={{ fontFamily: "Fredoka_700Bold", fontSize: 12, color: "#0E5FC2" }}>
+                  {mosqueName || t("mosque.defaultName")}
+                </Text>
+                <View className="flex-row items-center" style={{ gap: 5 }}>
+                  <View style={{ width: 70, height: 8, borderRadius: 4, backgroundColor: "rgba(0,0,0,0.10)", overflow: "hidden" }}>
+                    <View style={{ width: `${mosquePct}%`, height: "100%", borderRadius: 4, backgroundColor: "#3FB984" }} />
+                  </View>
+                  <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 11, color: "#5B6470" }}>%{mosquePct}</Text>
                 </View>
-                <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 12, color: "#5B6470" }}>%{mosquePct}</Text>
               </View>
-            </View>
-          </Pressable>
+            </Pressable>
+          </View>
         </View>
 
         {/* Yolculuk haritası */}
