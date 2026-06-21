@@ -17,6 +17,8 @@ export function ChainBanner({ accentColor = "#F5A524" }: { accentColor?: string 
   const cv = useStreakStore.getState().chainView(Date.now());
   const active = cv.current > 0;
   const visible = Math.min(cv.current, 7);
+  // Henüz hiç seri yoksa bandı gösterme (boş madalyon kalabalık yapmasın) — ilk pratikte çıkar
+  const hidden = cv.best === 0 && cv.current === 0;
 
   // en yeni boncuk + madalyon nabzı
   const pulse = useSharedValue(0);
@@ -32,6 +34,8 @@ export function ChainBanner({ accentColor = "#F5A524" }: { accentColor?: string 
   }, [pulse]);
   const newestStyle = useAnimatedStyle(() => ({ transform: [{ scale: 1 + pulse.value * 0.1 }, { rotate: `${pulse.value * 4}deg` }] }));
   const haloStyle = useAnimatedStyle(() => ({ opacity: 0.18 + pulse.value * 0.18, transform: [{ scale: 1 + pulse.value * 0.12 }] }));
+
+  if (hidden) return null;
 
   return (
     <View

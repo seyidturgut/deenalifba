@@ -226,7 +226,6 @@ export default function Home() {
   const router = useRouter();
   const { width } = useWindowDimensions();
   const childName = useSettingsStore((s) => s.childName);
-  const mascotName = useSettingsStore((s) => s.mascotName);
   const accentColor = useSettingsStore((s) => s.accentColor) ?? "#F5A524";
   const mosqueName = useSettingsStore((s) => s.mosqueName);
   const musicEnabled = useSettingsStore((s) => s.musicEnabled);
@@ -399,32 +398,20 @@ export default function Home() {
         onScroll={onScroll}
         scrollEventThrottle={16}
       >
-        {/* Üst: selam (maskot artık haritada rehber olarak duruyor) */}
+        {/* Üst: kısa selam (companion sesini Pırıl'ın harita balonu taşır → alt balon yok) */}
         <View className="px-1 pt-1">
-          <View className="flex-row items-end gap-2">
-            <View className="flex-1 pb-3">
-              <Text
-                style={{
-                  fontFamily: "Fredoka_700Bold",
-                  fontSize: 19,
-                  color: "#0E5FC2",
-                  textShadowColor: "rgba(255,255,255,0.95)",
-                  textShadowOffset: { width: 0, height: 1 },
-                  textShadowRadius: 4,
-                }}
-              >
-                {childName ? t("home.greeting", { name: childName }) : t("home.hello")}
-              </Text>
-              <View
-                className="mt-1 self-start rounded-2xl rounded-tl-md bg-white/90 px-3 py-1.5"
-                style={{ shadowColor: "#1462B5", shadowOpacity: 0.08, shadowRadius: 4, shadowOffset: { width: 0, height: 2 } }}
-              >
-                <Text style={{ fontFamily: "Nunito_700Bold", fontSize: 15, color: "#5C6B7A" }}>
-                  {mascotName ? t("home.companion", { mascot: mascotName }) : t("home.subtitle")}
-                </Text>
-              </View>
-            </View>
-          </View>
+          <Text
+            style={{
+              fontFamily: "Fredoka_700Bold",
+              fontSize: 20,
+              color: "#0E5FC2",
+              textShadowColor: "rgba(255,255,255,0.95)",
+              textShadowOffset: { width: 0, height: 1 },
+              textShadowRadius: 4,
+            }}
+          >
+            {childName ? t("home.greeting", { name: childName }) : t("home.hello")}
+          </Text>
 
           {/* Zincir + büyüyen cami: tek satırda yan yana (sığmazsa alt satıra sarar) */}
           <View className="mt-2 flex-row flex-wrap items-start" style={{ gap: 8 }}>
