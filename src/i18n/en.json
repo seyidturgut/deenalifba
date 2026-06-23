@@ -115,7 +115,8 @@
     "lettersLearned": "{{n}} / {{total}} letters learned",
     "unlockedMinaret": "A new minaret unlocked!",
     "unlockedDome": "A new dome unlocked!",
-    "bestChain": "Best chain: {{n}} days"
+    "bestChain": "Best chain: {{n}} days",
+    "tapToBuild": "Tap to build! 🧱"
   },
   "parentGate": {
     "title": "Parents' Gate",

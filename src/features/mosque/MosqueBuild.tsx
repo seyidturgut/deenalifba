@@ -1,11 +1,12 @@
 import { Image } from "expo-image";
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Dimensions, Pressable, Text, View } from "react-native";
 import Animated, {
   Easing,
   useAnimatedStyle,
   useSharedValue,
   withDelay,
+  withRepeat,
   withSequence,
   withSpring,
   withTiming,
@@ -20,17 +21,15 @@ import { Mascot } from "@/components/ui/Mascot";
 import { Crescent, Star8 } from "@/components/ui/IslamicMotifs";
 
 const { width: SCREEN_W } = Dimensions.get("window");
-const HOLD = 1100; // önceki aşamayı göster (çocuk "öncesi"ni görsün), sonra büyümeye geç
-const GROW = 850; // geçiş süresi
-const ADMIRE = 2600; // yeni parça belirince hayran kalma süresi (Sohail #3: yavaşlat)
+const GROW = 850; // parça belirme süresi
+const ADMIRE = 2400; // inşadan sonra hayran kalma süresi
+const AUTOBUILD = 5200; // çocuk dokunmazsa otomatik inşa (takılmasın)
 
 /**
- * Seviye sonu cami inşa kutsahnesi: ÖNCE önceki aşama gösterilir, SONRA yeni parça
- * büyüyerek/parıldayarak belirir (crossfade + pop + parıltı) → çocuk "nereden nereye"
- * geldiğini görür. `visible` true olunca oynar, dokununca / otomatik `onDone`.
- *
- * NOT: Giriş animasyonları shared-value ile yapılır (Reanimated `entering` RNW'de
- * güvenilir değil → backdrop/kart açılmıyordu).
+ * Seviye sonu cami anı — ETKİLEŞİMLİ "dokun ve inşa et" (Sohail #6):
+ * çocuk parıldayan işarete dokununca yeni parça yerine oturur (Pırıl yardım ister).
+ * Dokunmazsa AUTOBUILD sonra kendiliğinden kurulur (takılma yok). İnşadan sonra
+ * Pırıl kutlar + kısa hayran kalma, sonra `onDone`.
  */
 export function MosqueBuild({
   visible,
@@ -43,67 +42,69 @@ export function MosqueBuild({
 }) {
   const { t } = useTranslation();
   const hapticsEnabled = useSettingsStore((s) => s.hapticsEnabled);
+  const [built, setBuilt] = useState(false);
+  const builtRef = useRef(false);
+  const doneRef = useRef(false);
 
-  const appear = useSharedValue(0); // backdrop + genel görünürlük
-  const cardScale = useSharedValue(0.8); // popup kart giriş
-  const newOpacity = useSharedValue(0); // yeni aşama belirir
-  const prevOpacity = useSharedValue(1); // önceki aşama solar
-  const pop = useSharedValue(0); // yeni aşama "yerine oturma"
-  const glow = useSharedValue(0); // büyüme anı parıltısı
-  const sparkle = useSharedValue(0); // yıldız parçacıkları
-  const piril = useSharedValue(0); // Pırıl kutlama girişi
+  const appear = useSharedValue(0);
+  const cardScale = useSharedValue(0.8);
+  const newOpacity = useSharedValue(0); // yeni aşama
+  const prevOpacity = useSharedValue(1); // önceki aşama
+  const pop = useSharedValue(0);
+  const glow = useSharedValue(0);
+  const sparkle = useSharedValue(0);
+  const marker = useSharedValue(0); // "dokun" işareti nabzı
+  const pirilBounce = useSharedValue(0);
 
   const idx = Math.min(Math.max(stageIndex, 0), images.mosqueStages.length - 1);
   const hasPrev = idx > 0;
   const prevIdx = hasPrev ? idx - 1 : idx;
 
+  const doBuild = () => {
+    if (builtRef.current) return;
+    builtRef.current = true;
+    setBuilt(true);
+    playSfx("mosque_build");
+    playSfx("star_earned", 0.7);
+    if (hapticsEnabled) haptics.celebrate();
+    newOpacity.value = withTiming(1, { duration: GROW, easing: Easing.out(Easing.cubic) });
+    if (hasPrev) prevOpacity.value = withTiming(0, { duration: GROW * 0.7 });
+    pop.value = withSequence(withTiming(1.1, { duration: 320, easing: Easing.out(Easing.back(2)) }), withSpring(1, { damping: 9 }));
+    glow.value = withSequence(withTiming(1, { duration: 360 }), withDelay(800, withTiming(0.5, { duration: 1000 })));
+    sparkle.value = withSequence(withTiming(1, { duration: 420 }), withDelay(800, withTiming(0, { duration: 800 })));
+    pirilBounce.value = withSequence(withTiming(1, { duration: 280, easing: Easing.out(Easing.back(2)) }), withSpring(0, { damping: 7 }));
+    setTimeout(() => {
+      if (doneRef.current) return;
+      doneRef.current = true;
+      onDone();
+    }, GROW + ADMIRE);
+  };
+
   useEffect(() => {
     if (!visible) return;
+    builtRef.current = false;
+    doneRef.current = false;
+    setBuilt(false);
     if (hapticsEnabled) haptics.tap();
 
-    // giriş (web+native güvenli)
     appear.value = 0;
     appear.value = withTiming(1, { duration: 220 });
     cardScale.value = 0.8;
     cardScale.value = withSequence(withTiming(1.04, { duration: 240, easing: Easing.out(Easing.back(2)) }), withSpring(1, { damping: 10 }));
 
-    newOpacity.value = hasPrev ? 0 : 1;
+    // inşa öncesi: önceki aşama görünür, yeni gizli (ilk parçada hafif hayalet)
+    newOpacity.value = hasPrev ? 0 : 0.22;
     prevOpacity.value = hasPrev ? 1 : 0;
     pop.value = 0;
     glow.value = 0;
     sparkle.value = 0;
-    piril.value = 0;
+    pirilBounce.value = 0;
+    // "dokun" işareti nabzı (inşaya kadar)
+    marker.value = withRepeat(withSequence(withTiming(1, { duration: 700, easing: Easing.inOut(Easing.ease) }), withTiming(0, { duration: 700, easing: Easing.inOut(Easing.ease) })), -1, false);
 
-    if (hasPrev) {
-      newOpacity.value = withDelay(HOLD, withTiming(1, { duration: GROW, easing: Easing.out(Easing.cubic) }));
-      prevOpacity.value = withDelay(HOLD, withTiming(0, { duration: GROW * 0.7 }));
-      pop.value = withDelay(
-        HOLD,
-        withSequence(withTiming(1.1, { duration: 320, easing: Easing.out(Easing.back(2)) }), withSpring(1, { damping: 9 }))
-      );
-      glow.value = withDelay(HOLD - 80, withSequence(withTiming(1, { duration: 360 }), withDelay(900, withTiming(0.5, { duration: 1000 }))));
-      sparkle.value = withDelay(HOLD, withSequence(withTiming(1, { duration: 420 }), withDelay(900, withTiming(0, { duration: 800 }))));
-      // Pırıl yeni parça belirince zıplayarak kutlar
-      piril.value = withDelay(HOLD + 220, withSequence(withTiming(1.15, { duration: 300, easing: Easing.out(Easing.back(2)) }), withSpring(1, { damping: 8 })));
-      const st = setTimeout(() => {
-        playSfx("mosque_build");
-        playSfx("star_earned", 0.7);
-        if (hapticsEnabled) haptics.celebrate();
-      }, HOLD);
-      const tt = setTimeout(onDone, HOLD + GROW + ADMIRE);
-      return () => {
-        clearTimeout(st);
-        clearTimeout(tt);
-      };
-    } else {
-      playSfx("mosque_build");
-      if (hapticsEnabled) haptics.celebrate();
-      pop.value = withSequence(withTiming(1.12, { duration: 360, easing: Easing.out(Easing.back(2)) }), withSpring(1, { damping: 9 }));
-      glow.value = withSequence(withTiming(1, { duration: 300 }), withDelay(800, withTiming(0.55, { duration: 800 })));
-      piril.value = withDelay(360, withSequence(withTiming(1.15, { duration: 300, easing: Easing.out(Easing.back(2)) }), withSpring(1, { damping: 8 })));
-      const tt = setTimeout(onDone, 3400);
-      return () => clearTimeout(tt);
-    }
+    const auto = setTimeout(doBuild, AUTOBUILD);
+    return () => clearTimeout(auto);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible, stageIndex]);
 
   const backdropStyle = useAnimatedStyle(() => ({ opacity: appear.value }));
@@ -112,7 +113,8 @@ export function MosqueBuild({
   const prevStyle = useAnimatedStyle(() => ({ opacity: prevOpacity.value }));
   const glowStyle = useAnimatedStyle(() => ({ opacity: glow.value, transform: [{ scale: 0.9 + glow.value * 0.3 }] }));
   const sparkleStyle = useAnimatedStyle(() => ({ opacity: sparkle.value, transform: [{ scale: 0.6 + sparkle.value * 0.6 }, { rotate: `${sparkle.value * 40}deg` }] }));
-  const pirilStyle = useAnimatedStyle(() => ({ opacity: piril.value > 0.02 ? 1 : 0, transform: [{ scale: piril.value }] }));
+  const markerStyle = useAnimatedStyle(() => ({ opacity: 0.5 + marker.value * 0.5, transform: [{ scale: 0.9 + marker.value * 0.22 }] }));
+  const pirilStyle = useAnimatedStyle(() => ({ transform: [{ scale: 1 + pirilBounce.value * 0.16 }, { translateY: -pirilBounce.value * 6 }] }));
 
   if (!visible) return null;
 
@@ -122,12 +124,11 @@ export function MosqueBuild({
   return (
     <Animated.View
       style={[
-        { position: "absolute", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(8,38,74,0.62)", alignItems: "center", justifyContent: "center", paddingHorizontal: 24 },
+        { position: "absolute", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "#0B3566", alignItems: "center", justifyContent: "center", paddingHorizontal: 24 },
         backdropStyle,
       ]}
     >
-      <Pressable onPress={onDone} style={{ alignItems: "center", justifyContent: "center", flex: 1, width: "100%" }}>
-        {/* Oyun-popup kartı */}
+      <Pressable onPress={() => (built ? onDone() : doBuild())} style={{ alignItems: "center", justifyContent: "center", flex: 1, width: "100%" }}>
         <Animated.View
           style={[
             {
@@ -151,25 +152,38 @@ export function MosqueBuild({
             {t("mosque.building")}
           </Text>
           <View style={{ width: BOX, height: BOX, alignItems: "center", justifyContent: "center" }}>
-            {/* sıcak parıltı (büyüme anı) */}
+            {/* sıcak parıltı (inşa anı) */}
             <Animated.View
               style={[
                 { position: "absolute", width: SCREEN_W * 0.56, height: SCREEN_W * 0.56, borderRadius: SCREEN_W * 0.28, backgroundColor: "rgba(245,165,36,0.3)" },
                 glowStyle,
               ]}
             />
-            {/* önceki aşama (solar) */}
+            {/* önceki aşama */}
             {hasPrev && (
               <Animated.View style={[{ position: "absolute", width: IMG, height: IMG }, prevStyle]}>
                 <Image source={images.mosqueStages[prevIdx]} style={{ width: IMG, height: IMG }} contentFit="contain" />
               </Animated.View>
             )}
-            {/* yeni aşama (büyüyerek belirir) */}
+            {/* yeni aşama */}
             <Animated.View style={[{ position: "absolute", width: IMG, height: IMG }, newStyle]}>
               <Image source={images.mosqueStages[idx]} style={{ width: IMG, height: IMG }} contentFit="contain" />
             </Animated.View>
-            {/* İslami motif parıltıları (yeni parça vurgusu) */}
-            {hasPrev && (
+
+            {/* "DOKUN" işareti (inşadan önce) */}
+            {!built && (
+              <Animated.View
+                style={[
+                  { position: "absolute", width: 76, height: 76, borderRadius: 38, backgroundColor: "rgba(245,165,36,0.95)", alignItems: "center", justifyContent: "center", borderWidth: 4, borderColor: "#fff" },
+                  markerStyle,
+                ]}
+              >
+                <Text style={{ fontSize: 34 }}>🧱</Text>
+              </Animated.View>
+            )}
+
+            {/* İslami motif parıltıları (inşa anında) */}
+            {built && hasPrev && (
               <>
                 <Animated.View style={[{ position: "absolute", top: 6, right: BOX * 0.16 }, sparkleStyle]}>
                   <Star8 size={34} color="#F5A524" />
@@ -183,15 +197,15 @@ export function MosqueBuild({
               </>
             )}
 
-            {/* Pırıl yeni parçayı kutlar (Sohail #3: Pırıl celebrate) */}
+            {/* Pırıl — inşadan önce yardım ister (point), sonra kutlar (celebrate) */}
             <Animated.View style={[{ position: "absolute", bottom: -BOX * 0.04, right: -BOX * 0.04, width: BOX * 0.42, height: BOX * 0.42, alignItems: "center", justifyContent: "flex-end" }, pirilStyle]}>
-              <Mascot size={BOX * 0.42} pose="celebrate" />
+              <Mascot size={BOX * 0.42} pose={built ? "celebrate" : "point"} />
             </Animated.View>
           </View>
         </Animated.View>
 
-        <Text style={{ fontFamily: "Nunito_700Bold", fontSize: 14, color: "rgba(255,255,255,0.9)", marginTop: 18 }}>
-          {t("mosque.tapContinue")}
+        <Text style={{ fontFamily: "Nunito_700Bold", fontSize: 15, color: "rgba(255,255,255,0.92)", marginTop: 18 }}>
+          {built ? t("mosque.tapContinue") : t("mosque.tapToBuild")}
         </Text>
       </Pressable>
     </Animated.View>
