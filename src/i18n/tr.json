@@ -133,7 +133,13 @@
     "parentAreaDesc": "Abonelik ve gizlilik (yalnız ebeveyn)",
     "parentAreaUnlocked": "🔓 Açık — abonelik yakında eklenecek.",
     "parentLogin": "Ebeveyn Girişi 🔒",
-    "replayIntro": "Tanıtımı tekrar izle ▶"
+    "replayIntro": "Tanıtımı tekrar izle ▶",
+    "progressTitle": "Çocuğunun ilerlemesi",
+    "weekThis": "Bu hafta",
+    "weekDays": "7 günün {{n}}'inde pratik 🌙",
+    "chainCurrent": "Güncel zincir: {{n}} gün",
+    "chainBest": "En iyi zincir: {{n}} gün",
+    "lettersLearnedP": "Öğrenilen harf: {{n}}/{{total}}"
   },
   "a11y": {
     "musicToggle": "Müzik aç/kapat",

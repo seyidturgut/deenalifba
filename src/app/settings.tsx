@@ -6,10 +6,48 @@ import { useTranslation } from "react-i18next";
 import { GradientBg } from "@/components/ui/GradientBg";
 import { JuicyButton } from "@/components/ui/JuicyButton";
 import { ParentGate } from "@/features/parent-gate/ParentGate";
+import { LETTERS } from "@/data/letters";
 import type { AppLanguage } from "@/i18n";
 import { playSfx, syncMusicWithSetting } from "@/lib/sfx";
 import { APP_VERSION_LABEL } from "@/lib/version";
+import { useProgressStore } from "@/stores/progressStore";
 import { useSettingsStore } from "@/stores/settingsStore";
+import { useStreakStore } from "@/stores/streakStore";
+
+/** Ebeveyn haftalık özeti (İstikamet Zinciri Faz 3a) — kapı arkasında, ekran-görüntüsü alınası. */
+function ParentSummary() {
+  const { t } = useTranslation();
+  const childName = useSettingsStore((s) => s.childName);
+  useStreakStore((s) => s.practiceDays); // reaktivite
+  const current = useStreakStore((s) => s.currentChain);
+  const best = useStreakStore((s) => s.bestChain);
+  const wv = useStreakStore.getState().weekView(Date.now());
+  const completed = useProgressStore((s) => LETTERS.filter((l) => s.isLetterComplete(l.id)).length);
+  const bestEver = Math.max(best, current);
+
+  return (
+    <View style={{ gap: 8, marginTop: 10 }}>
+      <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 15, color: "#0E5FC2" }}>
+        {t("settings.progressTitle")}{childName ? ` · ${childName}` : ""}
+      </Text>
+      {/* Son 7 gün — dolu=pratik (sonuncusu bugün) */}
+      <View className="flex-row items-center" style={{ gap: 6 }}>
+        {wv.flags.map((f, i) => (
+          <View
+            key={i}
+            style={{ width: 22, height: 22, borderRadius: 11, alignItems: "center", justifyContent: "center", backgroundColor: f ? "#3FB984" : "rgba(0,0,0,0.08)" }}
+          >
+            {f && <Text style={{ fontSize: 11, color: "#fff" }}>🌙</Text>}
+          </View>
+        ))}
+      </View>
+      <Text style={{ fontFamily: "Nunito_700Bold", fontSize: 14, color: "#34618C" }}>{t("settings.weekDays", { n: wv.count })}</Text>
+      <Text style={{ fontFamily: "Nunito_700Bold", fontSize: 13, color: "#5C6B7A" }}>{t("settings.chainCurrent", { n: current })}</Text>
+      <Text style={{ fontFamily: "Nunito_700Bold", fontSize: 13, color: "#5C6B7A" }}>{t("settings.chainBest", { n: bestEver })}</Text>
+      <Text style={{ fontFamily: "Nunito_700Bold", fontSize: 13, color: "#5C6B7A" }}>{t("settings.lettersLearnedP", { n: completed, total: LETTERS.length })}</Text>
+    </View>
+  );
+}
 
 /**
  * Ayarlar — zararsız çocuk ayarları (dil/ses/müzik/titreşim) DOĞRUDAN açıktır.
@@ -101,7 +139,7 @@ export default function Settings() {
           <Text className="text-lg font-bold text-ink">{t("settings.parentArea")}</Text>
           <Text className="text-sm font-semibold text-ink/55">{t("settings.parentAreaDesc")}</Text>
           {parentUnlocked ? (
-            <Text className="mt-1 text-base font-semibold text-ink/70">{t("settings.parentAreaUnlocked")}</Text>
+            <ParentSummary />
           ) : (
             <JuicyButton label={t("settings.parentLogin")} tone="primary" onPress={() => { playSfx("ui_tap"); setShowGate(true); }} />
           )}

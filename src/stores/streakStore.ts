@@ -43,6 +43,8 @@ type StreakState = {
   lastShieldAt: number | null;
   /** Kalkanın zinciri koruduğu son gün (geri bildirim için) */
   lastProtectedDay: string | null;
+  /** Pratik yapılan günlerin kaydı (son ~21 gün) — ebeveyn haftalık özeti için */
+  practiceDays: string[];
 
   /** Bir pratik gününü işaretler (harf tamamlanınca çağrılır). Kalkan otomatik korur. */
   recordPractice: (now: number) => void;
@@ -50,6 +52,8 @@ type StreakState = {
   grantWeeklyShield: (now: number) => void;
   /** Görüntüleme durumu (+ kalkan + bugün korundu mu). */
   chainView: (now: number) => ChainView;
+  /** Ebeveyn özeti: son 7 günde kaç gün pratik + gün-gün bayraklar (eskiden yeniye). */
+  weekView: (now: number) => { count: number; flags: boolean[] };
 };
 
 const DAY = 24 * 60 * 60 * 1000;
@@ -64,16 +68,18 @@ export const useStreakStore = create<StreakState>()(
       shields: 0,
       lastShieldAt: null,
       lastProtectedDay: null,
+      practiceDays: [],
 
       recordPractice: (now) =>
         set((s) => {
           const today = dayStr(now);
           if (s.lastPracticeDay === today) return s; // bugün zaten sayıldı
+          const days = [...s.practiceDays, today].slice(-21); // gün geçmişi (ebeveyn özeti)
           const yesterday = dayStr(now - DAY);
           if (s.lastPracticeDay === yesterday) {
             // zincir devam ediyor (ardışık gün)
             const currentChain = s.currentChain + 1;
-            return { currentChain, bestChain: Math.max(s.bestChain, currentChain), lastPracticeDay: today };
+            return { currentChain, bestChain: Math.max(s.bestChain, currentChain), lastPracticeDay: today, practiceDays: days };
           }
           // TEK gün kaçırıldı + kalkan varsa → kalkanı harca, zinciri KORU (devam et)
           const twoDaysAgo = dayStr(now - 2 * DAY);
@@ -85,6 +91,7 @@ export const useStreakStore = create<StreakState>()(
               lastPracticeDay: today,
               shields: s.shields - 1,
               lastProtectedDay: today,
+              practiceDays: days,
             };
           }
           // ilk pratik VEYA korunamayan boşluk → eskiyi kupaya yaz, yeniden başla
@@ -92,6 +99,7 @@ export const useStreakStore = create<StreakState>()(
             bestChain: Math.max(s.bestChain, s.currentChain),
             currentChain: 1,
             lastPracticeDay: today,
+            practiceDays: days,
           };
         }),
 
@@ -115,6 +123,14 @@ export const useStreakStore = create<StreakState>()(
           shields,
           protectedToday: lastProtectedDay === today,
         };
+      },
+
+      weekView: (now) => {
+        const days = get().practiceDays;
+        // son 7 gün: bugün..6 gün önce → eskiden yeniye sırala
+        const flags: boolean[] = [];
+        for (let i = 6; i >= 0; i--) flags.push(days.includes(dayStr(now - i * DAY)));
+        return { count: flags.filter(Boolean).length, flags };
       },
     }),
     {

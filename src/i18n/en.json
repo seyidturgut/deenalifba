@@ -133,7 +133,13 @@
     "parentAreaDesc": "Subscription & privacy (parents only)",
     "parentAreaUnlocked": "🔓 Unlocked — subscription coming soon.",
     "parentLogin": "Parent Login 🔒",
-    "replayIntro": "Watch intro again ▶"
+    "replayIntro": "Watch intro again ▶",
+    "progressTitle": "Your child's progress",
+    "weekThis": "This week",
+    "weekDays": "Practised {{n}} of 7 days 🌙",
+    "chainCurrent": "Current chain: {{n}} days",
+    "chainBest": "Best chain: {{n}} days",
+    "lettersLearnedP": "Letters learned: {{n}}/{{total}}"
   },
   "a11y": {
     "musicToggle": "Toggle music",
