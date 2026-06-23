@@ -12,9 +12,24 @@ import { zustandMMKVStorage } from "@/db/storage";
  *    yeni zincir 1'den başlar — ceza yok, rekoru geçmeye davet.
  *  - Aynı gün birden çok pratik → tek sayılır (idempotent).
  *
+ * FAZ 2 — KALKAN (shield): Haftada 1 koruyucu kalkan verilir (en çok SHIELD_CAP).
+ *  Çocuk TEK bir günü kaçırırsa ve kalkanı varsa, kalkan otomatik harcanır ve
+ *  zincir kırılmadan DEVAM eder ("Pırıl zincirini güvende tuttu"). Nazik/affedici.
+ *
  * GİZLİLİK: tamamen cihaz-içi (MMKV), uzak senkron yok. `now` dışarıdan verilir
  * (test edilebilir). Tarih, yerel gün sınırına göre `toDateString()` ile karşılaştırılır.
  */
+const SHIELD_CAP = 2;
+
+type ChainView = {
+  current: number;
+  best: number;
+  practicedToday: boolean;
+  paused: boolean;
+  shields: number;
+  protectedToday: boolean;
+};
+
 type StreakState = {
   /** En son pratik günü (new Date(now).toDateString()) veya null */
   lastPracticeDay: string | null;
@@ -22,15 +37,19 @@ type StreakState = {
   currentChain: number;
   /** Şimdiye kadarki en uzun zincir (kupa) */
   bestChain: number;
+  /** Eldeki kalkan sayısı (Faz 2) */
+  shields: number;
+  /** En son kalkan verilme zamanı (epoch ms) — haftalık verme için */
+  lastShieldAt: number | null;
+  /** Kalkanın zinciri koruduğu son gün (geri bildirim için) */
+  lastProtectedDay: string | null;
 
-  /** Bir pratik gününü işaretler (harf tamamlanınca çağrılır). */
+  /** Bir pratik gününü işaretler (harf tamamlanınca çağrılır). Kalkan otomatik korur. */
   recordPractice: (now: number) => void;
-  /**
-   * Görüntüleme durumu: bugün/dün pratik varsa zincir "canlı"dır; aksi halde
-   * duraklamıştır (gösterimde 0 say, sonraki pratikte 1'den başlar).
-   * best = max(bestChain, currentChain).
-   */
-  chainView: (now: number) => { current: number; best: number; practicedToday: boolean; paused: boolean };
+  /** Haftada 1 kalkan verir (home odaklanınca çağrılır). */
+  grantWeeklyShield: (now: number) => void;
+  /** Görüntüleme durumu (+ kalkan + bugün korundu mu). */
+  chainView: (now: number) => ChainView;
 };
 
 const DAY = 24 * 60 * 60 * 1000;
@@ -42,6 +61,9 @@ export const useStreakStore = create<StreakState>()(
       lastPracticeDay: null,
       currentChain: 0,
       bestChain: 0,
+      shields: 0,
+      lastShieldAt: null,
+      lastProtectedDay: null,
 
       recordPractice: (now) =>
         set((s) => {
@@ -49,11 +71,23 @@ export const useStreakStore = create<StreakState>()(
           if (s.lastPracticeDay === today) return s; // bugün zaten sayıldı
           const yesterday = dayStr(now - DAY);
           if (s.lastPracticeDay === yesterday) {
-            // zincir devam ediyor
+            // zincir devam ediyor (ardışık gün)
             const currentChain = s.currentChain + 1;
             return { currentChain, bestChain: Math.max(s.bestChain, currentChain), lastPracticeDay: today };
           }
-          // ilk pratik VEYA gün(ler) kaçırıldı → eskiyi kupaya yaz, yeniden başla
+          // TEK gün kaçırıldı + kalkan varsa → kalkanı harca, zinciri KORU (devam et)
+          const twoDaysAgo = dayStr(now - 2 * DAY);
+          if (s.lastPracticeDay === twoDaysAgo && s.shields > 0 && s.currentChain > 0) {
+            const currentChain = s.currentChain + 1;
+            return {
+              currentChain,
+              bestChain: Math.max(s.bestChain, currentChain),
+              lastPracticeDay: today,
+              shields: s.shields - 1,
+              lastProtectedDay: today,
+            };
+          }
+          // ilk pratik VEYA korunamayan boşluk → eskiyi kupaya yaz, yeniden başla
           return {
             bestChain: Math.max(s.bestChain, s.currentChain),
             currentChain: 1,
@@ -61,8 +95,15 @@ export const useStreakStore = create<StreakState>()(
           };
         }),
 
+      grantWeeklyShield: (now) =>
+        set((s) => {
+          if (s.lastShieldAt !== null && now - s.lastShieldAt < 7 * DAY) return s;
+          if (s.shields >= SHIELD_CAP) return { lastShieldAt: now };
+          return { shields: Math.min(SHIELD_CAP, s.shields + 1), lastShieldAt: now };
+        }),
+
       chainView: (now) => {
-        const { lastPracticeDay, currentChain, bestChain } = get();
+        const { lastPracticeDay, currentChain, bestChain, shields, lastProtectedDay } = get();
         const today = dayStr(now);
         const yesterday = dayStr(now - DAY);
         const live = lastPracticeDay === today || lastPracticeDay === yesterday;
@@ -71,6 +112,8 @@ export const useStreakStore = create<StreakState>()(
           best: Math.max(bestChain, currentChain),
           practicedToday: lastPracticeDay === today,
           paused: !live && currentChain > 0,
+          shields,
+          protectedToday: lastProtectedDay === today,
         };
       },
     }),

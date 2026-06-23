@@ -24,6 +24,7 @@ import { images } from "@/lib/images";
 import { playSfx, syncMusicWithSetting } from "@/lib/sfx";
 import { useProgressStore } from "@/stores/progressStore";
 import { useSettingsStore } from "@/stores/settingsStore";
+import { useStreakStore } from "@/stores/streakStore";
 
 const NODE = 108;
 const V_GAP = 150; // düğümler arası dikey aralık (alt etikete yer)
@@ -236,6 +237,11 @@ export default function Home() {
   useEffect(() => {
     syncMusicWithSetting();
   }, [musicEnabled]);
+
+  // Haftada 1 kalkan ver (İstikamet Zinciri Faz 2) — home açılınca dener (haftalık kapılı)
+  useEffect(() => {
+    useStreakStore.getState().grantWeeklyShield(Date.now());
+  }, []);
 
   const contentW = width - 36; // GradientBg padding 18*2
 

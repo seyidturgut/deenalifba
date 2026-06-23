@@ -14,6 +14,7 @@ import { useStreakStore } from "@/stores/streakStore";
 export function ChainBanner({ accentColor = "#F5A524" }: { accentColor?: string }) {
   useStreakStore((s) => s.currentChain); // reaktivite
   useStreakStore((s) => s.lastPracticeDay);
+  useStreakStore((s) => s.shields);
   const cv = useStreakStore.getState().chainView(Date.now());
   const active = cv.current > 0;
   const visible = Math.min(cv.current, 7);
@@ -86,6 +87,24 @@ export function ChainBanner({ accentColor = "#F5A524" }: { accentColor?: string 
         <Animated.View style={newestStyle}>
           <Image source={images.chainBead} style={{ width: 38, height: 38 }} contentFit="contain" />
         </Animated.View>
+      )}
+
+      {/* Kalkan rozeti (Faz 2) — eldeki koruma; bugün korunduysa vurgulu */}
+      {(cv.shields > 0 || cv.protectedToday) && (
+        <View
+          className="flex-row items-center"
+          style={{
+            gap: 2,
+            marginLeft: 6,
+            paddingHorizontal: 7,
+            paddingVertical: 4,
+            borderRadius: 14,
+            backgroundColor: cv.protectedToday ? "#E5F8EE" : "rgba(46,139,158,0.12)",
+          }}
+        >
+          <Text style={{ fontSize: 15 }}>🛡️</Text>
+          <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 13, color: cv.protectedToday ? "#1E8C57" : "#2E8B9E" }}>{cv.shields}</Text>
+        </View>
       )}
     </View>
   );
