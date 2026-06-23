@@ -162,10 +162,10 @@ export default function Settings() {
             left: 0,
             right: 0,
             bottom: 0,
-            backgroundColor: "rgba(8,38,74,0.55)",
-            paddingHorizontal: 18,
+            backgroundColor: "#0B3566", // opak → arka plan (ayarlar) görünmesin
+            paddingHorizontal: 24,
             paddingTop: 24,
-            paddingBottom: 32,
+            paddingBottom: 28,
           }}
         >
           <ParentGate
@@ -174,9 +174,10 @@ export default function Settings() {
               setShowGate(false);
             }}
           />
-          <Pressable onPress={() => setShowGate(false)} className="items-center pt-2">
-            <Text className="text-base font-bold text-white">{t("common.cancel")}</Text>
-          </Pressable>
+          {/* Kapat — proje buton tasarımı (JuicyButton) */}
+          <View style={{ width: "100%", maxWidth: 360, alignSelf: "center" }}>
+            <JuicyButton label={t("common.cancel")} tone="primary" onPress={() => setShowGate(false)} />
+          </View>
         </View>
       )}
     </GradientBg>

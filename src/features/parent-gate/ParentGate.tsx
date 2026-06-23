@@ -36,10 +36,10 @@ export function ParentGate({ onSuccess }: { onSuccess: () => void }) {
       <View className="h-16 w-16 items-center justify-center rounded-full bg-white/80">
         <Text className="text-3xl">🔒</Text>
       </View>
-      <Text className="font-display text-2xl font-extrabold text-ink">
+      <Text className="font-display text-2xl font-extrabold" style={{ color: "#FFFFFF" }}>
         {t("parentGate.title")}
       </Text>
-      <Text className="text-center text-base font-semibold text-ink/60">
+      <Text className="text-center text-base font-semibold" style={{ color: "rgba(255,255,255,0.78)" }}>
         {t("parentGate.forParents")}
       </Text>
       <View
