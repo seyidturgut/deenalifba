@@ -1,22 +1,32 @@
 import { Image } from "expo-image";
 import { useEffect } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
+import Svg, { G, Path } from "react-native-svg";
 import { useTranslation } from "react-i18next";
 
 import { Floating } from "@/components/ui/Floating";
 import { JuicyButton } from "@/components/ui/JuicyButton";
 import { getLetter } from "@/data/letters";
+import { getLetterPath, PATH_BOX } from "@/data/letterPaths";
 import { images } from "@/lib/images";
 import { playLetter } from "@/lib/sfx";
 
+const CARD = 250;
+const GLYPH = 176; // kart içi glif alanı (altın çerçeveye değmesin)
+
 /**
- * "Tanı" (öğret) adımı — TEST DEĞİL. Harfi tanıtır: büyük harf + adı + sesi
- * (otomatik çalar + Dinle). Çocuk önce harfi görür/duyar, sonra Devam'a basar.
- * Pedagoji: önce öğret, sonra pratik.
+ * "Tanı" (öğret) adımı — TEST DEĞİL. Harfi tanıtır: büyük harf + sesi
+ * (otomatik çalar + dokun-tekrar). Latin ad gösterilmez (Ismail: Arapça + ses).
+ *
+ * Harf, GERÇEK Amiri glif konturuyla (letterPaths, 1000×1000 kutuda ORTALANMIŞ)
+ * SVG path olarak çizilir → 28 harfin hepsi kartta STABİL ortalı durur. (Text
+ * glifi kullanılırsa kuyruklu harfler ح/ج yan boşluk/baseline yüzünden kayıyordu.)
  */
 export function LetterIntro({ letterId, onComplete }: { letterId: number; onComplete: () => void }) {
   const { t } = useTranslation();
   const letter = getLetter(letterId);
+  const lp = getLetterPath(letterId);
+  const sc = GLYPH / PATH_BOX;
 
   useEffect(() => {
     const tt = setTimeout(() => playLetter(letterId), 350);
@@ -29,10 +39,20 @@ export function LetterIntro({ letterId, onComplete }: { letterId: number; onComp
     <View className="flex-1 items-center justify-center gap-5">
       {/* Büyük harf kartı — dokununca harfin sesi tekrar çalar (etiketsiz) */}
       <Floating distance={8} duration={2200}>
-        <Pressable onPress={() => playLetter(letterId)} style={{ width: 250, height: 250 }}>
+        <Pressable onPress={() => playLetter(letterId)} style={{ width: CARD, height: CARD }}>
           <Image source={images.playPanel} style={StyleSheet.absoluteFill} contentFit="fill" />
           <View style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, alignItems: "center", justifyContent: "center" }}>
-            <Text style={{ fontFamily: "Amiri_700Bold", fontSize: 140, color: "#2A2A33" }}>{letter.char}</Text>
+            {lp ? (
+              // bbox-merkezli path → her harf aynı şekilde ortalı
+              <Svg width={GLYPH} height={GLYPH}>
+                <G transform={`scale(${sc})`}>
+                  <Path d={lp.d} fill="#2A2A33" />
+                </G>
+              </Svg>
+            ) : (
+              // path yoksa Amiri glif fallback
+              <Text style={{ fontFamily: "Amiri_700Bold", fontSize: 140, color: "#2A2A33" }}>{letter.char}</Text>
+            )}
           </View>
         </Pressable>
       </Floating>
