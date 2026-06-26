@@ -1,7 +1,7 @@
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { Pressable, Text, TextInput, View } from "react-native";
+import { Pressable, Text, TextInput, useWindowDimensions, View } from "react-native";
 import Animated, { Easing, FadeIn, useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming } from "react-native-reanimated";
 import { useTranslation } from "react-i18next";
 
@@ -18,14 +18,16 @@ import { useProgressStore } from "@/stores/progressStore";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { useStreakStore } from "@/stores/streakStore";
 
+// Konumlar dünya kutusuna ORANTILI (0..1 merkez) → ölçek büyüyünce hizalı kalır
 const LANTERN_SPOTS = [
-  { left: 28, top: 150 },
-  { left: 232, top: 132 },
-  { left: 132, top: 64 },
+  { x: 0.12, y: 0.54 },
+  { x: 0.80, y: 0.47 },
+  { x: 0.46, y: 0.22 },
 ];
+const FOUNTAIN_SPOT = { x: 0.40, y: 0.56 };
 
 /** Cami dünyası dokunulabilir öğesi — kapalıyken nabız atar (davet), dokununca açılır + ışır. */
-function WorldSpot({ on, onActivate, pos, onImg, offImg, size = 48 }: { on: boolean; onActivate: () => void; pos: { left: number; top: number }; onImg: number; offImg: number; size?: number }) {
+function WorldSpot({ on, onActivate, cx, cy, onImg, offImg, size = 48 }: { on: boolean; onActivate: () => void; cx: number; cy: number; onImg: number; offImg: number; size?: number }) {
   const pulse = useSharedValue(0);
   useEffect(() => {
     if (!on) pulse.value = withRepeat(withSequence(withTiming(1, { duration: 650, easing: Easing.inOut(Easing.ease) }), withTiming(0, { duration: 650, easing: Easing.inOut(Easing.ease) })), -1, false);
@@ -36,8 +38,8 @@ function WorldSpot({ on, onActivate, pos, onImg, offImg, size = 48 }: { on: bool
     transform: [{ scale: (on ? 1.15 : 0.85) + pulse.value * 0.18 }],
   }));
   return (
-    <Pressable onPress={on ? undefined : onActivate} disabled={on} style={{ position: "absolute", left: pos.left, top: pos.top, width: size, height: size + 12, alignItems: "center", justifyContent: "center" }} hitSlop={10}>
-      <Animated.View style={[{ position: "absolute", width: size + 14, height: size + 14, borderRadius: (size + 14) / 2, backgroundColor: on ? "#FFD36B" : "#FFFFFF" }, haloStyle]} />
+    <Pressable onPress={on ? undefined : onActivate} disabled={on} style={{ position: "absolute", left: cx - size / 2, top: cy - size / 2, width: size, height: size, alignItems: "center", justifyContent: "center" }} hitSlop={12}>
+      <Animated.View style={[{ position: "absolute", width: size * 1.3, height: size * 1.3, borderRadius: size * 0.65, backgroundColor: on ? "#FFD36B" : "#FFFFFF" }, haloStyle]} />
       <Image source={on ? onImg : offImg} style={{ width: size, height: size }} contentFit="contain" />
     </Pressable>
   );
@@ -46,6 +48,10 @@ function WorldSpot({ on, onActivate, pos, onImg, offImg, size = 48 }: { on: bool
 export default function Mosque() {
   const { t } = useTranslation();
   const router = useRouter();
+  const { width } = useWindowDimensions();
+  const WORLD = Math.min(width - 12, 392); // cami sahnesi ekranı doldurur (Sohail: çok daha büyük)
+  const lanternSize = Math.round(WORLD * 0.17);
+  const fountainSize = Math.round(WORLD * 0.23);
 
   const completed = useProgressStore((s) => LETTERS.filter((l) => s.isLetterComplete(l.id)).length);
   const mosqueName = useSettingsStore((s) => s.mosqueName);
@@ -155,24 +161,24 @@ export default function Mosque() {
           </Text>
         </View>
 
-        {/* Cami — süzülen inşa aşaması + dokunulabilir fenerler (Sohail #6) */}
-        <View className="my-3 flex-1 items-center justify-center">
-          <View style={{ width: 300, height: 300 }}>
-            <Floating distance={9} duration={2400}>
+        {/* Cami — süzülen inşa aşaması + dokunulabilir fenerler/çeşme (Sohail #6, büyük sahne) */}
+        <View className="my-2 flex-1 items-center justify-center">
+          <View style={{ width: WORLD, height: WORLD }}>
+            <Floating distance={10} duration={2400}>
               <Animated.View key={stageIdx} entering={FadeIn.duration(500)}>
                 <Image
                   source={images.mosqueStages[stageIdx]}
-                  style={{ width: 300, height: 300, opacity: completed === 0 ? 0.4 : 1 }}
+                  style={{ width: WORLD, height: WORLD, opacity: completed === 0 ? 0.4 : 1 }}
                   contentFit="contain"
                 />
               </Animated.View>
             </Floating>
             {/* Fenerler — çocuk dokununca yanar (kalıcı; "benim camim") */}
-            {LANTERN_SPOTS.map((pos, i) => (
-              <WorldSpot key={i} on={lanterns[i] === true} onActivate={() => onLight(i)} pos={pos} onImg={images.lanternOn} offImg={images.lanternOff} />
+            {LANTERN_SPOTS.map((s, i) => (
+              <WorldSpot key={i} on={lanterns[i] === true} onActivate={() => onLight(i)} cx={s.x * WORLD} cy={s.y * WORLD} onImg={images.lanternOn} offImg={images.lanternOff} size={lanternSize} />
             ))}
             {/* Çeşme — dokununca su akar */}
-            <WorldSpot on={fountain} onActivate={onFountain} pos={{ left: 118, top: 158 }} onImg={images.fountainOn} offImg={images.fountainOff} size={66} />
+            <WorldSpot on={fountain} onActivate={onFountain} cx={FOUNTAIN_SPOT.x * WORLD} cy={FOUNTAIN_SPOT.y * WORLD} onImg={images.fountainOn} offImg={images.fountainOff} size={fountainSize} />
           </View>
 
           {/* Pırıl camide "yaşar" + fener görevini söyler; dokununca zıplar (companion bağı) */}
