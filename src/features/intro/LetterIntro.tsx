@@ -37,19 +37,8 @@ export function LetterIntro({ letterId, onComplete }: { letterId: number; onComp
         </Pressable>
       </Floating>
 
-      {/* Harfin adı */}
-      <Text
-        style={{
-          fontFamily: "Fredoka_700Bold",
-          fontSize: 30,
-          color: "#0E5FC2",
-          textShadowColor: "rgba(255,255,255,0.9)",
-          textShadowOffset: { width: 0, height: 1 },
-          textShadowRadius: 4,
-        }}
-      >
-        {letter.name}
-      </Text>
+      {/* Latin ad GÖSTERİLMEZ (Ismail: Arapça harf + ses; transliterasyona dayanma).
+          Çocuk harfi görür + sesini duyar; karta dokununca ses tekrar çalar. */}
 
       {/* Devam (öğretme adımı — açık devam butonu) */}
       <JuicyButton label={t("intro.continue")} tone="success" onPress={onComplete} />

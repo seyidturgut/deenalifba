@@ -86,7 +86,7 @@
     "listen": "Dinle"
   },
   "recall": {
-    "prompt": "Bu harf hangisi?",
+    "prompt": "Hangi harfi duydun? 👂",
     "none": "Şimdilik tekrar yok — devam! 🎉"
   },
   "intro": {

@@ -86,7 +86,7 @@
     "listen": "Listen"
   },
   "recall": {
-    "prompt": "Which letter is this?",
+    "prompt": "Which letter did you hear? 👂",
     "none": "Nothing to review yet — keep going! 🎉"
   },
   "intro": {

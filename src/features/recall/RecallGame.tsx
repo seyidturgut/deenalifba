@@ -7,30 +7,31 @@ import { useTranslation } from "react-i18next";
 import { getLetter, LETTERS } from "@/data/letters";
 import { haptics } from "@/lib/haptics";
 import { images } from "@/lib/images";
-import { playSfx } from "@/lib/sfx";
+import { playLetter, playSfx } from "@/lib/sfx";
 import { useProgressStore } from "@/stores/progressStore";
 import { useStageStore } from "@/stores/stageStore";
 import { useSrsStore } from "@/stores/srsStore";
 
 /**
  * "Tekrar" (Recall): önceki öğrenilen harflerden (SM-2 vadesi gelenler öncelikli)
- * 1-3 tanesini seçer, harfi gösterip 4 isimden doğrusunu seçtirir. Sonuç SM-2'ye
- * işlenir (aralıklı tekrar). İlk harflerde tekrar yoksa nazikçe atlanır.
+ * 1-3 tanesini seçer. YAZISIZ: hedef harfin SESİ çalar, çocuk 4 Arap harfinden
+ * duyduğunu seçer (Ismail: Arapça + ses, transliterasyon yok). Sonuç SM-2'ye
+ * işlenir. İlk harflerde tekrar yoksa nazikçe atlanır.
  */
 const CARD = 120;
 const INNER = CARD * 0.6;
 const MAX_Q = 3;
 
-type Question = { id: number; char: string; name: string; options: string[] };
+type Question = { id: number; options: number[] };
 
-function NameOption({
-  label,
+function CharOption({
+  char,
   correct,
   locked,
   onCorrect,
   onWrong,
 }: {
-  label: string;
+  char: string;
   correct: boolean;
   locked: boolean;
   onCorrect: () => void;
@@ -58,7 +59,7 @@ function NameOption({
     <Animated.View style={[{ width: "48%" }, style]}>
       <Pressable
         onPress={press}
-        className="items-center justify-center rounded-2xl py-3"
+        className="items-center justify-center rounded-2xl py-2"
         style={{
           backgroundColor: picked ? "#3FB984" : "white",
           shadowColor: "#1462B5",
@@ -67,7 +68,7 @@ function NameOption({
           shadowOffset: { width: 0, height: 3 },
         }}
       >
-        <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 18, color: picked ? "white" : "#34618C" }}>{label}</Text>
+        <Text style={{ fontFamily: "Amiri_700Bold", fontSize: 46, lineHeight: 64, color: picked ? "white" : "#2A2A33" }}>{char}</Text>
       </Pressable>
     </Animated.View>
   );
@@ -90,16 +91,15 @@ export function RecallGame({ letterId, onComplete }: { letterId: number; onCompl
       [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
     }
     return shuffled.slice(0, Math.min(MAX_Q, shuffled.length)).map((id) => {
-      const target = getLetter(id)!;
       const pd = LETTERS.filter((l) => l.id !== id);
-      const names: string[] = [];
-      for (let i = 0; i < 3 && pd.length; i++) names.push(pd.splice(Math.floor(Math.random() * pd.length), 1)[0].name);
-      const options = [...names, target.name];
+      const distractors: number[] = [];
+      for (let i = 0; i < 3 && pd.length; i++) distractors.push(pd.splice(Math.floor(Math.random() * pd.length), 1)[0].id);
+      const options = [...distractors, id];
       for (let i = options.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [options[i], options[j]] = [options[j], options[i]];
       }
-      return { id, char: target.char, name: target.name, options };
+      return { id, options };
     });
   }, [letterId]);
 
@@ -114,6 +114,15 @@ export function RecallGame({ letterId, onComplete }: { letterId: number; onCompl
       return () => clearTimeout(tt);
     }
   }, [questions.length, onComplete]);
+
+  // Soru değişince hedef harfin SESİ çalar (yazısız prompt: "duyduğunu seç")
+  useEffect(() => {
+    if (questions.length === 0) return;
+    const id = questions[qi]?.id;
+    if (id == null) return;
+    const tt = setTimeout(() => playLetter(id), 300);
+    return () => clearTimeout(tt);
+  }, [qi, questions]);
 
   if (questions.length === 0) {
     return (
@@ -165,8 +174,8 @@ export function RecallGame({ letterId, onComplete }: { letterId: number; onCompl
         </View>
       </View>
 
-      {/* Harf kartı */}
-      <View style={{ width: CARD, height: CARD, alignItems: "center", justifyContent: "center" }}>
+      {/* Dinle kartı — hedef harfin sesini (tekrar) çalar; çocuk duyduğunu seçer */}
+      <Pressable onPress={() => playLetter(q.id)} style={{ width: CARD, height: CARD, alignItems: "center", justifyContent: "center" }}>
         <Image source={images.nodeTile} style={{ position: "absolute", width: CARD, height: CARD }} contentFit="contain" />
         <View
           style={{
@@ -177,11 +186,9 @@ export function RecallGame({ letterId, onComplete }: { letterId: number; onCompl
             transform: [{ translateX: CARD * 0.023 }, { translateY: CARD * -0.053 }],
           }}
         >
-          <Text style={{ fontFamily: "Amiri_700Bold", fontSize: INNER * 0.74, lineHeight: INNER * 0.92, color: "#3A3A44" }}>
-            {q.char}
-          </Text>
+          <Text style={{ fontSize: INNER * 0.6 }}>🔊</Text>
         </View>
-      </View>
+      </Pressable>
 
       {/* İlerleme noktaları */}
       <View className="flex-row gap-1.5">
@@ -193,13 +200,13 @@ export function RecallGame({ letterId, onComplete }: { letterId: number; onCompl
         ))}
       </View>
 
-      {/* 4 isim seçeneği */}
+      {/* 4 Arap harfi seçeneği — duyduğun harfi seç */}
       <View key={qi} style={{ width: CARD * 2 + 40, flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", rowGap: 12 }}>
-        {q.options.map((name, i) => (
-          <NameOption
+        {q.options.map((optId, i) => (
+          <CharOption
             key={`${qi}-${i}`}
-            label={name}
-            correct={name === q.name}
+            char={getLetter(optId)!.char}
+            correct={optId === q.id}
             locked={finished}
             onCorrect={onCorrect}
             onWrong={onWrong}

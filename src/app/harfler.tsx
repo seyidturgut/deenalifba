@@ -55,11 +55,9 @@ function LetterTile({ letter, index, isActive }: { letter: Letter; index: number
           borderColor,
         }}
       >
-        <Text className="text-5xl" style={{ fontFamily: "Amiri_700Bold", color: playable ? "#2A2A33" : "#A9B4C2" }}>
+        {/* Latin ad GÖSTERİLMEZ (Ismail: Arapça harf + ses) — sadece büyük harf */}
+        <Text className="text-6xl" style={{ fontFamily: "Amiri_700Bold", color: playable ? "#2A2A33" : "#A9B4C2" }}>
           {letter.char}
-        </Text>
-        <Text className="mt-1 font-display text-base font-bold" style={{ color: playable ? "#5B6470" : "#B7C0CC" }}>
-          {letter.name}
         </Text>
         {!playable && (
           <Image source={images.icLock} style={{ width: 30, height: 30, position: "absolute", right: 6, top: 6 }} contentFit="contain" />
