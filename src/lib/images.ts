@@ -68,9 +68,11 @@ export const images = {
   chainBead: require("@/assets/illustrations/decor/chain_bead.webp"), // altın hilal boncuk (tekrarlanan)
   chainMedallion: require("@/assets/illustrations/decor/chain_medallion.webp"), // gün sayısı madalyonu
 
-  // Cami dünyası — dokunulabilir fenerler (İslami fanous)
+  // Cami dünyası — dokunulabilir fenerler (İslami fanous) + çeşme (sebil)
   lanternOn: require("@/assets/illustrations/decor/lantern_on.webp"),
   lanternOff: require("@/assets/illustrations/decor/lantern_off.webp"),
+  fountainOn: require("@/assets/illustrations/decor/fountain_on.webp"),
+  fountainOff: require("@/assets/illustrations/decor/fountain_off.webp"),
 
   // v3 oyun asset'leri
   cardBack: require("@/assets/illustrations/decor/card_back.webp"), // Eşleştir — kapalı kart

@@ -118,7 +118,9 @@
     "bestChain": "En iyi zincir: {{n}} gün",
     "tapToBuild": "Dokun ve inşa et! 🧱",
     "lightLanterns": "Hadi fenerleri yak! 🪔",
-    "allLit": "Maşallah, hepsi yandı! ✨"
+    "allLit": "Maşallah, hepsi yandı! ✨",
+    "turnOnWater": "Suyu aç! 💧",
+    "allReady": "Maşallah, camimiz hazır! ✨"
   },
   "parentGate": {
     "title": "Ebeveyn Kapısı",

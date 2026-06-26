@@ -118,7 +118,9 @@
     "bestChain": "Best chain: {{n}} days",
     "tapToBuild": "Tap to build! 🧱",
     "lightLanterns": "Light the lanterns! 🪔",
-    "allLit": "Masha'Allah, all lit! ✨"
+    "allLit": "Masha'Allah, all lit! ✨",
+    "turnOnWater": "Turn on the water! 💧",
+    "allReady": "Masha'Allah, our mosque is ready! ✨"
   },
   "parentGate": {
     "title": "Parents' Gate",

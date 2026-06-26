@@ -24,21 +24,21 @@ const LANTERN_SPOTS = [
   { left: 132, top: 64 },
 ];
 
-/** Dokunulabilir fener — sönükken nabız atar (yak davetimi), dokununca yanar + ışır. */
-function LanternSpot({ lit, onLight, pos }: { lit: boolean; onLight: () => void; pos: { left: number; top: number } }) {
+/** Cami dünyası dokunulabilir öğesi — kapalıyken nabız atar (davet), dokununca açılır + ışır. */
+function WorldSpot({ on, onActivate, pos, onImg, offImg, size = 48 }: { on: boolean; onActivate: () => void; pos: { left: number; top: number }; onImg: number; offImg: number; size?: number }) {
   const pulse = useSharedValue(0);
   useEffect(() => {
-    if (!lit) pulse.value = withRepeat(withSequence(withTiming(1, { duration: 650, easing: Easing.inOut(Easing.ease) }), withTiming(0, { duration: 650, easing: Easing.inOut(Easing.ease) })), -1, false);
+    if (!on) pulse.value = withRepeat(withSequence(withTiming(1, { duration: 650, easing: Easing.inOut(Easing.ease) }), withTiming(0, { duration: 650, easing: Easing.inOut(Easing.ease) })), -1, false);
     else pulse.value = withTiming(0, { duration: 200 });
-  }, [lit, pulse]);
+  }, [on, pulse]);
   const haloStyle = useAnimatedStyle(() => ({
-    opacity: lit ? 0.55 : 0.12 + pulse.value * 0.3,
-    transform: [{ scale: (lit ? 1.15 : 0.85) + pulse.value * 0.18 }],
+    opacity: on ? 0.55 : 0.12 + pulse.value * 0.3,
+    transform: [{ scale: (on ? 1.15 : 0.85) + pulse.value * 0.18 }],
   }));
   return (
-    <Pressable onPress={lit ? undefined : onLight} disabled={lit} style={{ position: "absolute", left: pos.left, top: pos.top, width: 48, height: 60, alignItems: "center", justifyContent: "center" }} hitSlop={10}>
-      <Animated.View style={[{ position: "absolute", width: 60, height: 60, borderRadius: 30, backgroundColor: lit ? "#FFD36B" : "#FFFFFF" }, haloStyle]} />
-      <Image source={lit ? images.lanternOn : images.lanternOff} style={{ width: 48, height: 48 }} contentFit="contain" />
+    <Pressable onPress={on ? undefined : onActivate} disabled={on} style={{ position: "absolute", left: pos.left, top: pos.top, width: size, height: size + 12, alignItems: "center", justifyContent: "center" }} hitSlop={10}>
+      <Animated.View style={[{ position: "absolute", width: size + 14, height: size + 14, borderRadius: (size + 14) / 2, backgroundColor: on ? "#FFD36B" : "#FFFFFF" }, haloStyle]} />
+      <Image source={on ? onImg : offImg} style={{ width: size, height: size }} contentFit="contain" />
     </Pressable>
   );
 }
@@ -53,14 +53,25 @@ export default function Mosque() {
   const accentColor = useSettingsStore((s) => s.accentColor) ?? "#F5A524";
   const lanterns = useSettingsStore((s) => s.mosqueLanterns);
   const lightLantern = useSettingsStore((s) => s.lightLantern);
+  const fountain = useSettingsStore((s) => s.mosqueFountain);
+  const setFountain = useSettingsStore((s) => s.setFountain);
   const litCount = LANTERN_SPOTS.filter((_, i) => lanterns[i] === true).length;
   const allLit = litCount === LANTERN_SPOTS.length;
+  const allDone = allLit && fountain;
   const onLight = (i: number) => {
     lightLantern(i, LANTERN_SPOTS.length);
     haptics.success();
     playSfx("level_unlock");
     if (litCount + 1 === LANTERN_SPOTS.length) playSfx("star_earned");
   };
+  const onFountain = () => {
+    setFountain(true);
+    haptics.success();
+    playSfx("whoosh");
+    if (allLit) playSfx("star_earned");
+  };
+  // Pırıl'ın görev balonu: önce fenerler → sonra çeşme → hepsi hazır
+  const promptKey = allDone ? "mosque.allReady" : !allLit ? "mosque.lightLanterns" : "mosque.turnOnWater";
   const bestChain = useStreakStore((s) => s.bestChain);
   const currentChain = useStreakStore((s) => s.currentChain);
   const bestChainEver = Math.max(bestChain, currentChain);
@@ -158,21 +169,23 @@ export default function Mosque() {
             </Floating>
             {/* Fenerler — çocuk dokununca yanar (kalıcı; "benim camim") */}
             {LANTERN_SPOTS.map((pos, i) => (
-              <LanternSpot key={i} lit={lanterns[i] === true} onLight={() => onLight(i)} pos={pos} />
+              <WorldSpot key={i} on={lanterns[i] === true} onActivate={() => onLight(i)} pos={pos} onImg={images.lanternOn} offImg={images.lanternOff} />
             ))}
+            {/* Çeşme — dokununca su akar */}
+            <WorldSpot on={fountain} onActivate={onFountain} pos={{ left: 118, top: 158 }} onImg={images.fountainOn} offImg={images.fountainOff} size={66} />
           </View>
 
           {/* Pırıl camide "yaşar" + fener görevini söyler; dokununca zıplar (companion bağı) */}
           <View pointerEvents="box-none" style={{ position: "absolute", left: -6, bottom: -4, width: 150, height: 188, alignItems: "center", justifyContent: "flex-end" }}>
             <View style={{ backgroundColor: "#FFFFFF", borderRadius: 14, paddingHorizontal: 10, paddingVertical: 6, maxWidth: 168, marginBottom: 2, shadowColor: "#1462B5", shadowOpacity: 0.14, shadowRadius: 5, shadowOffset: { width: 0, height: 3 } }}>
               <Text numberOfLines={2} style={{ fontFamily: "Fredoka_600SemiBold", fontSize: 12, color: "#34414F", textAlign: "center" }}>
-                {allLit ? t("mosque.allLit") : t("mosque.lightLanterns")}
+                {t(promptKey)}
               </Text>
             </View>
             <View style={{ width: 138, height: 138, alignItems: "center", justifyContent: "flex-end" }}>
               <View style={{ position: "absolute", bottom: 30, width: 94, height: 94, borderRadius: 47, backgroundColor: accentColor, opacity: 0.22 }} />
               <Image source={images.nodeCloud} style={{ position: "absolute", bottom: 0, width: 126, height: 52 }} contentFit="contain" />
-              <Mascot size={118} pose={allLit ? "celebrate" : "point"} />
+              <Mascot size={118} pose={allDone ? "celebrate" : "point"} />
             </View>
           </View>
         </View>
