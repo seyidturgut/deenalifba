@@ -2,7 +2,7 @@
   "expo": {
     "name": "Alif",
     "slug": "AlifBa-Game",
-    "version": "1.2.0",
+    "version": "1.2.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "alifbagame",
@@ -46,7 +46,7 @@
       "reactCompiler": true
     },
     "extra": {
-      "build": "2026.06.22"
+      "build": "2026.06.26"
     }
   }
 }

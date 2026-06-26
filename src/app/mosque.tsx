@@ -2,7 +2,7 @@ import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { Pressable, Text, TextInput, useWindowDimensions, View } from "react-native";
-import Animated, { Easing, FadeIn, useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming } from "react-native-reanimated";
+import Animated, { Easing, FadeIn, useAnimatedStyle, useSharedValue, withSequence, withSpring, withTiming } from "react-native-reanimated";
 import { useTranslation } from "react-i18next";
 
 import { Floating } from "@/components/ui/Floating";
@@ -18,66 +18,16 @@ import { useProgressStore } from "@/stores/progressStore";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { useStreakStore } from "@/stores/streakStore";
 
-// Konumlar dünya kutusuna ORANTILI (0..1 merkez) → ölçek büyüyünce hizalı kalır
-const LANTERN_SPOTS = [
-  { x: 0.12, y: 0.54 },
-  { x: 0.80, y: 0.47 },
-  { x: 0.46, y: 0.22 },
-];
-const FOUNTAIN_SPOT = { x: 0.40, y: 0.56 };
-
-/** Cami dünyası dokunulabilir öğesi — kapalıyken nabız atar (davet), dokununca açılır + ışır. */
-function WorldSpot({ on, onActivate, cx, cy, onImg, offImg, size = 48 }: { on: boolean; onActivate: () => void; cx: number; cy: number; onImg: number; offImg: number; size?: number }) {
-  const pulse = useSharedValue(0);
-  useEffect(() => {
-    if (!on) pulse.value = withRepeat(withSequence(withTiming(1, { duration: 650, easing: Easing.inOut(Easing.ease) }), withTiming(0, { duration: 650, easing: Easing.inOut(Easing.ease) })), -1, false);
-    else pulse.value = withTiming(0, { duration: 200 });
-  }, [on, pulse]);
-  const haloStyle = useAnimatedStyle(() => ({
-    opacity: on ? 0.55 : 0.12 + pulse.value * 0.3,
-    transform: [{ scale: (on ? 1.15 : 0.85) + pulse.value * 0.18 }],
-  }));
-  return (
-    <Pressable onPress={on ? undefined : onActivate} disabled={on} style={{ position: "absolute", left: cx - size / 2, top: cy - size / 2, width: size, height: size, alignItems: "center", justifyContent: "center" }} hitSlop={12}>
-      <Animated.View style={[{ position: "absolute", width: size * 1.3, height: size * 1.3, borderRadius: size * 0.65, backgroundColor: on ? "#FFD36B" : "#FFFFFF" }, haloStyle]} />
-      <Image source={on ? onImg : offImg} style={{ width: size, height: size }} contentFit="contain" />
-    </Pressable>
-  );
-}
-
 export default function Mosque() {
   const { t } = useTranslation();
   const router = useRouter();
   const { width } = useWindowDimensions();
   const WORLD = Math.min(width - 12, 392); // cami sahnesi ekranı doldurur (Sohail: çok daha büyük)
-  const lanternSize = Math.round(WORLD * 0.17);
-  const fountainSize = Math.round(WORLD * 0.23);
 
   const completed = useProgressStore((s) => LETTERS.filter((l) => s.isLetterComplete(l.id)).length);
   const mosqueName = useSettingsStore((s) => s.mosqueName);
   const setMosqueName = useSettingsStore((s) => s.setMosqueName);
   const accentColor = useSettingsStore((s) => s.accentColor) ?? "#F5A524";
-  const lanterns = useSettingsStore((s) => s.mosqueLanterns);
-  const lightLantern = useSettingsStore((s) => s.lightLantern);
-  const fountain = useSettingsStore((s) => s.mosqueFountain);
-  const setFountain = useSettingsStore((s) => s.setFountain);
-  const litCount = LANTERN_SPOTS.filter((_, i) => lanterns[i] === true).length;
-  const allLit = litCount === LANTERN_SPOTS.length;
-  const allDone = allLit && fountain;
-  const onLight = (i: number) => {
-    lightLantern(i, LANTERN_SPOTS.length);
-    haptics.success();
-    playSfx("level_unlock");
-    if (litCount + 1 === LANTERN_SPOTS.length) playSfx("star_earned");
-  };
-  const onFountain = () => {
-    setFountain(true);
-    haptics.success();
-    playSfx("whoosh");
-    if (allLit) playSfx("star_earned");
-  };
-  // Pırıl'ın görev balonu: önce fenerler → sonra çeşme → hepsi hazır
-  const promptKey = allDone ? "mosque.allReady" : !allLit ? "mosque.lightLanterns" : "mosque.turnOnWater";
   const bestChain = useStreakStore((s) => s.bestChain);
   const currentChain = useStreakStore((s) => s.currentChain);
   const bestChainEver = Math.max(bestChain, currentChain);
@@ -87,6 +37,10 @@ export default function Mosque() {
   const stageIdx = Math.min(STAGES - 1, Math.max(0, completed - 1));
   const built = Math.min(completed, STAGES);
   const progress = built / STAGES;
+  const allDone = built >= STAGES;
+
+  // Pırıl'ın balonu: ilerlemeye göre teşvik (artık fener/çeşme görevi yok — cami kendi büyür)
+  const promptKey = allDone ? "mosque.allReady" : completed === 0 ? "mosque.startLearning" : "mosque.growing";
 
   const displayName = mosqueName || t("mosque.defaultName");
   const [editing, setEditing] = useState(false);
@@ -109,6 +63,20 @@ export default function Mosque() {
     if (completed > 0 && stageIdx > prevStage.current) playSfx("mosque_build");
     prevStage.current = stageIdx;
   }, [stageIdx, completed]);
+
+  // Pırıl camide "yaşar" — dokununca zıplar (companion bağı)
+  const pirilJump = useSharedValue(0);
+  const onPirilTap = () => {
+    haptics.tap();
+    playSfx("ui_tap");
+    pirilJump.value = withSequence(
+      withTiming(1, { duration: 240, easing: Easing.out(Easing.back(2.2)) }),
+      withSpring(0, { damping: 6, stiffness: 140 })
+    );
+  };
+  const pirilStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: -pirilJump.value * 22 }, { scale: 1 + pirilJump.value * 0.08 }],
+  }));
 
   return (
     <GradientBg variant="skyWarm">
@@ -161,7 +129,7 @@ export default function Mosque() {
           </Text>
         </View>
 
-        {/* Cami — süzülen inşa aşaması + dokunulabilir fenerler/çeşme (Sohail #6, büyük sahne) */}
+        {/* Cami — süzülen inşa aşaması (12 parça, kendi içinde bütünlüklü büyür) */}
         <View className="my-2 flex-1 items-center justify-center">
           <View style={{ width: WORLD, height: WORLD }}>
             <Floating distance={10} duration={2400}>
@@ -173,26 +141,22 @@ export default function Mosque() {
                 />
               </Animated.View>
             </Floating>
-            {/* Fenerler — çocuk dokununca yanar (kalıcı; "benim camim") */}
-            {LANTERN_SPOTS.map((s, i) => (
-              <WorldSpot key={i} on={lanterns[i] === true} onActivate={() => onLight(i)} cx={s.x * WORLD} cy={s.y * WORLD} onImg={images.lanternOn} offImg={images.lanternOff} size={lanternSize} />
-            ))}
-            {/* Çeşme — dokununca su akar */}
-            <WorldSpot on={fountain} onActivate={onFountain} cx={FOUNTAIN_SPOT.x * WORLD} cy={FOUNTAIN_SPOT.y * WORLD} onImg={images.fountainOn} offImg={images.fountainOff} size={fountainSize} />
           </View>
 
-          {/* Pırıl camide "yaşar" + fener görevini söyler; dokununca zıplar (companion bağı) */}
+          {/* Pırıl camide "yaşar" + teşvik söyler; dokununca zıplar (companion bağı) */}
           <View pointerEvents="box-none" style={{ position: "absolute", left: -6, bottom: -4, width: 150, height: 188, alignItems: "center", justifyContent: "flex-end" }}>
             <View style={{ backgroundColor: "#FFFFFF", borderRadius: 14, paddingHorizontal: 10, paddingVertical: 6, maxWidth: 168, marginBottom: 2, shadowColor: "#1462B5", shadowOpacity: 0.14, shadowRadius: 5, shadowOffset: { width: 0, height: 3 } }}>
               <Text numberOfLines={2} style={{ fontFamily: "Fredoka_600SemiBold", fontSize: 12, color: "#34414F", textAlign: "center" }}>
                 {t(promptKey)}
               </Text>
             </View>
-            <View style={{ width: 138, height: 138, alignItems: "center", justifyContent: "flex-end" }}>
+            <Pressable onPress={onPirilTap} hitSlop={10} style={{ width: 138, height: 138, alignItems: "center", justifyContent: "flex-end" }}>
               <View style={{ position: "absolute", bottom: 30, width: 94, height: 94, borderRadius: 47, backgroundColor: accentColor, opacity: 0.22 }} />
               <Image source={images.nodeCloud} style={{ position: "absolute", bottom: 0, width: 126, height: 52 }} contentFit="contain" />
-              <Mascot size={118} pose={allDone ? "celebrate" : "point"} />
-            </View>
+              <Animated.View style={pirilStyle}>
+                <Mascot size={118} pose={allDone ? "celebrate" : "happy"} />
+              </Animated.View>
+            </Pressable>
           </View>
         </View>
 
