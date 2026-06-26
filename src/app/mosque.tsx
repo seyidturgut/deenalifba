@@ -9,7 +9,7 @@ import { Floating } from "@/components/ui/Floating";
 import { GradientBg } from "@/components/ui/GradientBg";
 import { JuicyButton } from "@/components/ui/JuicyButton";
 import { Mascot } from "@/components/ui/Mascot";
-import { Crescent, Lantern } from "@/components/ui/IslamicMotifs";
+import { Crescent } from "@/components/ui/IslamicMotifs";
 import { LETTERS } from "@/data/letters";
 import { haptics } from "@/lib/haptics";
 import { images } from "@/lib/images";
@@ -37,8 +37,8 @@ function LanternSpot({ lit, onLight, pos }: { lit: boolean; onLight: () => void;
   }));
   return (
     <Pressable onPress={lit ? undefined : onLight} disabled={lit} style={{ position: "absolute", left: pos.left, top: pos.top, width: 48, height: 60, alignItems: "center", justifyContent: "center" }} hitSlop={10}>
-      <Animated.View style={[{ position: "absolute", width: 58, height: 58, borderRadius: 29, backgroundColor: lit ? "#FFD36B" : "#FFFFFF" }, haloStyle]} />
-      <Lantern size={42} color={lit ? "#F5A524" : "#A6B0BD"} glow={lit ? "#FFE6A8" : "#EDF1F5"} />
+      <Animated.View style={[{ position: "absolute", width: 60, height: 60, borderRadius: 30, backgroundColor: lit ? "#FFD36B" : "#FFFFFF" }, haloStyle]} />
+      <Image source={lit ? images.lanternOn : images.lanternOff} style={{ width: 48, height: 48 }} contentFit="contain" />
     </Pressable>
   );
 }
