@@ -149,7 +149,8 @@ export function PaintTrace({ letterId, onComplete }: { letterId: number; onCompl
 
   return (
     <GestureDetector gesture={pan}>
-      <View onLayout={onLayout} style={{ flex: 1, width: "100%" }}>
+      {/* touchAction:none (web/WebView) → sürükleme sayfayı kaydırmaz, tamamen çizime ait */}
+      <View onLayout={onLayout} style={[{ flex: 1, width: "100%" }, { touchAction: "none" } as object]}>
         {side > 0 && (
           <Animated.View style={[{ width: size.w, height: size.h }, popStyle]}>
             <Svg width={size.w} height={size.h}>

@@ -12,6 +12,7 @@ import { Nunito_400Regular, Nunito_600SemiBold, Nunito_700Bold } from "@expo-goo
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
+import { Platform } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
@@ -32,6 +33,23 @@ export default function RootLayout() {
   useEffect(() => {
     if (fontsLoaded) SplashScreen.hideAsync();
   }, [fontsLoaded]);
+
+  // Web/APK WebView: viewport zoom/pan kilidi. SPA çıktısında +html.tsx uygulanmadığı
+  // için meta'yı runtime'da ayarlıyoruz. Bu olmadan APK'da harf çizerken parmak
+  // sürükleme zoom-pan'e dönüşüp ekran sağa-sola kayıyordu (sağda beyaz boşluk).
+  useEffect(() => {
+    if (Platform.OS !== "web" || typeof document === "undefined") return;
+    let meta = document.querySelector('meta[name="viewport"]') as HTMLMetaElement | null;
+    if (!meta) {
+      meta = document.createElement("meta");
+      meta.name = "viewport";
+      document.head.appendChild(meta);
+    }
+    meta.setAttribute(
+      "content",
+      "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+    );
+  }, []);
 
   if (!fontsLoaded) return null;
 
