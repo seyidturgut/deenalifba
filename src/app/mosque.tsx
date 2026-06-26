@@ -162,8 +162,8 @@ export default function Mosque() {
             ))}
           </View>
 
-          {/* Pırıl camide "yaşar" + fener görevini söyler (balon) */}
-          <View pointerEvents="none" style={{ position: "absolute", left: -6, bottom: -4, width: 150, height: 188, alignItems: "center", justifyContent: "flex-end" }}>
+          {/* Pırıl camide "yaşar" + fener görevini söyler; dokununca zıplar (companion bağı) */}
+          <View pointerEvents="box-none" style={{ position: "absolute", left: -6, bottom: -4, width: 150, height: 188, alignItems: "center", justifyContent: "flex-end" }}>
             <View style={{ backgroundColor: "#FFFFFF", borderRadius: 14, paddingHorizontal: 10, paddingVertical: 6, maxWidth: 168, marginBottom: 2, shadowColor: "#1462B5", shadowOpacity: 0.14, shadowRadius: 5, shadowOffset: { width: 0, height: 3 } }}>
               <Text numberOfLines={2} style={{ fontFamily: "Fredoka_600SemiBold", fontSize: 12, color: "#34414F", textAlign: "center" }}>
                 {allLit ? t("mosque.allLit") : t("mosque.lightLanterns")}
