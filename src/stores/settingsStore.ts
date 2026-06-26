@@ -19,6 +19,8 @@ type SettingsState = {
   /** Çocuğun seçtiği tema/aksan rengi (hex). Cihazda. */
   accentColor: string | null;
   isUnder13: boolean;
+  /** Camideki yanan fenerler (çocuk dokununca yakar — "benim camim" sahipliği). Cihazda. */
+  mosqueLanterns: boolean[];
   language: AppLanguage;
   soundEnabled: boolean;
   musicEnabled: boolean;
@@ -31,6 +33,7 @@ type SettingsState = {
   setMosqueName: (name: string) => void;
   setMascotName: (name: string) => void;
   setAccentColor: (hex: string) => void;
+  lightLantern: (index: number, total: number) => void;
   setIsUnder13: (value: boolean) => void;
   setLanguage: (lng: AppLanguage) => void;
   toggleSound: () => void;
@@ -49,6 +52,7 @@ export const useSettingsStore = create<SettingsState>()(
       mosqueName: null,
       mascotName: null,
       accentColor: null,
+      mosqueLanterns: [],
       isUnder13: true, // fail-safe varsayım
       language: "en", // varsayılan EN (müşteri talebi); kullanıcı TR'ye geçebilir
       soundEnabled: true,
@@ -62,6 +66,12 @@ export const useSettingsStore = create<SettingsState>()(
       setMosqueName: (name) => set({ mosqueName: name.trim() }),
       setMascotName: (name) => set({ mascotName: name.trim() }),
       setAccentColor: (hex) => set({ accentColor: hex }),
+      lightLantern: (index, total) =>
+        set((s) => {
+          const arr = Array.from({ length: total }, (_, i) => s.mosqueLanterns[i] === true);
+          arr[index] = true;
+          return { mosqueLanterns: arr };
+        }),
       setIsUnder13: (value) => {
         setIsUnder13(value); // analytics guard'ı senkronla
         set({ isUnder13: value });

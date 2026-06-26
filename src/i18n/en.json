@@ -116,7 +116,9 @@
     "unlockedMinaret": "A new minaret unlocked!",
     "unlockedDome": "A new dome unlocked!",
     "bestChain": "Best chain: {{n}} days",
-    "tapToBuild": "Tap to build! 🧱"
+    "tapToBuild": "Tap to build! 🧱",
+    "lightLanterns": "Light the lanterns! 🪔",
+    "allLit": "Masha'Allah, all lit! ✨"
   },
   "parentGate": {
     "title": "Parents' Gate",

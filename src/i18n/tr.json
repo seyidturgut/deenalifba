@@ -116,7 +116,9 @@
     "unlockedMinaret": "Yeni bir minare açıldı!",
     "unlockedDome": "Yeni bir kubbe açıldı!",
     "bestChain": "En iyi zincir: {{n}} gün",
-    "tapToBuild": "Dokun ve inşa et! 🧱"
+    "tapToBuild": "Dokun ve inşa et! 🧱",
+    "lightLanterns": "Hadi fenerleri yak! 🪔",
+    "allLit": "Maşallah, hepsi yandı! ✨"
   },
   "parentGate": {
     "title": "Ebeveyn Kapısı",

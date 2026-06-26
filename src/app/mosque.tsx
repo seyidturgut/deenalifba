@@ -2,20 +2,46 @@ import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
-import Animated, { FadeIn } from "react-native-reanimated";
+import Animated, { Easing, FadeIn, useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming } from "react-native-reanimated";
 import { useTranslation } from "react-i18next";
 
 import { Floating } from "@/components/ui/Floating";
 import { GradientBg } from "@/components/ui/GradientBg";
 import { JuicyButton } from "@/components/ui/JuicyButton";
 import { Mascot } from "@/components/ui/Mascot";
-import { Crescent } from "@/components/ui/IslamicMotifs";
+import { Crescent, Lantern } from "@/components/ui/IslamicMotifs";
 import { LETTERS } from "@/data/letters";
+import { haptics } from "@/lib/haptics";
 import { images } from "@/lib/images";
 import { playSfx } from "@/lib/sfx";
 import { useProgressStore } from "@/stores/progressStore";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { useStreakStore } from "@/stores/streakStore";
+
+const LANTERN_SPOTS = [
+  { left: 28, top: 150 },
+  { left: 232, top: 132 },
+  { left: 132, top: 64 },
+];
+
+/** Dokunulabilir fener — sönükken nabız atar (yak davetimi), dokununca yanar + ışır. */
+function LanternSpot({ lit, onLight, pos }: { lit: boolean; onLight: () => void; pos: { left: number; top: number } }) {
+  const pulse = useSharedValue(0);
+  useEffect(() => {
+    if (!lit) pulse.value = withRepeat(withSequence(withTiming(1, { duration: 650, easing: Easing.inOut(Easing.ease) }), withTiming(0, { duration: 650, easing: Easing.inOut(Easing.ease) })), -1, false);
+    else pulse.value = withTiming(0, { duration: 200 });
+  }, [lit, pulse]);
+  const haloStyle = useAnimatedStyle(() => ({
+    opacity: lit ? 0.55 : 0.12 + pulse.value * 0.3,
+    transform: [{ scale: (lit ? 1.15 : 0.85) + pulse.value * 0.18 }],
+  }));
+  return (
+    <Pressable onPress={lit ? undefined : onLight} disabled={lit} style={{ position: "absolute", left: pos.left, top: pos.top, width: 48, height: 60, alignItems: "center", justifyContent: "center" }} hitSlop={10}>
+      <Animated.View style={[{ position: "absolute", width: 58, height: 58, borderRadius: 29, backgroundColor: lit ? "#FFD36B" : "#FFFFFF" }, haloStyle]} />
+      <Lantern size={42} color={lit ? "#F5A524" : "#A6B0BD"} glow={lit ? "#FFE6A8" : "#EDF1F5"} />
+    </Pressable>
+  );
+}
 
 export default function Mosque() {
   const { t } = useTranslation();
@@ -25,6 +51,16 @@ export default function Mosque() {
   const mosqueName = useSettingsStore((s) => s.mosqueName);
   const setMosqueName = useSettingsStore((s) => s.setMosqueName);
   const accentColor = useSettingsStore((s) => s.accentColor) ?? "#F5A524";
+  const lanterns = useSettingsStore((s) => s.mosqueLanterns);
+  const lightLantern = useSettingsStore((s) => s.lightLantern);
+  const litCount = LANTERN_SPOTS.filter((_, i) => lanterns[i] === true).length;
+  const allLit = litCount === LANTERN_SPOTS.length;
+  const onLight = (i: number) => {
+    lightLantern(i, LANTERN_SPOTS.length);
+    haptics.success();
+    playSfx("level_unlock");
+    if (litCount + 1 === LANTERN_SPOTS.length) playSfx("star_earned");
+  };
   const bestChain = useStreakStore((s) => s.bestChain);
   const currentChain = useStreakStore((s) => s.currentChain);
   const bestChainEver = Math.max(bestChain, currentChain);
@@ -108,23 +144,36 @@ export default function Mosque() {
           </Text>
         </View>
 
-        {/* Cami — süzülen inşa aşaması */}
+        {/* Cami — süzülen inşa aşaması + dokunulabilir fenerler (Sohail #6) */}
         <View className="my-3 flex-1 items-center justify-center">
-          <Floating distance={9} duration={2400}>
-            <Animated.View key={stageIdx} entering={FadeIn.duration(500)}>
-              <Image
-                source={images.mosqueStages[stageIdx]}
-                style={{ width: 300, height: 300, opacity: completed === 0 ? 0.4 : 1 }}
-                contentFit="contain"
-              />
-            </Animated.View>
-          </Floating>
+          <View style={{ width: 300, height: 300 }}>
+            <Floating distance={9} duration={2400}>
+              <Animated.View key={stageIdx} entering={FadeIn.duration(500)}>
+                <Image
+                  source={images.mosqueStages[stageIdx]}
+                  style={{ width: 300, height: 300, opacity: completed === 0 ? 0.4 : 1 }}
+                  contentFit="contain"
+                />
+              </Animated.View>
+            </Floating>
+            {/* Fenerler — çocuk dokununca yanar (kalıcı; "benim camim") */}
+            {LANTERN_SPOTS.map((pos, i) => (
+              <LanternSpot key={i} lit={lanterns[i] === true} onLight={() => onLight(i)} pos={pos} />
+            ))}
+          </View>
 
-          {/* Pırıl camide "yaşar" — köşede bulutta, sahiplenme halesiyle (madde 1 & 5) */}
-          <View pointerEvents="none" style={{ position: "absolute", left: -6, bottom: -4, width: 138, height: 138, alignItems: "center", justifyContent: "flex-end" }}>
-            <View style={{ position: "absolute", bottom: 30, width: 94, height: 94, borderRadius: 47, backgroundColor: accentColor, opacity: 0.22 }} />
-            <Image source={images.nodeCloud} style={{ position: "absolute", bottom: 0, width: 126, height: 52 }} contentFit="contain" />
-            <Mascot size={118} pose={completed > 0 ? "celebrate" : "point"} />
+          {/* Pırıl camide "yaşar" + fener görevini söyler (balon) */}
+          <View pointerEvents="none" style={{ position: "absolute", left: -6, bottom: -4, width: 150, height: 188, alignItems: "center", justifyContent: "flex-end" }}>
+            <View style={{ backgroundColor: "#FFFFFF", borderRadius: 14, paddingHorizontal: 10, paddingVertical: 6, maxWidth: 168, marginBottom: 2, shadowColor: "#1462B5", shadowOpacity: 0.14, shadowRadius: 5, shadowOffset: { width: 0, height: 3 } }}>
+              <Text numberOfLines={2} style={{ fontFamily: "Fredoka_600SemiBold", fontSize: 12, color: "#34414F", textAlign: "center" }}>
+                {allLit ? t("mosque.allLit") : t("mosque.lightLanterns")}
+              </Text>
+            </View>
+            <View style={{ width: 138, height: 138, alignItems: "center", justifyContent: "flex-end" }}>
+              <View style={{ position: "absolute", bottom: 30, width: 94, height: 94, borderRadius: 47, backgroundColor: accentColor, opacity: 0.22 }} />
+              <Image source={images.nodeCloud} style={{ position: "absolute", bottom: 0, width: 126, height: 52 }} contentFit="contain" />
+              <Mascot size={118} pose={allLit ? "celebrate" : "point"} />
+            </View>
           </View>
         </View>
 
