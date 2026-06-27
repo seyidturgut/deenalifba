@@ -46,6 +46,9 @@ type SettingsState = {
   completeOnboarding: () => void;
   /** Günlük ödülü dener; bugün ilk kezse true döner ve işaretler. */
   claimDailyReward: () => boolean;
+  /** "Yeni Oyun" (test): profil + onboarding + cami kozmetiğini başa al.
+   *  Dil/ses/müzik/titreşim/abonelik korunur. */
+  resetForNewGame: () => void;
 };
 
 export const useSettingsStore = create<SettingsState>()(
@@ -96,6 +99,17 @@ export const useSettingsStore = create<SettingsState>()(
         set({ lastRewardDay: today });
         return true;
       },
+      resetForNewGame: () =>
+        set({
+          childName: null,
+          mascotName: null,
+          accentColor: null,
+          mosqueName: null,
+          mosqueLanterns: [],
+          mosqueFountain: false,
+          onboardingComplete: false,
+          lastRewardDay: null,
+        }),
     }),
     {
       name: "alif-settings",

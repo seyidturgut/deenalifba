@@ -16,6 +16,8 @@ type SrsStore = {
   grade: (letterId: number, quality: QualityScore, now: number) => void;
   /** Verilen harfler arasından vadesi gelmişleri (id) döndürür. */
   dueAmong: (ids: number[], now: number) => number[];
+  /** Tüm SM-2 durumunu sıfırla (Ayarlar "Yeni Oyun" — test). */
+  reset: () => void;
 };
 
 export const useSrsStore = create<SrsStore>()(
@@ -33,6 +35,7 @@ export const useSrsStore = create<SrsStore>()(
           .filter((x): x is LetterSrsState => !!x);
         return getDueLetters(states, now).map((s) => s.letterId);
       },
+      reset: () => set({ byLetter: {} }),
     }),
     {
       name: "alif-srs",

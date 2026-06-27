@@ -39,6 +39,8 @@ type MosqueState = {
   /** Tamamlanan harf sayısına göre eşikleri değerlendirir, yeni parçaları açar. */
   syncWithProgress: (completedLetterCount: number) => MosquePart[];
   clearLastUnlocked: () => void;
+  /** Cami parçalarını sıfırla (Ayarlar "Yeni Oyun" — test). */
+  reset: () => void;
 };
 
 export const useMosqueStore = create<MosqueState>()(
@@ -63,6 +65,8 @@ export const useMosqueStore = create<MosqueState>()(
       },
 
       clearLastUnlocked: () => set({ lastUnlocked: null }),
+
+      reset: () => set({ unlockedParts: [], lastUnlocked: null }),
     }),
     {
       name: "alif-mosque",

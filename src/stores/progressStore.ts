@@ -28,6 +28,8 @@ type ProgressState = {
   completeLetter: (letterId: number) => void;
   isLetterComplete: (letterId: number) => boolean;
   unlockLetter: (letterId: number, now: number, countsAsDaily: boolean) => void;
+  /** Tüm ilerlemeyi başa al (Ayarlar "Yeni Oyun" — test). */
+  reset: () => void;
 };
 
 export const useProgressStore = create<ProgressState>()(
@@ -69,6 +71,8 @@ export const useProgressStore = create<ProgressState>()(
             : [...s.unlockedLetters, letterId],
           lastDailyUnlockAt: countsAsDaily ? now : s.lastDailyUnlockAt,
         })),
+
+      reset: () => set({ completedSteps: {}, completedLetters: [], unlockedLetters: [1], lastDailyUnlockAt: null }),
     }),
     {
       name: "alif-progress",

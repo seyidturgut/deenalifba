@@ -8,6 +8,7 @@ import { JuicyButton } from "@/components/ui/JuicyButton";
 import { ParentGate } from "@/features/parent-gate/ParentGate";
 import { LETTERS } from "@/data/letters";
 import type { AppLanguage } from "@/i18n";
+import { resetAllProgress } from "@/lib/reset";
 import { playSfx, syncMusicWithSetting } from "@/lib/sfx";
 import { APP_VERSION_LABEL } from "@/lib/version";
 import { useProgressStore } from "@/stores/progressStore";
@@ -60,6 +61,14 @@ export default function Settings() {
   const router = useRouter();
   const [showGate, setShowGate] = useState(false);
   const [parentUnlocked, setParentUnlocked] = useState(false);
+  const [showReset, setShowReset] = useState(false);
+
+  const doNewGame = () => {
+    resetAllProgress();
+    playSfx("ui_tap");
+    setShowReset(false);
+    router.replace("/onboarding");
+  };
 
   const language = useSettingsStore((s) => s.language);
   const setLanguage = useSettingsStore((s) => s.setLanguage);
@@ -150,6 +159,8 @@ export default function Settings() {
           {APP_VERSION_LABEL}
         </Text>
         <JuicyButton label={t("settings.replayIntro")} tone="accent" onPress={() => router.push("/onboarding")} />
+        {/* Yeni Oyun (test) — onaylı; tüm ilerlemeyi sıfırlar, onboarding'den başlar */}
+        <JuicyButton label={t("settings.newGame")} tone="primary" onPress={() => { playSfx("ui_tap"); setShowReset(true); }} />
         <JuicyButton label={t("common.close")} tone="primary" onPress={() => router.back()} />
       </View>
 
@@ -177,6 +188,35 @@ export default function Settings() {
           {/* Kapat — proje buton tasarımı (JuicyButton) */}
           <View style={{ width: "100%", maxWidth: 360, alignSelf: "center" }}>
             <JuicyButton label={t("common.cancel")} tone="primary" onPress={() => setShowGate(false)} />
+          </View>
+        </View>
+      )}
+
+      {/* Yeni Oyun onayı — opak, kazara silmeyi önler */}
+      {showReset && (
+        <View
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "#0B3566",
+            paddingHorizontal: 24,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <View style={{ width: "100%", maxWidth: 360, gap: 14 }}>
+            <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 24, color: "white", textAlign: "center" }}>
+              {t("settings.resetTitle")}
+            </Text>
+            <Text style={{ fontFamily: "Nunito_700Bold", fontSize: 15, color: "rgba(255,255,255,0.85)", textAlign: "center" }}>
+              {t("settings.resetBody")}
+            </Text>
+            <View style={{ height: 4 }} />
+            <JuicyButton label={t("settings.resetConfirm")} tone="accent" onPress={doNewGame} />
+            <JuicyButton label={t("common.cancel")} tone="primary" onPress={() => setShowReset(false)} />
           </View>
         </View>
       )}

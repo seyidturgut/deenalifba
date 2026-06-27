@@ -54,6 +54,8 @@ type StreakState = {
   chainView: (now: number) => ChainView;
   /** Ebeveyn özeti: son 7 günde kaç gün pratik + gün-gün bayraklar (eskiden yeniye). */
   weekView: (now: number) => { count: number; flags: boolean[] };
+  /** Zinciri/kalkanları/geçmişi sıfırla (Ayarlar "Yeni Oyun" — test). */
+  reset: () => void;
 };
 
 const DAY = 24 * 60 * 60 * 1000;
@@ -132,6 +134,9 @@ export const useStreakStore = create<StreakState>()(
         for (let i = 6; i >= 0; i--) flags.push(days.includes(dayStr(now - i * DAY)));
         return { count: flags.filter(Boolean).length, flags };
       },
+
+      reset: () =>
+        set({ lastPracticeDay: null, currentChain: 0, bestChain: 0, shields: 0, lastShieldAt: null, lastProtectedDay: null, practiceDays: [] }),
     }),
     {
       name: "alif-streak",
