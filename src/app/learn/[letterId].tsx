@@ -15,6 +15,7 @@ import { GiveToPiril } from "@/features/drag/GiveToPiril";
 import { HearTap } from "@/features/heartap/HearTap";
 import { LetterIntro } from "@/features/intro/LetterIntro";
 import { MatchGame } from "@/features/match/MatchGame";
+import { FeedbackModal } from "@/components/ui/FeedbackModal";
 import { MosqueBuild } from "@/features/mosque/MosqueBuild";
 import { MosqueFinale } from "@/features/mosque/MosqueFinale";
 import { RecallGame } from "@/features/recall/RecallGame";
@@ -116,6 +117,7 @@ export default function LearnScreen() {
   const [buildVisible, setBuildVisible] = useState(false);
   const [buildStage, setBuildStage] = useState(0);
   const [finaleVisible, setFinaleVisible] = useState(false);
+  const [feedbackVisible, setFeedbackVisible] = useState(false);
 
   useEffect(() => {
     startLetter(id);
@@ -280,7 +282,15 @@ export default function LearnScreen() {
 
       <Celebration visible={celebrate} onDone={finishLetter} />
       <MosqueBuild visible={buildVisible} stageIndex={buildStage} onDone={goHome} />
-      <MosqueFinale visible={finaleVisible} onDone={goHome} />
+      {/* 28 finali → Continue → ebeveyn geri bildirim ekranı → home (Sohail) */}
+      <MosqueFinale
+        visible={finaleVisible}
+        onDone={() => {
+          setFinaleVisible(false);
+          setFeedbackVisible(true);
+        }}
+      />
+      <FeedbackModal visible={feedbackVisible} context="finale" onClose={goHome} />
     </GradientBg>
   );
 }

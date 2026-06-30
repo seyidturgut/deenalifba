@@ -14,7 +14,7 @@ import Animated, {
 import Svg, { Polyline } from "react-native-svg";
 import { useTranslation } from "react-i18next";
 
-import { ChainBanner } from "@/components/ui/ChainBanner";
+import { FeedbackModal } from "@/components/ui/FeedbackModal";
 import { GradientBg } from "@/components/ui/GradientBg";
 import { Mascot } from "@/components/ui/Mascot";
 import { StarBadge } from "@/components/ui/StarBadge";
@@ -245,6 +245,7 @@ export default function Home() {
   const unlocked = useProgressStore((s) => s.unlockedLetters);
   const isLetterComplete = useProgressStore((s) => s.isLetterComplete);
   const scrollRef = useRef<any>(null);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
 
   useEffect(() => {
     syncMusicWithSetting();
@@ -425,9 +426,8 @@ export default function Home() {
           >
             {childName ? t("home.greeting", { name: childName }) : t("home.hello")}
           </Text>
-
-          {/* İstikamet zinciri bandı (seri varsa görünür) */}
-          <ChainBanner accentColor={accentColor} />
+          {/* NOT: İstikamet zinciri bandı home'dan KALDIRILDI (Sohail: belirsiz/tıklanamıyor,
+              kafa karıştırıyor). Zincir verisi Ayarlar → Ebeveyn Özeti'nde duruyor. */}
         </View>
 
         {/* Yolculuk haritası */}
@@ -494,10 +494,39 @@ export default function Home() {
         </View>
       </Animated.ScrollView>
 
+      {/* Pasif ebeveyn geri bildirim butonu — sol alt, ana navigasyondan ayrı (Sohail).
+          Prompt/push yok; isteyen ebeveyn dokununca modal açılır. */}
+      <Pressable
+        onPress={() => {
+          playSfx("ui_tap");
+          setFeedbackOpen(true);
+        }}
+        hitSlop={8}
+        style={{
+          position: "absolute",
+          left: 14,
+          bottom: 84,
+          width: 46,
+          height: 46,
+          borderRadius: 23,
+          backgroundColor: "rgba(255,255,255,0.92)",
+          alignItems: "center",
+          justifyContent: "center",
+          shadowColor: "#1462B5",
+          shadowOpacity: 0.18,
+          shadowRadius: 6,
+          shadowOffset: { width: 0, height: 3 },
+        }}
+      >
+        <Text style={{ fontSize: 22 }}>💬</Text>
+      </Pressable>
+
       {/* Alt menü (sabit) */}
       <View style={{ position: "absolute", left: 12, right: 12, bottom: 8 }}>
         <BottomNav />
       </View>
+
+      <FeedbackModal visible={feedbackOpen} context="home" onClose={() => setFeedbackOpen(false)} />
     </GradientBg>
   );
 }

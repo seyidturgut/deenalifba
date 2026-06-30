@@ -100,6 +100,15 @@
     "showSomeone": "Yaptığın camiyi birine gösterir misin? 🕌",
     "continue": "Devam ▶"
   },
+  "feedback": {
+    "title": "Nasıl gidiyor?",
+    "hint": "Bir düşüncen var mı? (ebeveyn için)",
+    "placeholder": "Buraya yazabilirsin…",
+    "send": "Gönder",
+    "skip": "Şimdilik geç",
+    "thanks": "Teşekkürler! 🌟",
+    "openLabel": "Geri bildirim"
+  },
   "catch": {
     "prompt": "Sesi duy, harfi yakala!",
     "listen": "Dinle"

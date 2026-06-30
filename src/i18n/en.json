@@ -100,6 +100,15 @@
     "showSomeone": "Can you show someone the mosque you built? 🕌",
     "continue": "Continue ▶"
   },
+  "feedback": {
+    "title": "How's it going?",
+    "hint": "Any thoughts? (for parents)",
+    "placeholder": "You can type here…",
+    "send": "Send",
+    "skip": "Skip for now",
+    "thanks": "Thank you! 🌟",
+    "openLabel": "Feedback"
+  },
   "catch": {
     "prompt": "Hear it, catch the letter!",
     "listen": "Listen"
