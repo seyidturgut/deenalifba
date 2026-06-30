@@ -93,6 +93,13 @@
     "listen": "Listen",
     "continue": "I'm ready ▶"
   },
+  "finale": {
+    "title": "Maa shaa Allah!",
+    "line1": "Maa shaa Allah! You know all 28 letters of the Arabic alphabet. Your mosque is complete. You did this! 🌟",
+    "line2": "The letters are ready. Soon I'll show you how they speak. ✨",
+    "showSomeone": "Can you show someone the mosque you built? 🕌",
+    "continue": "Continue ▶"
+  },
   "catch": {
     "prompt": "Hear it, catch the letter!",
     "listen": "Listen"
@@ -171,6 +178,6 @@
     "surahs": "Surahs",
     "salah": "Salah",
     "goalLabel": "GOAL",
-    "soon": "Soon"
+    "soon": "Coming Soon"
   }
 }

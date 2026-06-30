@@ -16,6 +16,7 @@ import { HearTap } from "@/features/heartap/HearTap";
 import { LetterIntro } from "@/features/intro/LetterIntro";
 import { MatchGame } from "@/features/match/MatchGame";
 import { MosqueBuild } from "@/features/mosque/MosqueBuild";
+import { MosqueFinale } from "@/features/mosque/MosqueFinale";
 import { RecallGame } from "@/features/recall/RecallGame";
 import { PaintTrace } from "@/features/trace/PaintTrace";
 import { ACTIVITY_META } from "@/data/lesson";
@@ -114,6 +115,7 @@ export default function LearnScreen() {
   const [celebrate, setCelebrate] = useState(false);
   const [buildVisible, setBuildVisible] = useState(false);
   const [buildStage, setBuildStage] = useState(0);
+  const [finaleVisible, setFinaleVisible] = useState(false);
 
   useEffect(() => {
     startLetter(id);
@@ -128,6 +130,11 @@ export default function LearnScreen() {
     let completed = 0;
     for (let i = 1; i <= TOTAL_LETTERS; i++) if (isComplete(i)) completed++;
     syncMosque(completed);
+    // Son harf (28) → BÜYÜK FİNAL (cami tam reveal + Pırıl diyalog), normal build yerine
+    if (completed >= TOTAL_LETTERS) {
+      setFinaleVisible(true);
+      return;
+    }
     const stages = images.mosqueStages.length;
     const idxNow = Math.min(stages - 1, Math.max(0, completed - 1));
     setBuildStage(idxNow);
@@ -273,6 +280,7 @@ export default function LearnScreen() {
 
       <Celebration visible={celebrate} onDone={finishLetter} />
       <MosqueBuild visible={buildVisible} stageIndex={buildStage} onDone={goHome} />
+      <MosqueFinale visible={finaleVisible} onDone={goHome} />
     </GradientBg>
   );
 }

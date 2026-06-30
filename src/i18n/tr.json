@@ -93,6 +93,13 @@
     "listen": "Dinle",
     "continue": "Hazırım ▶"
   },
+  "finale": {
+    "title": "Maşallah!",
+    "line1": "Maşallah! Arap alfabesinin 28 harfini öğrendin. Camin tamamlandı. Bunu sen başardın! 🌟",
+    "line2": "Harfler hazır. Yakında sana nasıl konuştuklarını göstereceğim. ✨",
+    "showSomeone": "Yaptığın camiyi birine gösterir misin? 🕌",
+    "continue": "Devam ▶"
+  },
   "catch": {
     "prompt": "Sesi duy, harfi yakala!",
     "listen": "Dinle"
