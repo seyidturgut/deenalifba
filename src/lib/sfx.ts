@@ -124,6 +124,58 @@ export function playLetter(id: number, volume = 1) {
   }
 }
 
+// ---- Seviye 28 BÜYÜK FİNAL — Pırıl diyaloğu (dile göre, 3 cümle) ----
+// ElevenLabs ile üretildi → sessizlikten 3 parçaya bölündü (bkz. proje notları).
+const FINALE_SOURCES: Record<"en" | "tr", [number, number, number]> = {
+  en: [
+    require("@/assets/audio/finale_en_1.mp3"),
+    require("@/assets/audio/finale_en_2.mp3"),
+    require("@/assets/audio/finale_en_3.mp3"),
+  ],
+  tr: [
+    require("@/assets/audio/finale_tr_1.mp3"),
+    require("@/assets/audio/finale_tr_2.mp3"),
+    require("@/assets/audio/finale_tr_3.mp3"),
+  ],
+};
+
+/** Ölçülen klip süreleri (ms) — MosqueFinale'nin oto-ilerleme zamanlamasını buna göre ayarlaması için. */
+export const FINALE_LINE_DURATIONS_MS: Record<"en" | "tr", [number, number, number]> = {
+  en: [7066, 3104, 2261],
+  tr: [5839, 3239, 2319],
+};
+
+const finalePlayers: Partial<Record<string, AudioPlayer>> = {};
+
+/** Final diyaloğunun `line` (0,1,2) cümlesini `lang` dilinde çalar. */
+export function playFinaleLine(lang: "en" | "tr", line: 0 | 1 | 2, volume = 1) {
+  if (!soundOn()) return;
+  try {
+    const key = `${lang}_${line}`;
+    let p = finalePlayers[key];
+    if (!p) {
+      p = createAudioPlayer(FINALE_SOURCES[lang][line]);
+      finalePlayers[key] = p;
+    }
+    p.volume = volume;
+    p.seekTo(0);
+    p.play();
+  } catch {
+    // ses kullanılamıyorsa sessizce geç
+  }
+}
+
+/** Devam eden final cümlelerini durdurur (faz değişince önceki cümle üst üste binmesin). */
+export function stopFinaleLines() {
+  Object.values(finalePlayers).forEach((p) => {
+    try {
+      p?.pause();
+    } catch {
+      // yoksay
+    }
+  });
+}
+
 // ---- Arka plan müziği (dikişsiz loop, kısık) ----
 let music: AudioPlayer | null = null;
 

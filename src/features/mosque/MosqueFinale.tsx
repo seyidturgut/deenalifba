@@ -19,23 +19,27 @@ import { Mascot } from "@/components/ui/Mascot";
 import { Crescent, Sparkle4, Star8 } from "@/components/ui/IslamicMotifs";
 import { haptics } from "@/lib/haptics";
 import { images } from "@/lib/images";
-import { playSfx } from "@/lib/sfx";
+import { FINALE_LINE_DURATIONS_MS, playFinaleLine, playSfx, stopFinaleLines } from "@/lib/sfx";
+import { useSettingsStore } from "@/stores/settingsStore";
 
 const { width: SCREEN_W } = Dimensions.get("window");
-const LINE1 = 3600; // 1. cümle → 2. cümle
-const LINE2 = 3600; // 2. cümle → "birine göster" + Devam
+const LINE_BREATHING_ROOM_MS = 800; // ses bitince bir nefes, sonra sıradaki cümle
+const FALLBACK_LINE_MS = 3600; // ses kapalıysa (soundEnabled=false) sabit süre
 
 /**
  * Level 28 BÜYÜK FİNAL (Sohail): son harf bitince camin tam reveal'ı (ışıklı,
- * tamamlanmış) + Pırıl'ın oyundaki en büyük duygusal anı + sesli-tarz kısa diyalog:
+ * tamamlanmış) + Pırıl'ın oyundaki en büyük duygusal anı + SESLİ (ElevenLabs,
+ * dile göre) kısa diyalog:
  *  1) "Maa shaa Allah — 28 harfi biliyorsun, cami tamam, bunu sen yaptın."
  *  2) "Harfler hazır. Yakında nasıl konuştuklarını göstereceğim." (Stage 2 tohumu)
  *  3) "Yaptığını birine gösterir misin?" (beta: ağızdan-ağıza)
- * Diyalog otomatik ilerler; dokununca hızlanır. Devam → onDone (home'da Stage 2
- * "Yakında" görünür). Ses şimdilik kutlama sfx; cümleler sonra seslendirilebilir.
+ * Diyalog otomatik ilerler (gerçek ses süresine göre); dokununca hızlanır.
+ * Devam → onDone (home'da Stage 2 "Yakında" görünür).
  */
 export function MosqueFinale({ visible, onDone }: { visible: boolean; onDone: () => void }) {
   const { t } = useTranslation();
+  const language = useSettingsStore((s) => s.language);
+  const soundEnabled = useSettingsStore((s) => s.soundEnabled);
   const [phase, setPhase] = useState(0); // 0:line1 1:line2 2:showSomeone+devam
   const doneRef = useRef(false);
 
@@ -43,6 +47,7 @@ export function MosqueFinale({ visible, onDone }: { visible: boolean; onDone: ()
   const glow = useSharedValue(0);
   const pirilBounce = useSharedValue(0);
 
+  // Açılış: reveal animasyonu + ilk kutlama vuruşu (fanfare — konuşma değil, diyalogla çakışmaz)
   useEffect(() => {
     if (!visible) return;
     doneRef.current = false;
@@ -57,19 +62,24 @@ export function MosqueFinale({ visible, onDone }: { visible: boolean; onDone: ()
       300,
       withRepeat(withSequence(withTiming(1, { duration: 420, easing: Easing.out(Easing.quad) }), withTiming(0, { duration: 420 })), 3, false)
     );
-    playSfx("mashallah", 1.0);
     playSfx("star_earned", 0.7);
     setTimeout(() => playSfx("mosque_build", 0.6), 250);
     haptics.celebrate();
-
-    const t1 = setTimeout(() => setPhase((p) => (p < 1 ? 1 : p)), LINE1);
-    const t2 = setTimeout(() => setPhase((p) => (p < 2 ? 2 : p)), LINE1 + LINE2);
-    return () => {
-      clearTimeout(t1);
-      clearTimeout(t2);
-    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible]);
+
+  // Diyalog: her faz kendi cümlesini seslendirir; ses bitince (+nefes payı) sıradakine geçer.
+  useEffect(() => {
+    if (!visible) return;
+    const lineIdx = phase as 0 | 1 | 2;
+    playFinaleLine(language, lineIdx, 1.0);
+    const dur = (soundEnabled ? FINALE_LINE_DURATIONS_MS[language][lineIdx] : FALLBACK_LINE_MS) + LINE_BREATHING_ROOM_MS;
+    const timer = phase < 2 ? setTimeout(() => setPhase((p) => (p < 2 ? p + 1 : p)), dur) : null;
+    return () => {
+      if (timer) clearTimeout(timer);
+      stopFinaleLines();
+    };
+  }, [visible, phase, language, soundEnabled]);
 
   const revealStyle = useAnimatedStyle(() => ({ opacity: Math.min(1, reveal.value), transform: [{ scale: 0.7 + reveal.value * 0.3 }] }));
   const glowStyle = useAnimatedStyle(() => ({ opacity: 0.35 + glow.value * 0.45, transform: [{ scale: 0.95 + glow.value * 0.12 }] }));
