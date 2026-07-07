@@ -87,18 +87,21 @@ function MatchCard({
 export function MatchGame({ letterId, onComplete }: { letterId: number; onComplete: () => void }) {
   const target = getLetter(letterId);
 
-  // 3 çift: hedef harf + 2 çeldirici → 6 kart, karışık
+  // TEK gerçek çift (hedef harf) + 4 TEKİL çeldirici (eşi yok) → 6 kart.
+  // Abdulkadir/Sohail: eski hâlde herhangi 2 çeldirici de eşleşince kazanılıyordu
+  // (harfi hiç tanımadan şans+hafızayla bitirilebiliyordu). Artık kazanmanın TEK
+  // yolu hedef harfin iki kartını bulmak — şans eseri çeldirici-çeldirici eşleşmesi
+  // mümkün değil (her çeldirici tektir, eşi deste içinde yok).
   const cards = useMemo<CardData[]>(() => {
     if (!target) return [];
     const pool = LETTERS.filter((l) => l.id !== letterId && l.char !== target.char);
     const distractors: typeof LETTERS = [];
-    for (let i = 0; i < 2 && pool.length; i++) distractors.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]);
-    const chosen = [target, ...distractors];
-    const deck: CardData[] = [];
-    chosen.forEach((l) => {
-      deck.push({ key: deck.length, letterId: l.id, char: l.char });
-      deck.push({ key: deck.length, letterId: l.id, char: l.char });
-    });
+    for (let i = 0; i < 4 && pool.length; i++) distractors.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]);
+    const deck: CardData[] = [
+      { key: 0, letterId: target.id, char: target.char },
+      { key: 0, letterId: target.id, char: target.char },
+      ...distractors.map((l) => ({ key: 0, letterId: l.id, char: l.char })),
+    ];
     for (let i = deck.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [deck[i], deck[j]] = [deck[j], deck[i]];
@@ -136,7 +139,8 @@ export function MatchGame({ letterId, onComplete }: { letterId: number; onComple
           haptics.success();
           playSfx("correct_ding");
           useStageStore.getState().cheer();
-          if (nm.length >= cards.length && !finishedRef.current) {
+          // Destede tek gerçek çift var (hedef harf) → herhangi bir eşleşme = hedefi buldu demek
+          if (!finishedRef.current) {
             finishedRef.current = true;
             playSfx("star_earned");
             setTimeout(onComplete, 650);
@@ -155,22 +159,12 @@ export function MatchGame({ letterId, onComplete }: { letterId: number; onComple
 
   if (!target) return null;
 
-  const totalPairs = cards.length / 2;
-  const pairsDone = matched.length / 2;
+  const found = matched.length > 0;
 
   return (
     <View className="flex-1 items-center justify-center gap-5">
-      {/* İlerleme — kaç çift bulundu (kaç çift kaldığı bariz olsun) */}
-      <View className="flex-row items-center gap-2">
-        {Array.from({ length: totalPairs }).map((_, i) => (
-          <Image
-            key={i}
-            source={images.star}
-            style={{ width: 30, height: 30, opacity: i < pairsDone ? 1 : 0.28 }}
-            contentFit="contain"
-          />
-        ))}
-      </View>
+      {/* Tek yıldız — hedef harf çifti bulununca yanar (destede aranacak TEK gerçek çift) */}
+      <Image source={images.star} style={{ width: 34, height: 34, opacity: found ? 1 : 0.28 }} contentFit="contain" />
 
       {/* 3×2 kart ızgarası */}
       <View style={{ width: CARD * 3 + 24, flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", rowGap: 14 }}>
