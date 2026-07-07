@@ -65,7 +65,7 @@ export function LetterIntro({ letterId, onComplete }: { letterId: number; onComp
           </View>
           {/* Dinle rozeti — ikonla "dokun ve dinle" daveti (illüstrasyon, emoji değil) */}
           <Animated.View pointerEvents="none" style={[{ position: "absolute", right: -14, bottom: -10 }, badgeStyle]}>
-            <Image source={images.icListen} style={{ width: 64, height: 50 }} contentFit="contain" />
+            <Image source={images.icListen} style={{ width: 62, height: 57 }} contentFit="contain" />
           </Animated.View>
         </Pressable>
       </Floating>
