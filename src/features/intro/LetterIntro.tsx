@@ -63,31 +63,9 @@ export function LetterIntro({ letterId, onComplete }: { letterId: number; onComp
               <Text style={{ fontFamily: "Amiri_700Bold", fontSize: 140, color: "#2A2A33" }}>{letter.char}</Text>
             )}
           </View>
-          {/* Dinle rozeti — ikonla "dokun ve dinle" daveti (diğer oyunlardaki 🔊 diliyle tutarlı) */}
-          <Animated.View
-            pointerEvents="none"
-            style={[
-              {
-                position: "absolute",
-                right: -8,
-                bottom: -8,
-                width: 52,
-                height: 52,
-                borderRadius: 26,
-                backgroundColor: "#FFFFFF",
-                alignItems: "center",
-                justifyContent: "center",
-                borderWidth: 3,
-                borderColor: "#F5A524",
-                shadowColor: "#1462B5",
-                shadowOpacity: 0.25,
-                shadowRadius: 6,
-                shadowOffset: { width: 0, height: 3 },
-              },
-              badgeStyle,
-            ]}
-          >
-            <Text style={{ fontSize: 26 }}>🔊</Text>
+          {/* Dinle rozeti — ikonla "dokun ve dinle" daveti (illüstrasyon, emoji değil) */}
+          <Animated.View pointerEvents="none" style={[{ position: "absolute", right: -14, bottom: -10 }, badgeStyle]}>
+            <Image source={images.icListen} style={{ width: 64, height: 50 }} contentFit="contain" />
           </Animated.View>
         </Pressable>
       </Floating>

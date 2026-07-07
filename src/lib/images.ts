@@ -64,6 +64,9 @@ export const images = {
   // Pırıl sepeti tutuyor (Pırıl'a Ver oyununun hedefi)
   pirilBasket: require("@/assets/illustrations/decor/piril_basket.webp"),
 
+  // "Dinle" rozeti/kartı — dokun-ve-dinle daveti (intro rozeti, Tekrar'ın dinle kartı)
+  icListen: require("@/assets/illustrations/decor/ic_listen.webp"),
+
   // İstikamet zinciri
   chainBead: require("@/assets/illustrations/decor/chain_bead.webp"), // altın hilal boncuk (tekrarlanan)
   chainMedallion: require("@/assets/illustrations/decor/chain_medallion.webp"), // gün sayısı madalyonu

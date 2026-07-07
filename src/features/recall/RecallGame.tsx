@@ -186,7 +186,7 @@ export function RecallGame({ letterId, onComplete }: { letterId: number; onCompl
             transform: [{ translateX: CARD * 0.023 }, { translateY: CARD * -0.053 }],
           }}
         >
-          <Text style={{ fontSize: INNER * 0.6 }}>🔊</Text>
+          <Image source={images.icListen} style={{ width: INNER * 0.82, height: INNER * 0.64 }} contentFit="contain" />
         </View>
       </Pressable>
 
