@@ -65,32 +65,60 @@ function StepBar({ activities, activeIndex }: { activities: ActivityKind[]; acti
           const done = i < activeIndex;
           const meta = ACTIVITY_META[k];
           return (
-            <View
-              key={`${k}-${i}`}
-              style={{
-                width: active ? 56 : 46,
-                height: active ? 56 : 46,
-                borderRadius: 30,
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: active ? "#FFFFFF" : "transparent",
-                borderWidth: done ? 3 : 0,
-                borderColor: "#3FB984",
-                shadowColor: active ? "#1462B5" : "transparent",
-                shadowOpacity: active ? 0.25 : 0,
-                shadowRadius: 6,
-                shadowOffset: { width: 0, height: 3 },
-              }}
-            >
-              {meta.icon ? (
-                <Image
-                  source={meta.icon}
-                  style={{ width: active ? 40 : 32, height: active ? 40 : 32, opacity: active || done ? 1 : 0.5 }}
-                  contentFit="contain"
+            <View key={`${k}-${i}`} style={{ flexDirection: "row", alignItems: "center" }}>
+              {/* Adımlar arası bağlantı çizgisi — "sıra/ilerleme" görsel olarak bariz olsun
+                  (Abdulkadir: ikonların anlamı/ilerlemesi net değildi). Yazı eklemeden. */}
+              {i > 0 && (
+                <View
+                  style={{ width: 10, height: 4, borderRadius: 2, marginHorizontal: 1, backgroundColor: i <= activeIndex ? "#3FB984" : "rgba(0,0,0,0.12)" }}
                 />
-              ) : (
-                <Text style={{ fontSize: active ? 28 : 22, opacity: active || done ? 1 : 0.5 }}>{meta.emoji}</Text>
               )}
+              <View
+                style={{
+                  width: active ? 56 : 46,
+                  height: active ? 56 : 46,
+                  borderRadius: 30,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: active ? "#FFFFFF" : "transparent",
+                  borderWidth: done ? 3 : 0,
+                  borderColor: "#3FB984",
+                  shadowColor: active ? "#1462B5" : "transparent",
+                  shadowOpacity: active ? 0.25 : 0,
+                  shadowRadius: 6,
+                  shadowOffset: { width: 0, height: 3 },
+                }}
+              >
+                {meta.icon ? (
+                  <Image
+                    source={meta.icon}
+                    style={{ width: active ? 40 : 32, height: active ? 40 : 32, opacity: active || done ? 1 : 0.5 }}
+                    contentFit="contain"
+                  />
+                ) : (
+                  <Text style={{ fontSize: active ? 28 : 22, opacity: active || done ? 1 : 0.5 }}>{meta.emoji}</Text>
+                )}
+                {/* Tamamlandı rozeti — net "bitti" işareti (yeşil kenarlık yeterince bariz değildi) */}
+                {done && (
+                  <View
+                    style={{
+                      position: "absolute",
+                      right: -2,
+                      bottom: -2,
+                      width: 18,
+                      height: 18,
+                      borderRadius: 9,
+                      backgroundColor: "#3FB984",
+                      borderWidth: 2,
+                      borderColor: "#fff",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Text style={{ fontSize: 10, color: "#fff", fontFamily: "Fredoka_700Bold" }}>✓</Text>
+                  </View>
+                )}
+              </View>
             </View>
           );
         })}
