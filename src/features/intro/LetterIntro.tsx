@@ -1,6 +1,7 @@
 import { Image } from "expo-image";
 import { useEffect } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
+import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming } from "react-native-reanimated";
 import Svg, { G, Path } from "react-native-svg";
 import { useTranslation } from "react-i18next";
 
@@ -28,6 +29,14 @@ export function LetterIntro({ letterId, onComplete }: { letterId: number; onComp
   const lp = getLetterPath(letterId);
   const sc = GLYPH / PATH_BOX;
 
+  // Dokun-dinle rozeti nabzı — çocuk okuyamaz, ikon davetle "buraya dokun" anlaşılsın
+  // (Abdulkadir: "sesli söyle" daveti yazıyla kalsın ama ikon/etkileşimle de desteklensin).
+  const pulse = useSharedValue(0);
+  useEffect(() => {
+    pulse.value = withRepeat(withSequence(withTiming(1, { duration: 700, easing: Easing.inOut(Easing.ease) }), withTiming(0, { duration: 700, easing: Easing.inOut(Easing.ease) })), -1, false);
+  }, []);
+  const badgeStyle = useAnimatedStyle(() => ({ transform: [{ scale: 1 + pulse.value * 0.14 }] }));
+
   useEffect(() => {
     const tt = setTimeout(() => playLetter(letterId), 350);
     return () => clearTimeout(tt);
@@ -54,6 +63,32 @@ export function LetterIntro({ letterId, onComplete }: { letterId: number; onComp
               <Text style={{ fontFamily: "Amiri_700Bold", fontSize: 140, color: "#2A2A33" }}>{letter.char}</Text>
             )}
           </View>
+          {/* Dinle rozeti — ikonla "dokun ve dinle" daveti (diğer oyunlardaki 🔊 diliyle tutarlı) */}
+          <Animated.View
+            pointerEvents="none"
+            style={[
+              {
+                position: "absolute",
+                right: -8,
+                bottom: -8,
+                width: 52,
+                height: 52,
+                borderRadius: 26,
+                backgroundColor: "#FFFFFF",
+                alignItems: "center",
+                justifyContent: "center",
+                borderWidth: 3,
+                borderColor: "#F5A524",
+                shadowColor: "#1462B5",
+                shadowOpacity: 0.25,
+                shadowRadius: 6,
+                shadowOffset: { width: 0, height: 3 },
+              },
+              badgeStyle,
+            ]}
+          >
+            <Text style={{ fontSize: 26 }}>🔊</Text>
+          </Animated.View>
         </Pressable>
       </Floating>
 
