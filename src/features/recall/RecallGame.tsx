@@ -20,7 +20,10 @@ import { useSrsStore } from "@/stores/srsStore";
  */
 const CARD = 120;
 const INNER = CARD * 0.6;
-const MAX_Q = 3;
+// Abdulkadir: ilerledikçe daha FAZLA tekrar olsun (sabit 3 yerine, birikinti büyüdükçe
+// gözden kaçmasın). 2 harften 6'ya kadar kademeli artar (her 6 harfte +1).
+const MIN_Q = 2;
+const MAX_Q = 6;
 
 type Question = { id: number; options: number[] };
 
@@ -83,14 +86,21 @@ export function RecallGame({ letterId, onComplete }: { letterId: number; onCompl
     const now = Date.now();
     const earlier = LETTERS.filter((l) => l.id < letterId && isComplete(l.id)).map((l) => l.id);
     if (earlier.length === 0) return [];
+    const byLetter = useSrsStore.getState().byLetter;
     const due = useSrsStore.getState().dueAmong(earlier, now);
-    const pool = due.length ? due : earlier;
+    // Hiç tekrar edilmemiş harfler (henüz SM-2 kaydı yok) her zaman havuza girsin —
+    // yoksa vadesi gelenler birikince yeni tamamlanan harfler sıraya hiç giremiyordu.
+    const neverReviewed = earlier.filter((id) => !byLetter[id]);
+    const candidates = Array.from(new Set([...due, ...neverReviewed]));
+    const pool = candidates.length ? candidates : earlier;
     const shuffled = [...pool];
     for (let i = shuffled.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
     }
-    return shuffled.slice(0, Math.min(MAX_Q, shuffled.length)).map((id) => {
+    // İlerledikçe daha fazla tekrar slotu (her 6 harfte +1, MAX_Q'da tavan)
+    const maxQ = Math.min(MAX_Q, MIN_Q + Math.floor(earlier.length / 6));
+    return shuffled.slice(0, Math.min(maxQ, shuffled.length)).map((id) => {
       const pd = LETTERS.filter((l) => l.id !== id);
       const distractors: number[] = [];
       for (let i = 0; i < 3 && pd.length; i++) distractors.push(pd.splice(Math.floor(Math.random() * pd.length), 1)[0].id);
