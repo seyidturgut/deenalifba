@@ -21,6 +21,8 @@ export const LEARNING_STEPS: LearningStep[] = [
  *   balloon  → Balon Patlat (doğru harfli balonları patlat)
  *   catch    → Yakala (harfler sağdan sola kayar, doğru olanı yakala)
  *   word     → Kelime (harf→resim; Faz B, görseller gelince)
+ *   dots     → Noktaları Ayırt Et (Abdulkadir #6: yalnız noktayla ayrılan harfler — ب/ت/ث gibi)
+ *   confuseSound → Benzer Sesler (Abdulkadir #7: karıştırılan sesler — ث/ف, ق/ك gibi)
  */
 export type ActivityKind =
   | "intro"
@@ -31,6 +33,8 @@ export type ActivityKind =
   | "balloon"
   | "catch"
   | "word"
+  | "dots"
+  | "confuseSound"
   | "recall";
 
 /** Tek bir Arap harfi (Harf). 28 harf — bkz. letters.ts */

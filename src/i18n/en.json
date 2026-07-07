@@ -65,6 +65,8 @@
     "balloon": "Balloons",
     "catch": "Catch",
     "word": "Word",
+    "dots": "Dots",
+    "confuseSound": "Similar Sounds",
     "recall": "Review",
     "introHint": "Listen, then say it out loud! 👋🗣️",
     "traceHint": "Paint the letter with your finger ✨",
@@ -74,6 +76,8 @@
     "balloonHint": "Pop the right letter balloons 🎈",
     "catchHint": "Catch the right sliding letter 🫧",
     "wordHint": "Pick the right word 📖",
+    "dotsHint": "Listen closely, they look alike! 👀",
+    "confuseSoundHint": "Listen closely, they sound alike! 👂",
     "recallHint": "Let's remember the\nletters we learned",
     "redraw": "Redraw",
     "soon": "Coming soon ✨"

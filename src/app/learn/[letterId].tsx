@@ -11,6 +11,7 @@ import { SoundToggles } from "@/components/ui/SoundToggles";
 import { StageHost } from "@/components/ui/StageHost";
 import { BalloonPop } from "@/features/balloon/BalloonPop";
 import { SoundCatch } from "@/features/catch/SoundCatch";
+import { ConfusePick } from "@/features/confuse/ConfusePick";
 import { GiveToPiril } from "@/features/drag/GiveToPiril";
 import { HearTap } from "@/features/heartap/HearTap";
 import { LetterIntro } from "@/features/intro/LetterIntro";
@@ -20,6 +21,7 @@ import { MosqueBuild } from "@/features/mosque/MosqueBuild";
 import { MosqueFinale } from "@/features/mosque/MosqueFinale";
 import { RecallGame } from "@/features/recall/RecallGame";
 import { PaintTrace } from "@/features/trace/PaintTrace";
+import { dotSiblings, soundSiblings } from "@/data/confusables";
 import { ACTIVITY_META } from "@/data/lesson";
 import { getLetter, TOTAL_LETTERS } from "@/data/letters";
 import type { ActivityKind } from "@/data/types";
@@ -41,6 +43,8 @@ const HINT_KEY: Record<ActivityKind, string> = {
   balloon: "learn.balloonHint",
   catch: "learn.catchHint",
   word: "learn.wordHint",
+  dots: "learn.dotsHint",
+  confuseSound: "learn.confuseSoundHint",
   recall: "learn.recallHint",
 };
 
@@ -290,6 +294,14 @@ export default function LearnScreen() {
       ) : kind === "catch" ? (
         <View className="flex-1 items-center justify-center">
           <SoundCatch key={`catch-${id}`} letterId={id} onComplete={onCompleteStep} />
+        </View>
+      ) : kind === "dots" ? (
+        <View className="flex-1 items-center justify-center">
+          <ConfusePick key={`dots-${id}`} letterId={id} siblings={dotSiblings(id)} onComplete={onCompleteStep} />
+        </View>
+      ) : kind === "confuseSound" ? (
+        <View className="flex-1 items-center justify-center">
+          <ConfusePick key={`confuseSound-${id}`} letterId={id} siblings={soundSiblings(id)} onComplete={onCompleteStep} />
         </View>
       ) : kind === "recall" ? (
         <View className="flex-1 items-center justify-center">

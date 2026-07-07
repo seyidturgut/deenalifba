@@ -65,6 +65,8 @@
     "balloon": "Balon",
     "catch": "Yakala",
     "word": "Kelime",
+    "dots": "Noktalar",
+    "confuseSound": "Benzer Sesler",
     "recall": "Tekrar",
     "introHint": "Dinle, sonra sesli söyle! 👋🗣️",
     "traceHint": "Harfi parmağınla boya ✨",
@@ -74,6 +76,8 @@
     "balloonHint": "Doğru harfli balonları patlat 🎈",
     "catchHint": "Kayan harflerden doğrusunu yakala 🫧",
     "wordHint": "Doğru kelimeyi seç 📖",
+    "dotsHint": "Dikkatli dinle, çok benziyorlar! 👀",
+    "confuseSoundHint": "Dikkatli dinle, sesleri benziyor! 👂",
     "recallHint": "Hadi eski harfleri\nhatırlayalım",
     "redraw": "Yeniden çiz",
     "soon": "Bu oyun yakında ✨"

@@ -1,3 +1,4 @@
+import { hasDotConfusable, hasSoundConfusable } from "@/data/confusables";
 import type { ActivityKind } from "@/data/types";
 import { hasWordImage } from "@/data/letterWords";
 import { images } from "@/lib/images";
@@ -10,7 +11,8 @@ import { hasLetterSound } from "@/lib/sfx";
 
 // Pratik (pekiştirme) oyun havuzu — öğretmeden SONRA gelir.
 // Hepsi YAZISIZ + sesli; "word" Faz B (illüstrasyon gelince).
-const PRACTICE: ActivityKind[] = ["hearTap", "match", "drag", "balloon", "catch", "word"];
+// "dots"/"confuseSound" yalnız karışabilir kardeşi OLAN harflerde havuza girer (Abdulkadir #6/#7).
+const PRACTICE: ActivityKind[] = ["hearTap", "match", "drag", "balloon", "catch", "word", "dots", "confuseSound"];
 
 /**
  * Harf için ders etkinlik listesini üretir (deterministik).
@@ -25,6 +27,8 @@ export function buildLesson(letterId: number): ActivityKind[] {
   // Uygun pratik oyunları — sesli oyunlar harf sesi gerektirir
   const practice = PRACTICE.filter((k) => {
     if (k === "word") return hasWordImage(letterId);
+    if (k === "dots") return hasLetterSound(letterId) && hasDotConfusable(letterId);
+    if (k === "confuseSound") return hasLetterSound(letterId) && hasSoundConfusable(letterId);
     return hasLetterSound(letterId); // hearTap/match/drag/balloon/catch sesli
   });
 
@@ -50,5 +54,7 @@ export const ACTIVITY_META: Record<ActivityKind, { labelKey: string; icon?: numb
   balloon: { labelKey: "learn.balloon", icon: images.stepBalloon },
   catch: { labelKey: "learn.catch", icon: images.stepCatch },
   word: { labelKey: "learn.word", emoji: "📖" },
+  dots: { labelKey: "learn.dots", emoji: "🔍" },
+  confuseSound: { labelKey: "learn.confuseSound", emoji: "🎧" },
   recall: { labelKey: "learn.recall", icon: images.stepRecall },
 };
