@@ -1,6 +1,6 @@
 import { Image } from "expo-image";
 import { useEffect } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming } from "react-native-reanimated";
 import Svg, { G, Path } from "react-native-svg";
 import { useTranslation } from "react-i18next";
@@ -46,7 +46,11 @@ export function LetterIntro({ letterId, onComplete }: { letterId: number; onComp
   if (!letter) return null;
 
   return (
-    <View className="flex-1 items-center justify-center gap-5">
+    <ScrollView
+      style={{ flex: 1 }}
+      contentContainerStyle={{ flexGrow: 1, alignItems: "center", justifyContent: "center", gap: 20, paddingVertical: 12 }}
+      showsVerticalScrollIndicator={false}
+    >
       {/* Büyük harf kartı — dokununca harfin sesi tekrar çalar (etiketsiz) */}
       <Floating distance={8} duration={2200}>
         <Pressable onPress={() => playLetter(letterId)} style={{ width: CARD, height: CARD }}>
@@ -80,6 +84,6 @@ export function LetterIntro({ letterId, onComplete }: { letterId: number; onComp
 
       {/* Devam (öğretme adımı — açık devam butonu) */}
       <JuicyButton label={t("intro.continue")} tone="success" onPress={onComplete} />
-    </View>
+    </ScrollView>
   );
 }
