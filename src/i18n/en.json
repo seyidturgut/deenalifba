@@ -95,7 +95,12 @@
   },
   "intro": {
     "listen": "Listen",
-    "continue": "I'm ready ▶"
+    "continue": "I'm ready ▶",
+    "recordPrompt": "Record and hear yourself! 🎤",
+    "recording": "Listening…",
+    "playYou": "You",
+    "playPiril": "Pırıl",
+    "recordAgain": "Record again"
   },
   "finale": {
     "title": "Maa shaa Allah!",

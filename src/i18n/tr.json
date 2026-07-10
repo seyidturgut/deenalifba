@@ -95,7 +95,12 @@
   },
   "intro": {
     "listen": "Dinle",
-    "continue": "Hazırım ▶"
+    "continue": "Hazırım ▶",
+    "recordPrompt": "Kaydet ve dinle! 🎤",
+    "recording": "Dinliyorum…",
+    "playYou": "Sen",
+    "playPiril": "Pırıl",
+    "recordAgain": "Tekrar kaydet"
   },
   "finale": {
     "title": "Maşallah!",

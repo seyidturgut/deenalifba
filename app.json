@@ -2,7 +2,7 @@
   "expo": {
     "name": "Alif",
     "slug": "AlifBa-Game",
-    "version": "1.4.0",
+    "version": "1.4.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "alifbagame",
@@ -39,14 +39,19 @@
         }
       ],
       "expo-sqlite",
-      "expo-audio"
+      [
+        "expo-audio",
+        {
+          "microphonePermission": "Alif harfleri kendi sesinle tekrarlayıp dinleyebilmen için mikrofona erişir. Kayıtlar cihazından hiç çıkmaz."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
     },
     "extra": {
-      "build": "2026.07.07"
+      "build": "2026.07.10"
     }
   }
 }

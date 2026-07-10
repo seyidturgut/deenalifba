@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 
 import { Floating } from "@/components/ui/Floating";
 import { JuicyButton } from "@/components/ui/JuicyButton";
+import { RecordCompare } from "@/components/ui/RecordCompare";
 import { getLetter } from "@/data/letters";
 import { getLetterPath, PATH_BOX } from "@/data/letterPaths";
 import { images } from "@/lib/images";
@@ -72,6 +73,10 @@ export function LetterIntro({ letterId, onComplete }: { letterId: number; onComp
 
       {/* Latin ad GÖSTERİLMEZ (Ismail: Arapça harf + ses; transliterasyona dayanma).
           Çocuk harfi görür + sesini duyar; karta dokununca ses tekrar çalar. */}
+
+      {/* Kaydet & karşılaştır (Sohail/Abdulkadir) — yargı yok, yalnız kendi sesini
+          Pırıl'ınkiyle karşılaştırma. İzin yoksa/desteklenmiyorsa kendini gizler. */}
+      <RecordCompare letterId={letterId} />
 
       {/* Devam (öğretme adımı — açık devam butonu) */}
       <JuicyButton label={t("intro.continue")} tone="success" onPress={onComplete} />
