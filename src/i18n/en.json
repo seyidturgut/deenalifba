@@ -96,8 +96,9 @@
   "intro": {
     "listen": "Listen",
     "continue": "I'm ready ▶",
-    "recordPrompt": "Record and hear yourself! 🎤",
+    "recordPrompt": "Your turn! Tap to record 🎤",
     "recording": "Listening…",
+    "recordCheer": "Great job! 🌟",
     "playYou": "You",
     "playPiril": "Pırıl",
     "recordAgain": "Record again"

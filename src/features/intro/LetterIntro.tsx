@@ -1,5 +1,5 @@
 import { Image } from "expo-image";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming } from "react-native-reanimated";
 import Svg, { G, Path } from "react-native-svg";
@@ -15,6 +15,9 @@ import { playLetter } from "@/lib/sfx";
 
 const CARD = 250;
 const GLYPH = 176; // kart içi glif alanı (altın çerçeveye değmesin)
+// Abdulkadir: "kaydet & karşılaştır" ilk birkaç harfte değil, çocuk harfleri tanımaya/
+// yazmaya biraz ısınınca gösterilsin. 4. harften (id>=4) itibaren gösteriyoruz.
+const RECORD_COMPARE_FROM_LETTER = 4;
 
 /**
  * "Tanı" (öğret) adımı — TEST DEĞİL. Harfi tanıtır: büyük harf + sesi
@@ -29,6 +32,8 @@ export function LetterIntro({ letterId, onComplete }: { letterId: number; onComp
   const letter = getLetter(letterId);
   const lp = getLetterPath(letterId);
   const sc = GLYPH / PATH_BOX;
+  const showRecord = letterId >= RECORD_COMPARE_FROM_LETTER;
+  const [hasRecorded, setHasRecorded] = useState(false);
 
   // Dokun-dinle rozeti nabzı — çocuk okuyamaz, ikon davetle "buraya dokun" anlaşılsın
   // (Abdulkadir: "sesli söyle" daveti yazıyla kalsın ama ikon/etkileşimle de desteklensin).
@@ -90,12 +95,12 @@ export function LetterIntro({ letterId, onComplete }: { letterId: number; onComp
 
         {/* Kaydet & karşılaştır (Sohail/Abdulkadir) — yargı yok, yalnız kendi sesini
             Pırıl'ınkiyle karşılaştırma. İzin yoksa/desteklenmiyorsa kendini gizler. */}
-        <RecordCompare letterId={letterId} />
+        {showRecord && <RecordCompare letterId={letterId} onRecordedChange={setHasRecorded} />}
       </ScrollView>
 
       {/* Devam (öğretme adımı — açık devam butonu) — SABİT, kaydırma alanının dışında */}
       <View style={{ alignItems: "center", paddingTop: 10, paddingBottom: 4 }}>
-        <JuicyButton label={t("intro.continue")} tone="success" onPress={onComplete} />
+        <JuicyButton label={t("intro.continue")} tone="success" onPress={onComplete} disabled={showRecord && !hasRecorded} />
       </View>
     </View>
   );

@@ -96,8 +96,9 @@
   "intro": {
     "listen": "Dinle",
     "continue": "Hazırım ▶",
-    "recordPrompt": "Kaydet ve dinle! 🎤",
+    "recordPrompt": "Senin sıran! Kaydet 🎤",
     "recording": "Dinliyorum…",
+    "recordCheer": "Harikasın! 🌟",
     "playYou": "Sen",
     "playPiril": "Pırıl",
     "recordAgain": "Tekrar kaydet"
