@@ -18,8 +18,9 @@ import { images } from "@/lib/images";
 import { playLetter, playSfx } from "@/lib/sfx";
 
 const MAX_RECORD_MS = 3500;
-const MIC = 84; // Abdulkadir: "make the microphone larger"
+const MIC = 64; // Abdulkadir: "make the microphone larger" — ama 84'te nabız animasyonuyla alttan kesiliyordu, küçültüldü
 const MIC_ASPECT = 480 / 313; // ic_mic.webp kaynak oranı (h/w)
+const MIC_BOX = MIC + 10; // nabız animasyonunun taşması için pay (görsel kesilmeyi önler)
 
 /**
  * "Kaydet ve karşılaştır" (Sohail/Abdulkadir onayladı; Abdulkadir canlıda deneyip
@@ -151,7 +152,7 @@ export function RecordCompare({ letterId, onRecordedChange }: { letterId: number
           hitSlop={10}
           style={{ flexDirection: "row", alignItems: "center", gap: 12 }}
         >
-          <View style={{ width: MIC, height: MIC, alignItems: "center", justifyContent: "center" }}>
+          <View style={{ width: MIC_BOX, height: MIC_BOX, alignItems: "center", justifyContent: "center" }}>
             {phase === "recording" && (
               <Animated.View
                 pointerEvents="none"
