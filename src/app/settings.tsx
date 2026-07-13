@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Pressable, Switch, Text, View } from "react-native";
+import { Pressable, ScrollView, Switch, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 
 import { GradientBg } from "@/components/ui/GradientBg";
@@ -101,7 +101,15 @@ export default function Settings() {
 
   return (
     <GradientBg>
-      <View className="flex-1 gap-4 py-6">
+      {/* Tüm ayarlar sayfası kaydırılabilir — içerik (özellikle alttaki 3 buton:
+          Tanıtımı izle/Yeni Oyun/Kapat) kısa ekranlarda taşıyordu ve HİÇ scroll
+          olmadığı için en alttaki buton erişilemez oluyordu. */}
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{ flexGrow: 1 }}
+        contentContainerClassName="gap-4 py-6"
+        showsVerticalScrollIndicator={false}
+      >
         <Text className="font-display text-3xl font-extrabold text-ink">{t("settings.title")}</Text>
 
         {/* Dil seçimi (TR varsayılan) */}
@@ -162,7 +170,7 @@ export default function Settings() {
         {/* Yeni Oyun (test) — onaylı; tüm ilerlemeyi sıfırlar, onboarding'den başlar */}
         <JuicyButton label={t("settings.newGame")} tone="primary" onPress={() => { playSfx("ui_tap"); setShowReset(true); }} />
         <JuicyButton label={t("common.close")} tone="primary" onPress={() => router.back()} />
-      </View>
+      </ScrollView>
 
       {/* Ebeveyn Kapısı yalnız hassas alan için — üst katman */}
       {showGate && (

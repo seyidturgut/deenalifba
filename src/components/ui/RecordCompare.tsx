@@ -113,13 +113,20 @@ export function RecordCompare({ letterId }: { letterId: number }) {
   return (
     <View style={{ alignItems: "center", gap: 6 }}>
       {phase !== "recorded" && (
-        <Pressable onPress={phase === "recording" ? stopRecording : startRecording} hitSlop={10} style={{ alignItems: "center", gap: 3 }}>
+        // Etiket mikrofonun YANINDA (satır düzeni) — altına koymak dikey yer yiyordu ve
+        // kısa gerçek cihaz ekranlarında ScrollView'in görünür kutusundan taşıp
+        // görünmez oluyordu (kullanıcı ekran görüntüsüyle bildirdi).
+        <Pressable
+          onPress={phase === "recording" ? stopRecording : startRecording}
+          hitSlop={10}
+          style={{ flexDirection: "row", alignItems: "center", gap: 10 }}
+        >
           <Animated.View
             style={[
               {
-                width: 50,
-                height: 50,
-                borderRadius: 25,
+                width: 46,
+                height: 46,
+                borderRadius: 23,
                 backgroundColor: phase === "recording" ? "#F0645A" : "#FFFFFF",
                 borderWidth: 3,
                 borderColor: phase === "recording" ? "#D8493F" : "#F5A524",
@@ -133,9 +140,9 @@ export function RecordCompare({ letterId }: { letterId: number }) {
               pulseStyle,
             ]}
           >
-            <Text style={{ fontSize: 22 }}>🎤</Text>
+            <Text style={{ fontSize: 20 }}>🎤</Text>
           </Animated.View>
-          <Text style={{ fontFamily: "Fredoka_600SemiBold", fontSize: 12, color: "#5B6470", textAlign: "center", maxWidth: 160 }}>
+          <Text style={{ fontFamily: "Fredoka_600SemiBold", fontSize: 12.5, color: "#5B6470", maxWidth: 170 }}>
             {phase === "recording" ? t("intro.recording") : t("intro.recordPrompt")}
           </Text>
         </Pressable>
