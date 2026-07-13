@@ -111,15 +111,15 @@ export function RecordCompare({ letterId }: { letterId: number }) {
   if (phase === "unsupported") return null;
 
   return (
-    <View style={{ alignItems: "center", gap: 8, marginTop: 2 }}>
+    <View style={{ alignItems: "center", gap: 6 }}>
       {phase !== "recorded" && (
-        <Pressable onPress={phase === "recording" ? stopRecording : startRecording} hitSlop={10} style={{ alignItems: "center", gap: 4 }}>
+        <Pressable onPress={phase === "recording" ? stopRecording : startRecording} hitSlop={10} style={{ alignItems: "center", gap: 3 }}>
           <Animated.View
             style={[
               {
-                width: 58,
-                height: 58,
-                borderRadius: 29,
+                width: 50,
+                height: 50,
+                borderRadius: 25,
                 backgroundColor: phase === "recording" ? "#F0645A" : "#FFFFFF",
                 borderWidth: 3,
                 borderColor: phase === "recording" ? "#D8493F" : "#F5A524",
@@ -133,34 +133,34 @@ export function RecordCompare({ letterId }: { letterId: number }) {
               pulseStyle,
             ]}
           >
-            <Text style={{ fontSize: 26 }}>🎤</Text>
+            <Text style={{ fontSize: 22 }}>🎤</Text>
           </Animated.View>
-          <Text style={{ fontFamily: "Fredoka_600SemiBold", fontSize: 12.5, color: "#5B6470", textAlign: "center", maxWidth: 160 }}>
+          <Text style={{ fontFamily: "Fredoka_600SemiBold", fontSize: 12, color: "#5B6470", textAlign: "center", maxWidth: 160 }}>
             {phase === "recording" ? t("intro.recording") : t("intro.recordPrompt")}
           </Text>
         </Pressable>
       )}
 
       {phase === "recorded" && (
-        <View style={{ alignItems: "center", gap: 6 }}>
+        <View style={{ alignItems: "center", gap: 4 }}>
           <View style={{ flexDirection: "row", gap: 14 }}>
-            <Pressable onPress={playYou} style={{ alignItems: "center", gap: 4 }}>
+            <Pressable onPress={playYou} style={{ alignItems: "center", gap: 3 }}>
               <View
-                style={{ width: 58, height: 58, borderRadius: 29, backgroundColor: "#FFFFFF", borderWidth: 3, borderColor: "#3FB984", alignItems: "center", justifyContent: "center", shadowColor: "#1462B5", shadowOpacity: 0.18, shadowRadius: 5, shadowOffset: { width: 0, height: 3 } }}
+                style={{ width: 50, height: 50, borderRadius: 25, backgroundColor: "#FFFFFF", borderWidth: 3, borderColor: "#3FB984", alignItems: "center", justifyContent: "center", shadowColor: "#1462B5", shadowOpacity: 0.18, shadowRadius: 5, shadowOffset: { width: 0, height: 3 } }}
               >
-                <Text style={{ fontSize: 24 }}>🎤</Text>
+                <Text style={{ fontSize: 21 }}>🎤</Text>
               </View>
               <Text style={{ fontFamily: "Fredoka_600SemiBold", fontSize: 12, color: "#5B6470" }}>{t("intro.playYou")}</Text>
             </Pressable>
-            <Pressable onPress={playPiril} style={{ alignItems: "center", gap: 4 }}>
-              <View style={{ width: 58, height: 58, alignItems: "center", justifyContent: "center" }}>
-                <Image source={images.icListen} style={{ width: 52, height: 48 }} contentFit="contain" />
+            <Pressable onPress={playPiril} style={{ alignItems: "center", gap: 3 }}>
+              <View style={{ width: 50, height: 50, alignItems: "center", justifyContent: "center" }}>
+                <Image source={images.icListen} style={{ width: 45, height: 41 }} contentFit="contain" />
               </View>
               <Text style={{ fontFamily: "Fredoka_600SemiBold", fontSize: 12, color: "#5B6470" }}>{t("intro.playPiril")}</Text>
             </Pressable>
           </View>
-          <Pressable onPress={recordAgain} hitSlop={8} style={{ paddingVertical: 4 }}>
-            <Text style={{ fontFamily: "Fredoka_600SemiBold", fontSize: 12.5, color: "#7A8593" }}>{t("intro.recordAgain")}</Text>
+          <Pressable onPress={recordAgain} hitSlop={8} style={{ paddingVertical: 2 }}>
+            <Text style={{ fontFamily: "Fredoka_600SemiBold", fontSize: 12, color: "#7A8593" }}>{t("intro.recordAgain")}</Text>
           </Pressable>
         </View>
       )}

@@ -46,46 +46,57 @@ export function LetterIntro({ letterId, onComplete }: { letterId: number; onComp
   if (!letter) return null;
 
   return (
-    <ScrollView
-      style={{ flex: 1, width: "100%" }}
-      contentContainerStyle={{ flexGrow: 1, width: "100%", alignItems: "center", justifyContent: "center", gap: 20, paddingVertical: 12 }}
-      showsVerticalScrollIndicator={false}
-    >
-      {/* Büyük harf kartı — dokununca harfin sesi tekrar çalar (etiketsiz) */}
-      <Floating distance={8} duration={2200}>
-        <Pressable onPress={() => playLetter(letterId)} style={{ width: CARD, height: CARD }}>
-          <Image source={images.playPanel} style={StyleSheet.absoluteFill} contentFit="fill" />
-          <View style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, alignItems: "center", justifyContent: "center" }}>
-            {lp ? (
-              // bbox-merkezli path → her harf aynı şekilde ortalı
-              <Svg width={GLYPH} height={GLYPH}>
-                <G transform={`scale(${sc})`}>
-                  <Path d={lp.d} fill="#2A2A33" />
-                </G>
-              </Svg>
-            ) : (
-              // path yoksa Amiri glif fallback
-              <Text style={{ fontFamily: "Amiri_700Bold", fontSize: 140, color: "#2A2A33" }}>{letter.char}</Text>
-            )}
-          </View>
-          {/* Dinle rozeti — ikonla "dokun ve dinle" daveti (illüstrasyon, emoji değil).
-              Kartın SINIRLARI İÇİNDE konumlanır (negatif taşma yok) → hangi kapsayıcı
-              (ScrollView dahil) olursa olsun asla kesilmez. */}
-          <Animated.View pointerEvents="none" style={[{ position: "absolute", right: 2, bottom: 2 }, badgeStyle]}>
-            <Image source={images.icListen} style={{ width: 58, height: 53 }} contentFit="contain" />
-          </Animated.View>
-        </Pressable>
-      </Floating>
+    <View style={{ flex: 1, width: "100%" }}>
+      {/* Kart + kayıt widget'ı kaydırılabilir (kısa ekranlarda taşarsa) — ama "Devam"
+          butonu bunun DIŞINDA/ALTINDA SABİT durur, kaydırma gerektirmeden her zaman
+          görünür (ana ilerleme kontrolü hiçbir zaman gizli/kesik kalmamalı). */}
+      {/* NOT: justifyContent:"center" kullanmıyoruz — içerik taştığında ortalama, taşmayı
+          YUKARI ve AŞAĞI'ya eşit dağıtıp her iki uçtan da kırpılmaya yol açıyordu (kafa
+          karıştırıcı çift-yönlü scroll). Üstten akış (flex-start) + üstte biraz boşluk daha
+          sağlam: içerik sığınca güzel durur, sığmayınca yalnız AŞAĞI kaydırılır. */}
+      <ScrollView
+        style={{ flex: 1, width: "100%" }}
+        contentContainerStyle={{ flexGrow: 1, width: "100%", alignItems: "center", gap: 12, paddingTop: 8, paddingBottom: 6 }}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Büyük harf kartı — dokununca harfin sesi tekrar çalar (etiketsiz) */}
+        <Floating distance={8} duration={2200}>
+          <Pressable onPress={() => playLetter(letterId)} style={{ width: CARD, height: CARD }}>
+            <Image source={images.playPanel} style={StyleSheet.absoluteFill} contentFit="fill" />
+            <View style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, alignItems: "center", justifyContent: "center" }}>
+              {lp ? (
+                // bbox-merkezli path → her harf aynı şekilde ortalı
+                <Svg width={GLYPH} height={GLYPH}>
+                  <G transform={`scale(${sc})`}>
+                    <Path d={lp.d} fill="#2A2A33" />
+                  </G>
+                </Svg>
+              ) : (
+                // path yoksa Amiri glif fallback
+                <Text style={{ fontFamily: "Amiri_700Bold", fontSize: 140, color: "#2A2A33" }}>{letter.char}</Text>
+              )}
+            </View>
+            {/* Dinle rozeti — ikonla "dokun ve dinle" daveti (illüstrasyon, emoji değil).
+                Kartın SINIRLARI İÇİNDE konumlanır (negatif taşma yok) → hangi kapsayıcı
+                (ScrollView dahil) olursa olsun asla kesilmez. */}
+            <Animated.View pointerEvents="none" style={[{ position: "absolute", right: 2, bottom: 2 }, badgeStyle]}>
+              <Image source={images.icListen} style={{ width: 58, height: 53 }} contentFit="contain" />
+            </Animated.View>
+          </Pressable>
+        </Floating>
 
-      {/* Latin ad GÖSTERİLMEZ (Ismail: Arapça harf + ses; transliterasyona dayanma).
-          Çocuk harfi görür + sesini duyar; karta dokununca ses tekrar çalar. */}
+        {/* Latin ad GÖSTERİLMEZ (Ismail: Arapça harf + ses; transliterasyona dayanma).
+            Çocuk harfi görür + sesini duyar; karta dokununca ses tekrar çalar. */}
 
-      {/* Kaydet & karşılaştır (Sohail/Abdulkadir) — yargı yok, yalnız kendi sesini
-          Pırıl'ınkiyle karşılaştırma. İzin yoksa/desteklenmiyorsa kendini gizler. */}
-      <RecordCompare letterId={letterId} />
+        {/* Kaydet & karşılaştır (Sohail/Abdulkadir) — yargı yok, yalnız kendi sesini
+            Pırıl'ınkiyle karşılaştırma. İzin yoksa/desteklenmiyorsa kendini gizler. */}
+        <RecordCompare letterId={letterId} />
+      </ScrollView>
 
-      {/* Devam (öğretme adımı — açık devam butonu) */}
-      <JuicyButton label={t("intro.continue")} tone="success" onPress={onComplete} />
-    </ScrollView>
+      {/* Devam (öğretme adımı — açık devam butonu) — SABİT, kaydırma alanının dışında */}
+      <View style={{ alignItems: "center", paddingTop: 10, paddingBottom: 4 }}>
+        <JuicyButton label={t("intro.continue")} tone="success" onPress={onComplete} />
+      </View>
+    </View>
   );
 }
