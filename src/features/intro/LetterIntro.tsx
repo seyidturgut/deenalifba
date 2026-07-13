@@ -47,8 +47,8 @@ export function LetterIntro({ letterId, onComplete }: { letterId: number; onComp
 
   return (
     <ScrollView
-      style={{ flex: 1 }}
-      contentContainerStyle={{ flexGrow: 1, alignItems: "center", justifyContent: "center", gap: 20, paddingVertical: 12 }}
+      style={{ flex: 1, width: "100%" }}
+      contentContainerStyle={{ flexGrow: 1, width: "100%", alignItems: "center", justifyContent: "center", gap: 20, paddingVertical: 12 }}
       showsVerticalScrollIndicator={false}
     >
       {/* Büyük harf kartı — dokununca harfin sesi tekrar çalar (etiketsiz) */}
@@ -68,9 +68,11 @@ export function LetterIntro({ letterId, onComplete }: { letterId: number; onComp
               <Text style={{ fontFamily: "Amiri_700Bold", fontSize: 140, color: "#2A2A33" }}>{letter.char}</Text>
             )}
           </View>
-          {/* Dinle rozeti — ikonla "dokun ve dinle" daveti (illüstrasyon, emoji değil) */}
-          <Animated.View pointerEvents="none" style={[{ position: "absolute", right: -14, bottom: -10 }, badgeStyle]}>
-            <Image source={images.icListen} style={{ width: 62, height: 57 }} contentFit="contain" />
+          {/* Dinle rozeti — ikonla "dokun ve dinle" daveti (illüstrasyon, emoji değil).
+              Kartın SINIRLARI İÇİNDE konumlanır (negatif taşma yok) → hangi kapsayıcı
+              (ScrollView dahil) olursa olsun asla kesilmez. */}
+          <Animated.View pointerEvents="none" style={[{ position: "absolute", right: 2, bottom: 2 }, badgeStyle]}>
+            <Image source={images.icListen} style={{ width: 58, height: 53 }} contentFit="contain" />
           </Animated.View>
         </Pressable>
       </Floating>
