@@ -18,7 +18,8 @@ import { images } from "@/lib/images";
 import { playLetter, playSfx } from "@/lib/sfx";
 
 const MAX_RECORD_MS = 3500;
-const MIC = 68; // Abdulkadir: "make the microphone larger"
+const MIC = 84; // Abdulkadir: "make the microphone larger"
+const MIC_ASPECT = 480 / 313; // ic_mic.webp kaynak oranı (h/w)
 
 /**
  * "Kaydet ve karşılaştır" (Sohail/Abdulkadir onayladı; Abdulkadir canlıda deneyip
@@ -157,26 +158,8 @@ export function RecordCompare({ letterId, onRecordedChange }: { letterId: number
                 style={[{ position: "absolute", width: MIC, height: MIC, borderRadius: MIC / 2, backgroundColor: "#F0645A" }, ringStyle]}
               />
             )}
-            <Animated.View
-              style={[
-                {
-                  width: MIC,
-                  height: MIC,
-                  borderRadius: MIC / 2,
-                  backgroundColor: phase === "recording" ? "#F0645A" : "#FFFFFF",
-                  borderWidth: 3,
-                  borderColor: phase === "recording" ? "#D8493F" : "#F5A524",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  shadowColor: "#1462B5",
-                  shadowOpacity: 0.2,
-                  shadowRadius: 6,
-                  shadowOffset: { width: 0, height: 3 },
-                },
-                pulseStyle,
-              ]}
-            >
-              <Text style={{ fontSize: 30 }}>🎤</Text>
+            <Animated.View style={pulseStyle}>
+              <Image source={images.icMic} style={{ width: MIC / MIC_ASPECT, height: MIC }} contentFit="contain" />
             </Animated.View>
           </View>
           <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 14, color: "#34618C", maxWidth: 150 }}>
@@ -198,7 +181,7 @@ export function RecordCompare({ letterId, onRecordedChange }: { letterId: number
               <View
                 style={{ width: 50, height: 50, borderRadius: 25, backgroundColor: "#FFFFFF", borderWidth: 3, borderColor: "#3FB984", alignItems: "center", justifyContent: "center", shadowColor: "#1462B5", shadowOpacity: 0.18, shadowRadius: 5, shadowOffset: { width: 0, height: 3 } }}
               >
-                <Text style={{ fontSize: 21 }}>🎤</Text>
+                <Image source={images.icMic} style={{ width: 34 / MIC_ASPECT, height: 34 }} contentFit="contain" />
               </View>
               <Text style={{ fontFamily: "Fredoka_600SemiBold", fontSize: 12, color: "#5B6470" }}>{t("intro.playYou")}</Text>
             </Pressable>

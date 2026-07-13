@@ -67,6 +67,9 @@ export const images = {
   // "Dinle" rozeti/kartı — dokun-ve-dinle daveti (intro rozeti, Tekrar'ın dinle kartı)
   icListen: require("@/assets/illustrations/decor/ic_listen.webp"),
 
+  // Kaydet & karşılaştır — 3D cıvıl mikrofon (Abdulkadir: "büyük mikrofon")
+  icMic: require("@/assets/illustrations/decor/ic_mic.webp"),
+
   // İstikamet zinciri
   chainBead: require("@/assets/illustrations/decor/chain_bead.webp"), // altın hilal boncuk (tekrarlanan)
   chainMedallion: require("@/assets/illustrations/decor/chain_medallion.webp"), // gün sayısı madalyonu
