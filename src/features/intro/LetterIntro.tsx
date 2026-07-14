@@ -93,20 +93,20 @@ export function LetterIntro({ letterId, onComplete }: { letterId: number; onComp
           // 2) Konuş: kaydet & karşılaştır — adımın SONUNDA, KENDİ tek-amaçlı ekranında
           // (Abdulkadir video: aynı ekranda hem kart hem kayıt widget'ı kalabalıktı/scroll
           // gerektiriyordu; "her harfte olsun ama adımın sonuna doğru" diye netleşti).
-          <View style={{ alignItems: "center", gap: 22 }}>
+          <View style={{ alignItems: "center", gap: 36 }}>
             <Pressable
               onPress={() => playLetter(letterId)}
-              style={{ flexDirection: "row", alignItems: "center", gap: 8, backgroundColor: "rgba(255,255,255,0.55)", borderRadius: 999, paddingVertical: 8, paddingHorizontal: 18 }}
+              style={{ flexDirection: "row", alignItems: "center", gap: 12, backgroundColor: "rgba(255,255,255,0.55)", borderRadius: 999, paddingVertical: 12, paddingHorizontal: 26 }}
             >
-              <Image source={images.icListen} style={{ width: 34, height: 31 }} contentFit="contain" />
+              <Image source={images.icListen} style={{ width: 46, height: 42 }} contentFit="contain" />
               {lp ? (
-                <Svg width={40} height={40}>
-                  <G transform={`scale(${40 / PATH_BOX})`}>
+                <Svg width={56} height={56}>
+                  <G transform={`scale(${56 / PATH_BOX})`}>
                     <Path d={lp.d} fill="#2A2A33" />
                   </G>
                 </Svg>
               ) : (
-                <Text style={{ fontFamily: "Amiri_700Bold", fontSize: 32, color: "#2A2A33" }}>{letter.char}</Text>
+                <Text style={{ fontFamily: "Amiri_700Bold", fontSize: 44, color: "#2A2A33" }}>{letter.char}</Text>
               )}
             </Pressable>
             <RecordCompare letterId={letterId} onRecordedChange={setHasRecorded} />

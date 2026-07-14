@@ -18,9 +18,11 @@ import { images } from "@/lib/images";
 import { playLetter, playSfx } from "@/lib/sfx";
 
 const MAX_RECORD_MS = 3500;
-const MIC = 64; // Abdulkadir: "make the microphone larger" — ama 84'te nabız animasyonuyla alttan kesiliyordu, küçültüldü
+// Artık kendi tek-amaçlı "speak" ekranında (LetterIntro), bol boşluk var — 84'te kesilme
+// büyük harf kartıyla AYNI ekranı paylaştığı için oluyordu, o sorun artık yok, tekrar büyüttük.
+const MIC = 110;
 const MIC_ASPECT = 480 / 313; // ic_mic.webp kaynak oranı (h/w)
-const MIC_BOX = MIC + 10; // nabız animasyonunun taşması için pay (görsel kesilmeyi önler)
+const MIC_BOX = MIC + 16; // nabız animasyonunun taşması için pay (görsel kesilmeyi önler)
 
 /**
  * "Kaydet ve karşılaştır" (Sohail/Abdulkadir onayladı; Abdulkadir canlıda deneyip
@@ -158,38 +160,38 @@ export function RecordCompare({ letterId, onRecordedChange }: { letterId: number
               <Image source={images.icMic} style={{ width: MIC / MIC_ASPECT, height: MIC }} contentFit="contain" />
             </Animated.View>
           </View>
-          <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 15, color: "#34618C" }}>
+          <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 18, color: "#34618C" }}>
             {phase === "recording" ? t("intro.recording") : t("intro.recordPrompt")}
           </Text>
         </Pressable>
       )}
 
       {phase === "recorded" && (
-        <View style={{ alignItems: "center", gap: 6 }}>
+        <View style={{ alignItems: "center", gap: 10 }}>
           {/* Pırıl'ın sıcak tepkisi — yargı yok, yalnız kutlama (Abdulkadir) */}
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-            <Mascot size={44} pose="celebrate" />
-            <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 15, color: "#3FB984" }}>{t("intro.recordCheer")}</Text>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+            <Mascot size={56} pose="celebrate" />
+            <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 19, color: "#3FB984" }}>{t("intro.recordCheer")}</Text>
           </View>
 
-          <View style={{ flexDirection: "row", gap: 14 }}>
-            <Pressable onPress={playYou} style={{ alignItems: "center", gap: 3 }}>
+          <View style={{ flexDirection: "row", gap: 18 }}>
+            <Pressable onPress={playYou} style={{ alignItems: "center", gap: 4 }}>
               <View
-                style={{ width: 50, height: 50, borderRadius: 25, backgroundColor: "#FFFFFF", borderWidth: 3, borderColor: "#3FB984", alignItems: "center", justifyContent: "center", shadowColor: "#1462B5", shadowOpacity: 0.18, shadowRadius: 5, shadowOffset: { width: 0, height: 3 } }}
+                style={{ width: 62, height: 62, borderRadius: 31, backgroundColor: "#FFFFFF", borderWidth: 3, borderColor: "#3FB984", alignItems: "center", justifyContent: "center", shadowColor: "#1462B5", shadowOpacity: 0.18, shadowRadius: 5, shadowOffset: { width: 0, height: 3 } }}
               >
-                <Image source={images.icMic} style={{ width: 34 / MIC_ASPECT, height: 34 }} contentFit="contain" />
+                <Image source={images.icMic} style={{ width: 42 / MIC_ASPECT, height: 42 }} contentFit="contain" />
               </View>
-              <Text style={{ fontFamily: "Fredoka_600SemiBold", fontSize: 12, color: "#5B6470" }}>{t("intro.playYou")}</Text>
+              <Text style={{ fontFamily: "Fredoka_600SemiBold", fontSize: 14, color: "#5B6470" }}>{t("intro.playYou")}</Text>
             </Pressable>
-            <Pressable onPress={playPiril} style={{ alignItems: "center", gap: 3 }}>
-              <View style={{ width: 50, height: 50, alignItems: "center", justifyContent: "center" }}>
-                <Image source={images.icListen} style={{ width: 45, height: 41 }} contentFit="contain" />
+            <Pressable onPress={playPiril} style={{ alignItems: "center", gap: 4 }}>
+              <View style={{ width: 62, height: 62, alignItems: "center", justifyContent: "center" }}>
+                <Image source={images.icListen} style={{ width: 56, height: 51 }} contentFit="contain" />
               </View>
-              <Text style={{ fontFamily: "Fredoka_600SemiBold", fontSize: 12, color: "#5B6470" }}>{t("intro.playPiril")}</Text>
+              <Text style={{ fontFamily: "Fredoka_600SemiBold", fontSize: 14, color: "#5B6470" }}>{t("intro.playPiril")}</Text>
             </Pressable>
           </View>
-          <Pressable onPress={recordAgain} hitSlop={8} style={{ paddingVertical: 2 }}>
-            <Text style={{ fontFamily: "Fredoka_600SemiBold", fontSize: 12, color: "#7A8593" }}>{t("intro.recordAgain")}</Text>
+          <Pressable onPress={recordAgain} hitSlop={8} style={{ paddingVertical: 4 }}>
+            <Text style={{ fontFamily: "Fredoka_600SemiBold", fontSize: 14, color: "#7A8593" }}>{t("intro.recordAgain")}</Text>
           </Pressable>
         </View>
       )}
