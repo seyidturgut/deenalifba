@@ -23,6 +23,9 @@ export const LEARNING_STEPS: LearningStep[] = [
  *   word     → Kelime (harf→resim; Faz B, görseller gelince)
  *   dots     → Noktaları Ayırt Et (Abdulkadir #6: yalnız noktayla ayrılan harfler — ب/ت/ث gibi)
  *   confuseSound → Benzer Sesler (Abdulkadir #7: karıştırılan sesler — ث/ف, ق/ك gibi)
+ *   speak    → Kaydet & Karşılaştır (Abdulkadir video: dinleme/tanımadan SONRA, dersin
+ *              GERÇEK son adımı — çocuk henüz hiçbir şey öğrenmeden konuşmasını istemek
+ *              yanlıştı, artık trace+pratik+recall'dan SONRA geliyor)
  */
 export type ActivityKind =
   | "intro"
@@ -35,7 +38,8 @@ export type ActivityKind =
   | "word"
   | "dots"
   | "confuseSound"
-  | "recall";
+  | "recall"
+  | "speak";
 
 /** Tek bir Arap harfi (Harf). 28 harf — bkz. letters.ts */
 export type Letter = {

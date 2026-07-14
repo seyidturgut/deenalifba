@@ -41,6 +41,10 @@ export function buildLesson(letterId: number): ActivityKind[] {
 
   // Önceki harf varsa sonda kısa tekrar (SM-2)
   if (letterId > 1) lesson.push("recall");
+
+  // Kaydet & karşılaştır — Abdulkadir video: dinleme/yazma/pratik BİTMEDEN konuşma
+  // istenmemeli, dersin GERÇEK son adımı olsun (her harfte).
+  lesson.push("speak");
   return lesson;
 }
 
@@ -57,4 +61,5 @@ export const ACTIVITY_META: Record<ActivityKind, { labelKey: string; icon?: numb
   dots: { labelKey: "learn.dots", emoji: "🔍" },
   confuseSound: { labelKey: "learn.confuseSound", emoji: "🎧" },
   recall: { labelKey: "learn.recall", icon: images.stepRecall },
+  speak: { labelKey: "learn.speak", icon: images.icMic },
 };

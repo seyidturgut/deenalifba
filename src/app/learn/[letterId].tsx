@@ -20,6 +20,7 @@ import { FeedbackModal } from "@/components/ui/FeedbackModal";
 import { MosqueBuild } from "@/features/mosque/MosqueBuild";
 import { MosqueFinale } from "@/features/mosque/MosqueFinale";
 import { RecallGame } from "@/features/recall/RecallGame";
+import { SpeakPractice } from "@/features/speak/SpeakPractice";
 import { PaintTrace } from "@/features/trace/PaintTrace";
 import { dotSiblings, soundSiblings } from "@/data/confusables";
 import { ACTIVITY_META } from "@/data/lesson";
@@ -46,6 +47,7 @@ const HINT_KEY: Record<ActivityKind, string> = {
   dots: "learn.dotsHint",
   confuseSound: "learn.confuseSoundHint",
   recall: "learn.recallHint",
+  speak: "learn.speakHint",
 };
 
 /** Ders adımları göstergesi — değişken sayıda etkinlik (tek bir "raf" üstünde). */
@@ -306,6 +308,10 @@ export default function LearnScreen() {
       ) : kind === "recall" ? (
         <View className="flex-1 items-center justify-center">
           <RecallGame key={`recall-${id}`} letterId={id} onComplete={onCompleteStep} />
+        </View>
+      ) : kind === "speak" ? (
+        <View className="flex-1 items-center justify-center">
+          <SpeakPractice key={`speak-${id}`} letterId={id} onComplete={onCompleteStep} />
         </View>
       ) : (
         <View className="flex-1" />

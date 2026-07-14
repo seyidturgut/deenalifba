@@ -68,7 +68,8 @@
     "dots": "Dots",
     "confuseSound": "Similar Sounds",
     "recall": "Review",
-    "introHint": "Listen, then say it out loud! 👋🗣️",
+    "speak": "Speak",
+    "introHint": "Listen and meet the letter! 👂✨",
     "traceHint": "Paint the letter with your finger ✨",
     "hearTapHint": "Listen and tap the right letter 👂",
     "matchHint": "Match the same letters 🃏",
@@ -79,6 +80,7 @@
     "dotsHint": "Listen closely, they look alike! 👀",
     "confuseSoundHint": "Listen closely, they sound alike! 👂",
     "recallHint": "Let's remember the\nletters we learned",
+    "speakHint": "Now it's your turn to say it! 🎤",
     "redraw": "Redraw",
     "soon": "Coming soon ✨"
   },

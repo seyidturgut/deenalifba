@@ -68,7 +68,8 @@
     "dots": "Noktalar",
     "confuseSound": "Benzer Sesler",
     "recall": "Tekrar",
-    "introHint": "Dinle, sonra sesli söyle! 👋🗣️",
+    "speak": "Konuş",
+    "introHint": "Dinle ve harfi tanı! 👂✨",
     "traceHint": "Harfi parmağınla boya ✨",
     "hearTapHint": "Dinle ve doğru harfe dokun 👂",
     "matchHint": "Aynı harfleri eşleştir 🃏",
@@ -79,6 +80,7 @@
     "dotsHint": "Dikkatli dinle, çok benziyorlar! 👀",
     "confuseSoundHint": "Dikkatli dinle, sesleri benziyor! 👂",
     "recallHint": "Hadi eski harfleri\nhatırlayalım",
+    "speakHint": "Şimdi senin sıran, sesli söyle! 🎤",
     "redraw": "Yeniden çiz",
     "soon": "Bu oyun yakında ✨"
   },
