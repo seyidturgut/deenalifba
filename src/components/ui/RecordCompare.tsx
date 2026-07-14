@@ -144,14 +144,9 @@ export function RecordCompare({ letterId, onRecordedChange }: { letterId: number
   return (
     <View style={{ alignItems: "center", gap: 6 }}>
       {phase !== "recorded" && (
-        // Abdulkadir: büyük mikrofon + net "Senin sıran!" daveti + kayıt sırasında
-        // bariz "dinliyorum" halkası. Etiket YANDA (dikey yer tasarrufu, gerçek
-        // cihazlarda kesilme yaşanmıştı).
-        <Pressable
-          onPress={phase === "recording" ? stopRecording : startRecording}
-          hitSlop={10}
-          style={{ flexDirection: "row", alignItems: "center", gap: 12 }}
-        >
+        // Abdulkadir: mikrofon ORTADA, tek/kısa bir davet metni ALTINDA (yan yana değil) +
+        // kayıt sırasında bariz "dinliyorum" halkası.
+        <Pressable onPress={phase === "recording" ? stopRecording : startRecording} hitSlop={10} style={{ alignItems: "center", gap: 8 }}>
           <View style={{ width: MIC_BOX, height: MIC_BOX, alignItems: "center", justifyContent: "center" }}>
             {phase === "recording" && (
               <Animated.View
@@ -163,7 +158,7 @@ export function RecordCompare({ letterId, onRecordedChange }: { letterId: number
               <Image source={images.icMic} style={{ width: MIC / MIC_ASPECT, height: MIC }} contentFit="contain" />
             </Animated.View>
           </View>
-          <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 14, color: "#34618C", maxWidth: 150 }}>
+          <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 15, color: "#34618C" }}>
             {phase === "recording" ? t("intro.recording") : t("intro.recordPrompt")}
           </Text>
         </Pressable>

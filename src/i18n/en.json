@@ -96,7 +96,7 @@
   "intro": {
     "listen": "Listen",
     "continue": "I'm ready ▶",
-    "recordPrompt": "Your turn! Tap to record 🎤",
+    "recordPrompt": "Your turn! 🎤",
     "recording": "Listening…",
     "recordCheer": "Great job! 🌟",
     "playYou": "You",
