@@ -96,8 +96,11 @@ export function RecordCompare({ letterId, onRecordedChange }: { letterId: number
       haptics.tap();
       setPhase("recording");
       stopTimerRef.current = setTimeout(stopRecording, MAX_RECORD_MS);
-    } catch {
+    } catch (err) {
       // mikrofon yok/izin yok/desteklenmiyor → sessizce gizle, ana akışı bozma
+      // (console.error: chrome://inspect ile WebView'a bağlanınca GERÇEK hatayı görmek için —
+      // izin verildiği halde kayıt başlamıyorsa buradaki mesaj kök nedeni gösterir)
+      console.error("RecordCompare: kayıt başlatılamadı", err);
       setPhase("unsupported");
       onRecordedChange?.(true);
     }
@@ -121,7 +124,8 @@ export function RecordCompare({ letterId, onRecordedChange }: { letterId: number
       } else {
         setPhase("idle");
       }
-    } catch {
+    } catch (err) {
+      console.error("RecordCompare: kayıt durdurulamadı", err);
       setPhase("idle");
     }
   };
