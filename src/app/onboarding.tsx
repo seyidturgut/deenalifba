@@ -1,6 +1,6 @@
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
 import { useTranslation } from "react-i18next";
 
@@ -10,6 +10,7 @@ import { Mascot } from "@/components/ui/Mascot";
 import { SpeechBubble } from "@/components/ui/SpeechBubble";
 import { haptics } from "@/lib/haptics";
 import { images } from "@/lib/images";
+import { playNarration } from "@/lib/sfx";
 import { useSettingsStore } from "@/stores/settingsStore";
 
 /**
@@ -27,11 +28,19 @@ export default function Onboarding() {
   const setMascotName = useSettingsStore((s) => s.setMascotName);
   const setAccentColor = useSettingsStore((s) => s.setAccentColor);
   const completeOnboarding = useSettingsStore((s) => s.completeOnboarding);
+  const language = useSettingsStore((s) => s.language);
 
   const [step, setStep] = useState(0);
   const [name, setName] = useState("");
   const [buddy, setBuddy] = useState(BUDDY_NAMES[0]);
   const [accent, setAccent] = useState(ACCENTS[0]);
+
+  // Pırıl'ın sesi — camin konseptini YAZI yerine SESLE anlatsın (Abdulkadir/Sohail
+  // playtest: ebeveynler camiyi kendileri açıklamak zorunda kalıyordu).
+  useEffect(() => {
+    if (step === 0) playNarration(language, "onboarding1");
+    if (step === 1) playNarration(language, "onboarding2");
+  }, [step, language]);
 
   const finish = () => {
     if (name.trim().length > 0) setChildName(name);

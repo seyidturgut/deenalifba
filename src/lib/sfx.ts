@@ -176,6 +176,42 @@ export function stopFinaleLines() {
   });
 }
 
+// ---- Pırıl anlatımı — onboarding (cami konsepti) + cami inşa anı (Abdulkadir/Sohail
+// playtest: "parents have to explain, spoken guidance rather than text"). ElevenLabs
+// ile üretildi → sessizlikten 3'e bölündü (finale ile aynı yöntem).
+const NARRATION_SOURCES: Record<"en" | "tr", Record<"onboarding1" | "onboarding2" | "mosqueBuilt", number>> = {
+  en: {
+    onboarding1: require("@/assets/audio/voice_onboarding1_en.mp3"),
+    onboarding2: require("@/assets/audio/voice_onboarding2_en.mp3"),
+    mosqueBuilt: require("@/assets/audio/voice_mosque_built_en.mp3"),
+  },
+  tr: {
+    onboarding1: require("@/assets/audio/voice_onboarding1_tr.mp3"),
+    onboarding2: require("@/assets/audio/voice_onboarding2_tr.mp3"),
+    mosqueBuilt: require("@/assets/audio/voice_mosque_built_tr.mp3"),
+  },
+};
+
+const narrationPlayers: Partial<Record<string, AudioPlayer>> = {};
+
+/** Pırıl'ın anlatım repliğini (`key`) `lang` dilinde çalar. */
+export function playNarration(lang: "en" | "tr", key: "onboarding1" | "onboarding2" | "mosqueBuilt", volume = 1) {
+  if (!soundOn()) return;
+  try {
+    const cacheKey = `${lang}_${key}`;
+    let p = narrationPlayers[cacheKey];
+    if (!p) {
+      p = createAudioPlayer(NARRATION_SOURCES[lang][key]);
+      narrationPlayers[cacheKey] = p;
+    }
+    p.volume = volume;
+    p.seekTo(0);
+    p.play();
+  } catch {
+    // ses kullanılamıyorsa sessizce geç
+  }
+}
+
 // ---- Arka plan müziği (dikişsiz loop, kısık) ----
 let music: AudioPlayer | null = null;
 
