@@ -149,7 +149,7 @@ export function MosqueBuild({
           ]}
         >
           <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 20, color: "#208AEF", textAlign: "center", marginBottom: 6 }}>
-            {t("mosque.building")}
+            {built ? t("mosque.builtCheer") : t("mosque.building")}
           </Text>
           <View style={{ width: BOX, height: BOX, alignItems: "center", justifyContent: "center" }}>
             {/* sıcak parıltı (inşa anı) */}
