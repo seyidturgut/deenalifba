@@ -27,7 +27,10 @@ import { useStageStore } from "@/stores/stageStore";
  * Başta el işareti kısa bir karalama demosu yapar (okuma gerektirmez).
  */
 const PAINT_R = 72; // boya damlası yarıçapı (glif birimi)
-const COVER_R = 100; // ilerleme sayımı yarıçapı (biraz cömert)
+// Abdulkadir/Sohail (playtest): harf bazen çocuk tam çizmeden kendiliğinden doluyordu —
+// COVER_R çok cömertti (100), her dokunuş çok geniş bir alanı "kapatıyordu". Küçültüldü;
+// hâlâ ceza YOK, hâlâ küçük çocuklar için serbestlik var, sadece gerçek iz sürme gerekiyor.
+const COVER_R = 78; // ilerleme sayımı yarıçapı
 const MIN_DIST = 30; // kaydedilen iki nokta arası min mesafe (glif birimi)
 const DONE_RATIO = 0.85;
 

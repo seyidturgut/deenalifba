@@ -179,15 +179,26 @@ export default function LearnScreen() {
 
   const onCompleteStep = () => {
     haptics.success();
-    const advanced = nextStep();
-    if (advanced) {
-      playSfx("step_complete");
+    // Sohail (playtest raporu): aktiviteler bitince bir sonrakine geçiş çok hızlıydı,
+    // çocuk başarıyı fark edecek zaman bulamıyordu. Her mini-oyun zaten kendi içinde
+    // ~650-900ms'lik bir "doğru!" payı bırakıp onComplete'i SONRA çağırıyor — ama o an
+    // hemen adım değişince kutlama (cheer) artık DEĞİŞMİŞ yeni ekranın üzerinde oynuyordu.
+    // Kutlamayı hâlâ görünen (bitmiş) ekranın üzerinde hemen başlat, adım değişimini/StepBar
+    // güncellemesini kısa bir gecikmeyle yap → kutlama gerçek bir "durak" hissi versin.
+    const willAdvance = activeIndex < activities.length - 1;
+    if (willAdvance) {
       useStageStore.getState().cheer(); // ara adımda HAFİF sevinç (büyük "Great Job!" değil — yanıltmasın)
-    } else {
-      completeLetter(id);
-      useStreakStore.getState().recordPractice(Date.now()); // bugünü zincire ekle (istikamet)
-      setCelebrate(true);
     }
+    setTimeout(() => {
+      const advanced = nextStep();
+      if (advanced) {
+        playSfx("step_complete");
+      } else {
+        completeLetter(id);
+        useStreakStore.getState().recordPractice(Date.now()); // bugünü zincire ekle (istikamet)
+        setCelebrate(true);
+      }
+    }, 450);
   };
 
   if (!letter) {
