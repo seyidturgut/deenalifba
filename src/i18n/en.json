@@ -98,6 +98,7 @@
   "intro": {
     "listen": "Listen",
     "continue": "I'm ready ▶",
+    "speakDemo": "Watch how Pırıl says it!",
     "recordPrompt": "Your turn! 🎤",
     "recording": "Listening…",
     "recordCheer": "Great job! 🌟",

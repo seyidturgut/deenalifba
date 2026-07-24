@@ -1,15 +1,18 @@
 import { Image } from "expo-image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import Svg, { G, Path } from "react-native-svg";
 import { useTranslation } from "react-i18next";
 
 import { JuicyButton } from "@/components/ui/JuicyButton";
+import { Mascot } from "@/components/ui/Mascot";
 import { RecordCompare } from "@/components/ui/RecordCompare";
 import { getLetter } from "@/data/letters";
 import { getLetterPath, PATH_BOX } from "@/data/letterPaths";
 import { images } from "@/lib/images";
 import { playLetter } from "@/lib/sfx";
+
+const DEMO_MS = 1600; // Pırıl'ın "önce ben söyleyeyim" anını gösterme süresi
 
 /**
  * "Konuş" (kaydet & karşılaştır) adımı — dersin GERÇEK son adımı (Abdulkadir video
@@ -18,12 +21,27 @@ import { playLetter } from "@/lib/sfx";
  *
  * Kendi tek-amaçlı ekranı: küçük "tekrar dinle" hapı + mikrofon ortada + tek kısa
  * davet metni altında (Abdulkadir: kalabalık/scroll gerektiren tek ekran yerine sade).
+ *
+ * Sohail (playtest): "sudden context switch" — çocuk boya/dokun/sürükle gibi
+ * aktivitelerden aniden "şimdi konuş"a geçiyordu. Önce Pırıl KENDİSİ harfi söyler
+ * (konuşma pozu + otomatik ses), mikrofon o kısa "demo" anından SONRA ortaya çıkar.
  */
 export function SpeakPractice({ letterId, onComplete }: { letterId: number; onComplete: () => void }) {
   const { t } = useTranslation();
   const letter = getLetter(letterId);
   const lp = getLetterPath(letterId);
   const [hasRecorded, setHasRecorded] = useState(false);
+  const [demoing, setDemoing] = useState(true);
+
+  useEffect(() => {
+    setDemoing(true);
+    const playTt = setTimeout(() => playLetter(letterId), 300);
+    const revealTt = setTimeout(() => setDemoing(false), DEMO_MS);
+    return () => {
+      clearTimeout(playTt);
+      clearTimeout(revealTt);
+    };
+  }, [letterId]);
 
   if (!letter) return null;
 
@@ -45,9 +63,17 @@ export function SpeakPractice({ letterId, onComplete }: { letterId: number; onCo
         )}
       </Pressable>
 
-      <RecordCompare letterId={letterId} onRecordedChange={setHasRecorded} />
+      {demoing ? (
+        // Pırıl önce kendisi söyler — mikrofon henüz yok, "aniden konuş" hissi olmasın
+        <View style={{ alignItems: "center", gap: 10 }}>
+          <Mascot size={72} pose="point" talking />
+          <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 16, color: "#34618C" }}>{t("intro.speakDemo")}</Text>
+        </View>
+      ) : (
+        <RecordCompare letterId={letterId} onRecordedChange={setHasRecorded} />
+      )}
 
-      <JuicyButton label={t("intro.continue")} tone="success" onPress={onComplete} disabled={!hasRecorded} />
+      <JuicyButton label={t("intro.continue")} tone="success" onPress={onComplete} disabled={demoing || !hasRecorded} />
     </View>
   );
 }

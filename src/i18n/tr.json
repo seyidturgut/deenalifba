@@ -98,6 +98,7 @@
   "intro": {
     "listen": "Dinle",
     "continue": "Hazırım ▶",
+    "speakDemo": "Pırıl nasıl söylüyor, dinle!",
     "recordPrompt": "Sırası sende! 🎤",
     "recording": "Dinliyorum…",
     "recordCheer": "Harikasın! 🌟",
