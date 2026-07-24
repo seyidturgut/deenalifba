@@ -1,12 +1,12 @@
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Pressable, ScrollView, Switch, Text, View } from "react-native";
+import { Pressable, ScrollView, Switch, Text, TextInput, View } from "react-native";
 import { useTranslation } from "react-i18next";
 
 import { GradientBg } from "@/components/ui/GradientBg";
 import { JuicyButton } from "@/components/ui/JuicyButton";
 import { ParentGate } from "@/features/parent-gate/ParentGate";
-import { LETTERS } from "@/data/letters";
+import { LETTERS, TOTAL_LETTERS } from "@/data/letters";
 import type { AppLanguage } from "@/i18n";
 import { resetAllProgress } from "@/lib/reset";
 import { playSfx, syncMusicWithSetting } from "@/lib/sfx";
@@ -62,12 +62,25 @@ export default function Settings() {
   const [showGate, setShowGate] = useState(false);
   const [parentUnlocked, setParentUnlocked] = useState(false);
   const [showReset, setShowReset] = useState(false);
+  const [jumpValue, setJumpValue] = useState("");
 
   const doNewGame = () => {
     resetAllProgress();
     playSfx("ui_tap");
     setShowReset(false);
     router.replace("/onboarding");
+  };
+
+  // Test/QA aracı — harf harf ilerleme/kilit beklemeden herhangi bir harfe git
+  // (Abdulkadir: 28 harfin telaffuzunu tek tek kontrol etmesi gerekiyordu; freemium
+  // kilidi zaten yalnız Harfler listesindeki dokunmayı kısıtlıyor, /learn/[id] rotasının
+  // kendisi kilitsiz — ama APK'da (WebView kabuğu) adres çubuğu yok, URL yazılamıyor).
+  const jumpToLetter = () => {
+    const n = Math.round(Number(jumpValue));
+    if (!n || n < 1 || n > TOTAL_LETTERS) return;
+    playSfx("ui_tap");
+    setJumpValue("");
+    router.push(`/learn/${n}`);
   };
 
   const language = useSettingsStore((s) => s.language);
@@ -167,6 +180,27 @@ export default function Settings() {
           {APP_VERSION_LABEL}
         </Text>
         <JuicyButton label={t("settings.replayIntro")} tone="accent" onPress={() => router.push("/onboarding")} />
+
+        {/* Harfe Atla (test/QA) — kilit/ilerleme beklemeden herhangi bir harfe git */}
+        <View className="rounded-2xl bg-white px-5 py-4" style={cardStyle}>
+          <Text className="text-lg font-bold text-ink">{t("settings.jumpToLetter")}</Text>
+          <View className="mt-3 flex-row items-center gap-3">
+            <TextInput
+              className="w-20 rounded-full border-2 border-primary-soft bg-canvas px-3 py-2 text-center text-xl font-bold"
+              keyboardType="number-pad"
+              value={jumpValue}
+              onChangeText={setJumpValue}
+              placeholder={`1-${TOTAL_LETTERS}`}
+              maxLength={2}
+              onSubmitEditing={jumpToLetter}
+              accessibilityLabel={t("settings.jumpToLetter")}
+            />
+            <View className="flex-1">
+              <JuicyButton label={t("settings.jumpGo")} tone="primary" onPress={jumpToLetter} />
+            </View>
+          </View>
+        </View>
+
         {/* Yeni Oyun (test) — onaylı; tüm ilerlemeyi sıfırlar, onboarding'den başlar */}
         <JuicyButton label={t("settings.newGame")} tone="primary" onPress={() => { playSfx("ui_tap"); setShowReset(true); }} />
         <JuicyButton label={t("common.close")} tone="primary" onPress={() => router.back()} />

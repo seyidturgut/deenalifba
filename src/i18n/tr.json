@@ -166,6 +166,8 @@
     "parentAreaUnlocked": "🔓 Açık — abonelik yakında eklenecek.",
     "parentLogin": "Ebeveyn Girişi 🔒",
     "replayIntro": "Tanıtımı tekrar izle ▶",
+    "jumpToLetter": "Harfe Atla (test)",
+    "jumpGo": "Git ▶",
     "newGame": "Yeni Oyun 🔄",
     "resetTitle": "Yeni oyun başlat?",
     "resetBody": "Tüm ilerleme silinir ve uygulama baştan (tanıtımdan) başlar. (Test için.)",

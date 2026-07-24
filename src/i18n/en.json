@@ -166,6 +166,8 @@
     "parentAreaUnlocked": "🔓 Unlocked — subscription coming soon.",
     "parentLogin": "Parent Login 🔒",
     "replayIntro": "Watch intro again ▶",
+    "jumpToLetter": "Jump to letter (test)",
+    "jumpGo": "Go ▶",
     "newGame": "New Game 🔄",
     "resetTitle": "Start a new game?",
     "resetBody": "All progress is erased and the app starts from the beginning (onboarding). For testing.",
