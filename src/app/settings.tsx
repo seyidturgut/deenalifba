@@ -15,6 +15,9 @@ import { useProgressStore } from "@/stores/progressStore";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { useStreakStore } from "@/stores/streakStore";
 
+/** Ekip test kodu — Sohail/Abdulkadir/Oliver'a ayrıca iletilir (çocuk bilmez). */
+const TEAM_UNLOCK_CODE = "DEEN2026";
+
 /** Ebeveyn haftalık özeti (İstikamet Zinciri Faz 3a) — kapı arkasında, ekran-görüntüsü alınası. */
 function ParentSummary() {
   const { t } = useTranslation();
@@ -63,6 +66,10 @@ export default function Settings() {
   const [parentUnlocked, setParentUnlocked] = useState(false);
   const [showReset, setShowReset] = useState(false);
   const [jumpValue, setJumpValue] = useState("");
+  // Ekip test kodu — çocuk kazara tüm bölümleri açmasın (kullanıcı ekibe iletecek)
+  const [showUnlock, setShowUnlock] = useState(false);
+  const [unlockCode, setUnlockCode] = useState("");
+  const [unlockErr, setUnlockErr] = useState(false);
 
   const doNewGame = () => {
     resetAllProgress();
@@ -201,6 +208,14 @@ export default function Settings() {
           </View>
         </View>
 
+        {/* Tüm bölümleri aç (test) — ekip sonraki bölümleri denemek için 28'i beklemesin.
+            Koda bağlı: çocuk kazara açıp tüm ilerlemeyi atlamasın. */}
+        <JuicyButton
+          label={t("settings.unlockAll")}
+          tone="accent"
+          onPress={() => { playSfx("ui_tap"); setUnlockCode(""); setUnlockErr(false); setShowUnlock(true); }}
+        />
+
         {/* Yeni Oyun (test) — onaylı; tüm ilerlemeyi sıfırlar, onboarding'den başlar */}
         <JuicyButton label={t("settings.newGame")} tone="primary" onPress={() => { playSfx("ui_tap"); setShowReset(true); }} />
         <JuicyButton label={t("common.close")} tone="primary" onPress={() => router.back()} />
@@ -230,6 +245,48 @@ export default function Settings() {
           {/* Kapat — proje buton tasarımı (JuicyButton) */}
           <View style={{ width: "100%", maxWidth: 360, alignSelf: "center" }}>
             <JuicyButton label={t("common.cancel")} tone="primary" onPress={() => setShowGate(false)} />
+          </View>
+        </View>
+      )}
+
+      {/* Ekip test kodu — "Tüm Bölümleri Aç" için */}
+      {showUnlock && (
+        <View
+          style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "#0B3566", paddingHorizontal: 24, alignItems: "center", justifyContent: "center" }}
+        >
+          <View style={{ width: "100%", maxWidth: 360, gap: 14 }}>
+            <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 22, color: "white", textAlign: "center" }}>
+              {t("settings.unlockAllTitle")}
+            </Text>
+            <Text style={{ fontFamily: "Nunito_700Bold", fontSize: 14, color: "rgba(255,255,255,0.8)", textAlign: "center" }}>
+              {t("settings.unlockAllBody")}
+            </Text>
+            <TextInput
+              value={unlockCode}
+              onChangeText={(v) => { setUnlockCode(v); setUnlockErr(false); }}
+              placeholder={t("settings.unlockAllPlaceholder")}
+              placeholderTextColor="#A9B4C2"
+              autoCapitalize="characters"
+              autoCorrect={false}
+              style={{ height: 52, borderRadius: 16, borderWidth: 2, borderColor: unlockErr ? "#F0645A" : "#E2E8F0", backgroundColor: "#fff", paddingHorizontal: 14, fontFamily: "Fredoka_700Bold", fontSize: 18, color: "#34414F", textAlign: "center" }}
+            />
+            {unlockErr && (
+              <Text style={{ fontFamily: "Nunito_700Bold", fontSize: 14, color: "#FFC9C4", textAlign: "center" }}>
+                {t("parentGate.wrong")}
+              </Text>
+            )}
+            <JuicyButton
+              label={t("settings.unlockAllConfirm")}
+              tone="accent"
+              onPress={() => {
+                if (unlockCode.trim().toUpperCase() !== TEAM_UNLOCK_CODE) { setUnlockErr(true); return; }
+                playSfx("ui_tap");
+                useProgressStore.getState().unlockAllForTesting();
+                setShowUnlock(false);
+                router.replace("/home");
+              }}
+            />
+            <JuicyButton label={t("common.cancel")} tone="primary" onPress={() => setShowUnlock(false)} />
           </View>
         </View>
       )}

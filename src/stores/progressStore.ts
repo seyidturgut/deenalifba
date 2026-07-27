@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
+import { LETTERS } from "@/data/letters";
 import { LEARNING_STEPS, type LearningStep } from "@/data/types";
 import { zustandMMKVStorage } from "@/db/storage";
 
@@ -28,6 +29,8 @@ type ProgressState = {
   completeLetter: (letterId: number) => void;
   isLetterComplete: (letterId: number) => boolean;
   unlockLetter: (letterId: number, now: number, countsAsDaily: boolean) => void;
+  /** TEST/QA: 28 harfin tamamını açar ve tamamlanmış işaretler (Ayarlar — ekip için). */
+  unlockAllForTesting: () => void;
   /** Tüm ilerlemeyi başa al (Ayarlar "Yeni Oyun" — test). */
   reset: () => void;
 };
@@ -71,6 +74,13 @@ export const useProgressStore = create<ProgressState>()(
             : [...s.unlockedLetters, letterId],
           lastDailyUnlockAt: countsAsDaily ? now : s.lastDailyUnlockAt,
         })),
+
+      // TEST/QA (Sohail/Abdulkadir/Oliver): sonraki bölümleri denemek için 28'i beklemek
+      // zorunda kalmasınlar. Yalnız Ayarlar'daki test aracından çağrılır.
+      unlockAllForTesting: () => {
+        const all = LETTERS.map((l) => l.id);
+        set({ completedLetters: all, unlockedLetters: all });
+      },
 
       reset: () => set({ completedSteps: {}, completedLetters: [], unlockedLetters: [1], lastDailyUnlockAt: null }),
     }),

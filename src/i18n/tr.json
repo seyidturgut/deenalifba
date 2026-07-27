@@ -188,7 +188,12 @@
     "weekDays": "7 günün {{n}}'inde pratik 🌙",
     "chainCurrent": "Güncel zincir: {{n}} gün",
     "chainBest": "En iyi zincir: {{n}} gün",
-    "lettersLearnedP": "Öğrenilen harf: {{n}}/{{total}}"
+    "lettersLearnedP": "Öğrenilen harf: {{n}}/{{total}}",
+    "unlockAll": "Tüm Bölümleri Aç (test) 🔓",
+    "unlockAllTitle": "Ekip Test Kodu 🔓",
+    "unlockAllBody": "Tüm harfleri tamamlanmış işaretler ve sonraki bölümleri açar. (Yalnız test içindir.)",
+    "unlockAllPlaceholder": "Kodu gir",
+    "unlockAllConfirm": "Aç"
   },
   "a11y": {
     "musicToggle": "Müzik aç/kapat",

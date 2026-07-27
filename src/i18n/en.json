@@ -188,7 +188,12 @@
     "weekDays": "Practised {{n}} of 7 days 🌙",
     "chainCurrent": "Current chain: {{n}} days",
     "chainBest": "Best chain: {{n}} days",
-    "lettersLearnedP": "Letters learned: {{n}}/{{total}}"
+    "lettersLearnedP": "Letters learned: {{n}}/{{total}}",
+    "unlockAll": "Unlock all levels (test) 🔓",
+    "unlockAllTitle": "Team Test Code 🔓",
+    "unlockAllBody": "Marks all letters complete and opens the later chapters. (Testing only.)",
+    "unlockAllPlaceholder": "Enter code",
+    "unlockAllConfirm": "Unlock"
   },
   "a11y": {
     "musicToggle": "Toggle music",
