@@ -19,7 +19,7 @@ import { GradientBg } from "@/components/ui/GradientBg";
 import { Mascot } from "@/components/ui/Mascot";
 import { StarBadge } from "@/components/ui/StarBadge";
 import { LETTERS } from "@/data/letters";
-import { getLetterForms, PATH_BOX } from "@/data/letterForms";
+
 import type { Letter } from "@/data/types";
 import { images } from "@/lib/images";
 import { playSfx, syncMusicWithSetting } from "@/lib/sfx";
@@ -229,7 +229,8 @@ function StageGate({
   goalLabel,
   onPress,
   subtitle,
-  chapterGlyph,
+  levelNo,
+  isChapter,
 }: {
   cx: number;
   cy: number;
@@ -240,8 +241,11 @@ function StageGate({
   goalLabel: string;
   onPress?: () => void;
   subtitle?: string;
-  /** Açık bölümde kart içinde gösterilecek normalize glif path'i (emoji yerine) */
-  chapterGlyph?: string;
+  /** Haritadaki sıra numarası — 28 harften SONRA da kesintisiz devam eder (29, 30…).
+      Çocuk okuma bilmiyor; soyut glif/emoji ona hiçbir şey anlatmıyor, sayı anlatıyor. */
+  levelNo?: number;
+  /** Gerçek (oynanabilir) bölüm mü — yeşil kart ile gösterilir */
+  isChapter?: boolean;
 }) {
   const W = NODE + 44;
   const open = !!onPress;
@@ -251,7 +255,7 @@ function StageGate({
       {goal && (
         <View style={{ position: "absolute", top: NODE * 0.04, width: NODE * 0.96, height: NODE * 0.96, borderRadius: NODE * 0.48, backgroundColor: "#F5C451", opacity: 0.3 }} />
       )}
-      {chapterGlyph ? (
+      {isChapter ? (
         /* Gerçek bir bölüm (yalnız "Yakında" değil) — harf seviyeleriyle AYNI kart dili,
            ayrışsın diye yeşil çerçeve. Kilitliyse aynı kart soluk + kilit rozetiyle
            gösterilir: çocuk hedefi baştan görür, bulut olarak "sıradan" görünmez. */
@@ -268,11 +272,9 @@ function StageGate({
           >
             {/* Metin glifi yerine normalize SVG path — Amiri metin glifleri kutuda
                 kayıyor/küçük kalıyor (LetterIntro'da da bu yüzden path kullanılıyor). */}
-            <Svg width={innerSize * 0.92} height={innerSize * 0.92}>
-              <G transform={`scale(${(innerSize * 0.92) / PATH_BOX})`}>
-                <Path d={chapterGlyph} fill="#2E7D5B" />
-              </G>
-            </Svg>
+            <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: innerSize * 0.5, color: "#2E7D5B", textAlign: "center" }}>
+              {levelNo}
+            </Text>
           </View>
           {!open && (
             <Image source={images.icLock} style={{ position: "absolute", right: 2, top: 2, width: 28, height: 28 }} contentFit="contain" />
@@ -281,7 +283,22 @@ function StageGate({
       ) : (
         <View style={{ width: NODE, height: NODE * 0.82, alignItems: "center", justifyContent: "center" }}>
           <Image source={images.nodeCloud} style={{ position: "absolute", width: NODE + 14, height: NODE * 0.78, opacity: goal ? 1 : 0.92 }} contentFit="contain" />
-          <Text style={{ fontSize: goal ? 38 : 30, opacity: goal ? 1 : 0.82 }}>{emoji}</Text>
+          {goal ? (
+            <Text style={{ fontSize: 38 }}>{emoji}</Text>
+          ) : (
+            <Text
+              style={{
+                fontFamily: "Fredoka_700Bold",
+                fontSize: NODE * 0.3,
+                color: "#8FA0B2",
+                textShadowColor: "rgba(255,255,255,0.95)",
+                textShadowOffset: { width: 0, height: 1 },
+                textShadowRadius: 3,
+              }}
+            >
+              {levelNo}
+            </Text>
+          )}
           <Image source={images.icLock} style={{ position: "absolute", right: NODE * 0.1, top: NODE * 0.04, width: 26, height: 26, opacity: 0.9 }} contentFit="contain" />
         </View>
       )}
@@ -545,7 +562,8 @@ export default function Home() {
                 soon={s.route && !allLettersDone ? t("forms.locked") : t("journey.soon")}
                 goalLabel={t("journey.goalLabel")}
                 subtitle={t("forms.progress", { n: formsDone, total: LETTERS.length })}
-                chapterGlyph={s.route ? getLetterForms(2)?.paths.medial : undefined}
+                levelNo={LETTERS.length + stageNodes.indexOf(s) + 1}
+                isChapter={!!s.route}
                 onPress={playable ? () => { playSfx("ui_tap"); router.push(s.route as any); } : undefined}
               />
             );
