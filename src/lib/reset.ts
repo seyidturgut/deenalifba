@@ -1,3 +1,4 @@
+import { useFormsStore } from "@/stores/formsStore";
 import { useMosqueStore } from "@/stores/mosqueStore";
 import { useProgressStore } from "@/stores/progressStore";
 import { useSettingsStore } from "@/stores/settingsStore";
@@ -17,5 +18,6 @@ export function resetAllProgress() {
   useSrsStore.getState().reset();
   useStreakStore.getState().reset();
   useMosqueStore.getState().reset();
+  useFormsStore.getState().reset();
   useSettingsStore.getState().resetForNewGame();
 }

@@ -209,6 +209,13 @@
     "surahs": "Sureler",
     "salah": "Namaz",
     "goalLabel": "HEDEF",
-    "soon": "Yakında"
+    "soon": "Yakında",
+    "letterForms": "Harf Tanıma"
+  },
+  "forms": {
+    "prompt": "Aynı harfin başka hâli hangisi?",
+    "progress": "{{n}} / {{total}} harf",
+    "chapterDone": "Maşallah! Artık harfleri kelime içinde de tanıyorsun! 🌟",
+    "locked": "Önce 28 harfi bitir"
   }
 }

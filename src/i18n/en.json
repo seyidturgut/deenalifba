@@ -209,6 +209,13 @@
     "surahs": "Surahs",
     "salah": "Salah",
     "goalLabel": "GOAL",
-    "soon": "Coming Soon"
+    "soon": "Coming Soon",
+    "letterForms": "Letter Forms"
+  },
+  "forms": {
+    "prompt": "Which one is the same letter?",
+    "progress": "{{n}} / {{total}} letters",
+    "chapterDone": "Maa shaa Allah! You can now spot letters inside words! 🌟",
+    "locked": "Finish the 28 letters first"
   }
 }

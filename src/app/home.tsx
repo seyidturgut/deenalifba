@@ -22,6 +22,7 @@ import { LETTERS } from "@/data/letters";
 import type { Letter } from "@/data/types";
 import { images } from "@/lib/images";
 import { playSfx, syncMusicWithSetting } from "@/lib/sfx";
+import { useFormsStore } from "@/stores/formsStore";
 import { useProgressStore } from "@/stores/progressStore";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { useStreakStore } from "@/stores/streakStore";
@@ -34,7 +35,11 @@ let lastSeenActiveIndex: number | null = null;
 
 // 28 harften sonraki BÜYÜK yolculuk aşamaları (kilitli, gelecek) — Elif'ten Namaz'a.
 // Haritada görünür → "28 harf" değil, hedefin Namaz olduğu bir macera hissi (Sohail #7).
-const JOURNEY_STAGES: { key: string; emoji: string; goal?: boolean }[] = [
+const JOURNEY_STAGES: { key: string; emoji: string; goal?: boolean; route?: string }[] = [
+  // Harf Tanıma — Abdulkadir'in müfredat önerisi: Harakat'tan ÖNCE gelmeli, çünkü çocuk
+  // harfi izole bilse de kelime içinde şekil değiştiği için tanıyamıyor. OYNANABİLİR
+  // (28 harf bitince açılır); diğerleri hâlâ kilitli/"Yakında".
+  { key: "letterForms", emoji: "🔤", route: "/forms" },
   { key: "harakat", emoji: "ﹶ" },
   { key: "joining", emoji: "🔗" },
   { key: "words", emoji: "📖" },
@@ -207,29 +212,68 @@ function BottomNav() {
   );
 }
 
-/** İleriki yolculuk aşaması — kilitli ama GÖRÜNÜR (merak uyandırır). goal=Namaz (hedef). */
-function StageGate({ cx, cy, emoji, name, goal, soon, goalLabel }: { cx: number; cy: number; emoji: string; name: string; goal?: boolean; soon: string; goalLabel: string }) {
+/**
+ * İleriki yolculuk aşaması. Çoğu kilitli ama GÖRÜNÜR (merak uyandırır); goal=Namaz (hedef).
+ * `onPress` verilirse aşama OYNANABİLİR demektir (kilit rozeti yok, "Yakında" yerine kendi
+ * durumu) — şu an yalnız "Harf Tanıma" böyle (28 harf bitince açılır).
+ */
+function StageGate({
+  cx,
+  cy,
+  emoji,
+  name,
+  goal,
+  soon,
+  goalLabel,
+  onPress,
+  subtitle,
+}: {
+  cx: number;
+  cy: number;
+  emoji: string;
+  name: string;
+  goal?: boolean;
+  soon: string;
+  goalLabel: string;
+  onPress?: () => void;
+  subtitle?: string;
+}) {
   const W = NODE + 44;
-  return (
-    <View pointerEvents="none" style={{ position: "absolute", left: cx - W / 2, top: cy - NODE / 2, width: W, alignItems: "center" }}>
-      {goal && (
-        <View style={{ position: "absolute", top: NODE * 0.04, width: NODE * 0.96, height: NODE * 0.96, borderRadius: NODE * 0.48, backgroundColor: "#F5C451", opacity: 0.3 }} />
+  const open = !!onPress;
+  const body = (
+    <>
+      {(goal || open) && (
+        <View style={{ position: "absolute", top: NODE * 0.04, width: NODE * 0.96, height: NODE * 0.96, borderRadius: NODE * 0.48, backgroundColor: open ? "#3FB984" : "#F5C451", opacity: 0.3 }} />
       )}
       <View style={{ width: NODE, height: NODE * 0.82, alignItems: "center", justifyContent: "center" }}>
-        <Image source={images.nodeCloud} style={{ position: "absolute", width: NODE + 14, height: NODE * 0.78, opacity: goal ? 1 : 0.92 }} contentFit="contain" />
-        <Text style={{ fontSize: goal ? 38 : 30, opacity: goal ? 1 : 0.82 }}>{emoji}</Text>
-        {/* kilit rozeti */}
-        <Image source={images.icLock} style={{ position: "absolute", right: NODE * 0.1, top: NODE * 0.04, width: 26, height: 26, opacity: 0.9 }} contentFit="contain" />
+        <Image source={images.nodeCloud} style={{ position: "absolute", width: NODE + 14, height: NODE * 0.78, opacity: goal || open ? 1 : 0.92 }} contentFit="contain" />
+        <Text style={{ fontSize: goal ? 38 : 30, opacity: goal || open ? 1 : 0.82 }}>{emoji}</Text>
+        {!open && (
+          <Image source={images.icLock} style={{ position: "absolute", right: NODE * 0.1, top: NODE * 0.04, width: 26, height: 26, opacity: 0.9 }} contentFit="contain" />
+        )}
       </View>
       <Text
         numberOfLines={1}
-        style={{ fontFamily: "Fredoka_700Bold", fontSize: goal ? 15 : 13, color: goal ? "#C77F12" : "#7C8A99", marginTop: 1, textShadowColor: "rgba(255,255,255,0.9)", textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 3 }}
+        style={{ fontFamily: "Fredoka_700Bold", fontSize: goal ? 15 : 13, color: goal ? "#C77F12" : open ? "#2E7D5B" : "#7C8A99", marginTop: 1, textShadowColor: "rgba(255,255,255,0.9)", textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 3 }}
       >
         {name}
       </Text>
-      <Text style={{ fontFamily: "Nunito_700Bold", fontSize: 10, color: goal ? "#D98A1E" : "#A9B4C2", letterSpacing: goal ? 1 : 0 }}>
-        {goal ? goalLabel : soon}
+      <Text style={{ fontFamily: "Nunito_700Bold", fontSize: 10, color: goal ? "#D98A1E" : open ? "#3FB984" : "#A9B4C2", letterSpacing: goal ? 1 : 0 }}>
+        {goal ? goalLabel : open ? subtitle : soon}
       </Text>
+    </>
+  );
+
+  if (open) {
+    return (
+      <Pressable onPress={onPress} style={{ position: "absolute", left: cx - W / 2, top: cy - NODE / 2, width: W, alignItems: "center" }}>
+        {body}
+      </Pressable>
+    );
+  }
+  return (
+    <View pointerEvents="none" style={{ position: "absolute", left: cx - W / 2, top: cy - NODE / 2, width: W, alignItems: "center" }}>
+      {body}
     </View>
   );
 }
@@ -244,6 +288,9 @@ export default function Home() {
   const musicEnabled = useSettingsStore((s) => s.musicEnabled);
   const unlocked = useProgressStore((s) => s.unlockedLetters);
   const isLetterComplete = useProgressStore((s) => s.isLetterComplete);
+  // Harf Tanıma bölümü (Abdulkadir) — 28 harf bitince açılır
+  const allLettersDone = useProgressStore((s) => LETTERS.every((l) => s.isLetterComplete(l.id)));
+  const formsDone = useFormsStore((s) => s.completed.length);
   const scrollRef = useRef<any>(null);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
 
@@ -451,18 +498,24 @@ export default function Home() {
           ))}
 
           {/* 28 harften sonra: büyük yolculuğun ileriki aşamaları (kilitli, görünür) */}
-          {stageNodes.map((s) => (
-            <StageGate
-              key={s.key}
-              cx={s.cx}
-              cy={s.cy}
-              emoji={s.emoji}
-              name={t(`journey.${s.key}`)}
-              goal={s.goal}
-              soon={t("journey.soon")}
-              goalLabel={t("journey.goalLabel")}
-            />
-          ))}
+          {stageNodes.map((s) => {
+            // Oynanabilir aşama (şu an yalnız Harf Tanıma) — ama 28 harf bitmeden kilitli kalır
+            const playable = !!s.route && allLettersDone;
+            return (
+              <StageGate
+                key={s.key}
+                cx={s.cx}
+                cy={s.cy}
+                emoji={s.emoji}
+                name={t(`journey.${s.key}`)}
+                goal={s.goal}
+                soon={s.route && !allLettersDone ? t("forms.locked") : t("journey.soon")}
+                goalLabel={t("journey.goalLabel")}
+                subtitle={t("forms.progress", { n: formsDone, total: LETTERS.length })}
+                onPress={playable ? () => { playSfx("ui_tap"); router.push(s.route as any); } : undefined}
+              />
+            );
+          })}
 
           {/* Rehber Hüdhüd — aktif seviyenin YANINDA; seviye bitince yenisine UÇAR */}
           {activeNode && (
