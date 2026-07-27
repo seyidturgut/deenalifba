@@ -255,11 +255,11 @@ function StageGate({
       {goal && (
         <View style={{ position: "absolute", top: NODE * 0.04, width: NODE * 0.96, height: NODE * 0.96, borderRadius: NODE * 0.48, backgroundColor: "#F5C451", opacity: 0.3 }} />
       )}
-      {isChapter ? (
-        /* Gerçek bir bölüm (yalnız "Yakında" değil) — harf seviyeleriyle AYNI kart dili,
-           ayrışsın diye yeşil çerçeve. Kilitliyse aynı kart soluk + kilit rozetiyle
-           gösterilir: çocuk hedefi baştan görür, bulut olarak "sıradan" görünmez. */
-        <View style={{ width: NODE, height: NODE, alignItems: "center", justifyContent: "center", opacity: open ? 1 : 0.55 }}>
+      {isChapter && open ? (
+        /* AÇIK bölüm — harf seviyeleriyle AYNI kart dili, ayrışsın diye yeşil çerçeve.
+           (Kilitliyken kart soluklaştırılıp gösterilmez — amatör duruyordu; kilitli her
+           şey diğer aşamalarla aynı bulut dilinde kalır, açılınca kart gelir.) */
+        <View style={{ width: NODE, height: NODE, alignItems: "center", justifyContent: "center" }}>
           <Image source={images.nodeTileChapter} style={{ position: "absolute", width: NODE, height: NODE }} contentFit="contain" />
           <View
             style={{
@@ -276,9 +276,6 @@ function StageGate({
               {levelNo}
             </Text>
           </View>
-          {!open && (
-            <Image source={images.icLock} style={{ position: "absolute", right: 2, top: 2, width: 28, height: 28 }} contentFit="contain" />
-          )}
         </View>
       ) : (
         <View style={{ width: NODE, height: NODE * 0.82, alignItems: "center", justifyContent: "center" }}>

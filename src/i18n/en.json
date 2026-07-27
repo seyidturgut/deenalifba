@@ -222,6 +222,9 @@
     "chIntro1": "Maa shaa Allah, you know all the letters now.",
     "chIntro2": "Now here's a secret. When letters stand together in a word, they hold hands and their shapes change a little.",
     "chIntro3": "But don't worry, they're still the same letters. Let's go and find them together.",
-    "chIntroStart": "Let's start! 🚀"
+    "chIntroStart": "Let's start! 🚀",
+    "posInitial": "At the beginning of the word",
+    "posMedial": "In the middle of the word",
+    "posFinal": "At the end of the word"
   }
 }

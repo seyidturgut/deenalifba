@@ -9,7 +9,8 @@ import { getLetter } from "@/data/letters";
 import { getLetterForms, PATH_BOX, type LetterFormKind } from "@/data/letterForms";
 import { getLetterPath } from "@/data/letterPaths";
 import { haptics } from "@/lib/haptics";
-import { playLetter, playSfx } from "@/lib/sfx";
+import { playLetter, playNarration, playSfx } from "@/lib/sfx";
+import { useSettingsStore } from "@/stores/settingsStore";
 
 /**
  * "Harf Tanıma" ÖĞRETME adımı — testten ÖNCE gelir.
@@ -27,6 +28,9 @@ const BIG = 128;
 const SLOT = 46;
 
 const ORDER: LetterFormKind[] = ["initial", "medial", "final"];
+/** Form → Pırıl'ın konum repliği. Üç kutu tek başına çocuğa "baş/orta/son" demiyordu;
+    kullanıcı haklı olarak sesli anlatım istedi. */
+const POS_NARRATION = { initial: "posInitial", medial: "posMedial", final: "posFinal" } as const;
 
 function Glyph({ d, size, color = "#2A2A33" }: { d: string; size: number; color?: string }) {
   return (
@@ -77,6 +81,7 @@ export function FormIntro({ letterId, onDone }: { letterId: number; onDone: () =
   const letter = getLetter(letterId);
   const iso = getLetterPath(letterId);
   const forms = getLetterForms(letterId);
+  const language = useSettingsStore((s) => s.language);
 
   // Bu harfin gerçekten sahip olduğu pozisyonel formlar (bağlanmayanlarda yalnız "final")
   const kinds = ORDER.filter((k) => !!forms?.paths[k]);
@@ -90,9 +95,15 @@ export function FormIntro({ letterId, onDone }: { letterId: number; onDone: () =
   const pulseStyle = useAnimatedStyle(() => ({ transform: [{ scale: 1 + pulse.value * 0.05 }] }));
 
   useEffect(() => {
-    const tt = setTimeout(() => playLetter(letterId), 300);
+    // faz 0: harfin kendi sesi (tanıdık çapa) — sonraki fazlarda Pırıl konumu SÖYLER
+    const k = phase === 0 ? null : kinds[phase - 1];
+    const tt = setTimeout(() => {
+      if (k) playNarration(language, POS_NARRATION[k as "initial" | "medial" | "final"]);
+      else playLetter(letterId);
+    }, 300);
     return () => clearTimeout(tt);
-  }, [letterId, phase]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [letterId, phase, language]);
 
   if (!letter || !iso || !forms) return null;
 
@@ -147,8 +158,11 @@ export function FormIntro({ letterId, onDone }: { letterId: number; onDone: () =
             </View>
           </View>
 
-          {/* Kelimedeki yeri — sağdan sola 3 kutu, harfin yeri vurgulu */}
+          {/* Kelimedeki yeri — sağdan sola 3 kutu, harfin yeri vurgulu + Pırıl SÖYLER */}
           <WordSlots kind={kind} glyphD={forms.paths[kind]!} />
+          <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 17, color: "#2E7D5B", textAlign: "center" }}>
+            {t(`forms.${POS_NARRATION[kind as "initial" | "medial" | "final"]}`)}
+          </Text>
         </Animated.View>
       )}
 
