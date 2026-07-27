@@ -17,6 +17,7 @@ import { HearTap } from "@/features/heartap/HearTap";
 import { LetterIntro } from "@/features/intro/LetterIntro";
 import { MatchGame } from "@/features/match/MatchGame";
 import { FeedbackModal } from "@/components/ui/FeedbackModal";
+import { ParentEmailOptin } from "@/components/ui/ParentEmailOptin";
 import { MosqueBuild } from "@/features/mosque/MosqueBuild";
 import { MosqueFinale } from "@/features/mosque/MosqueFinale";
 import { RecallGame } from "@/features/recall/RecallGame";
@@ -151,6 +152,7 @@ export default function LearnScreen() {
   const [buildVisible, setBuildVisible] = useState(false);
   const [buildStage, setBuildStage] = useState(0);
   const [finaleVisible, setFinaleVisible] = useState(false);
+  const [emailOptinVisible, setEmailOptinVisible] = useState(false);
   const [feedbackVisible, setFeedbackVisible] = useState(false);
 
   useEffect(() => {
@@ -339,11 +341,18 @@ export default function LearnScreen() {
 
       <Celebration visible={celebrate} onDone={finishLetter} />
       <MosqueBuild visible={buildVisible} stageIndex={buildStage} onDone={goHome} />
-      {/* 28 finali → Continue → ebeveyn geri bildirim ekranı → home (Sohail) */}
+      {/* 28 finali → Continue → ebeveyn e-posta opt-in → geri bildirim → home (Sohail) */}
       <MosqueFinale
         visible={finaleVisible}
         onDone={() => {
           setFinaleVisible(false);
+          setEmailOptinVisible(true);
+        }}
+      />
+      <ParentEmailOptin
+        visible={emailOptinVisible}
+        onClose={() => {
+          setEmailOptinVisible(false);
           setFeedbackVisible(true);
         }}
       />

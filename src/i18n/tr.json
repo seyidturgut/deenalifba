@@ -113,6 +113,15 @@
     "showSomeone": "Yaptığın camiyi birine gösterir misin? 🕌",
     "continue": "Devam ▶"
   },
+  "emailOptin": {
+    "title": "Ebeveynler için 👋",
+    "body": "Sıradaki bölüm (Harekeler, kelimeler, dualar…) hazır olunca ilk siz haberdar olun.",
+    "placeholder": "E-posta adresiniz",
+    "privacy": "Yalnızca yeni bölüm haberi için kullanılır. Çocuğunuzun adı veya ilerlemesi gönderilmez.",
+    "send": "Haber ver ✉️",
+    "skip": "Şimdilik geç",
+    "thanks": "Teşekkürler! 🌟"
+  },
   "feedback": {
     "title": "Nasıl gidiyor?",
     "hint": "Bir düşüncen var mı? (ebeveyn için)",

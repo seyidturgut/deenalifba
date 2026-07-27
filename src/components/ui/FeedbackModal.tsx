@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import { JuicyButton } from "@/components/ui/JuicyButton";
 import { Mascot } from "@/components/ui/Mascot";
 import { haptics } from "@/lib/haptics";
+import { sendFeedbackRemote } from "@/lib/remoteFeedback";
 import { playSfx } from "@/lib/sfx";
 import { useFeedbackStore, type FeedbackRating } from "@/stores/feedbackStore";
 
@@ -46,6 +47,7 @@ export function FeedbackModal({ visible, context, onClose }: { visible: boolean;
   const submit = () => {
     if (!rating) return;
     addFeedback({ rating, text: text.trim(), context, at: Date.now() });
+    sendFeedbackRemote(rating, text.trim(), context); // best-effort; ağ hatası akışı bozmaz
     playSfx("star_earned");
     haptics.success();
     setSent(true);

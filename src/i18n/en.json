@@ -113,6 +113,15 @@
     "showSomeone": "Can you show someone the mosque you built? 🕌",
     "continue": "Continue ▶"
   },
+  "emailOptin": {
+    "title": "For grown-ups 👋",
+    "body": "Be the first to know when the next stage (harakat, words, du'as…) is ready.",
+    "placeholder": "Your email address",
+    "privacy": "Used only to let you know about the next stage. Your child's name and progress are never sent.",
+    "send": "Keep me posted ✉️",
+    "skip": "Skip for now",
+    "thanks": "Thank you! 🌟"
+  },
   "feedback": {
     "title": "How's it going?",
     "hint": "Any thoughts? (for parents)",
