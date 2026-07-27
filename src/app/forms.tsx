@@ -11,6 +11,7 @@ import { JuicyButton } from "@/components/ui/JuicyButton";
 import { Mascot } from "@/components/ui/Mascot";
 import { SoundToggles } from "@/components/ui/SoundToggles";
 import { StageHost } from "@/components/ui/StageHost";
+import { ChapterIntro } from "@/features/forms/ChapterIntro";
 import { FormIntro } from "@/features/forms/FormIntro";
 import { FormRecognition } from "@/features/forms/FormRecognition";
 import { LETTERS } from "@/data/letters";
@@ -33,6 +34,10 @@ export default function FormsChapter() {
   const router = useRouter();
   const completed = useFormsStore((s) => s.completed);
   const complete = useFormsStore((s) => s.complete);
+  // Bölüme İLK girişte Pırıl sesli anlatır (28'den sonra neden farklı bir şey geldiğini
+  // çocuk kendi başına anlayamaz — kullanıcının itirazı).
+  const introSeen = useFormsStore((s) => s.introSeen);
+  const markIntroSeen = useFormsStore((s) => s.markIntroSeen);
 
   // Bu oturumun harfleri — henüz bitmemişlerden ilk ROUND_SIZE tanesi
   const [queue] = useState<number[]>(() =>
@@ -96,7 +101,9 @@ export default function FormsChapter() {
       </Text>
 
       <View style={{ flex: 1, marginTop: 8, marginBottom: 110 }}>
-        {allDone ? (
+        {!introSeen ? (
+          <ChapterIntro onDone={markIntroSeen} />
+        ) : allDone ? (
           // Bölümün tamamı bitti — kutlama + çıkış
           <View style={{ flex: 1, alignItems: "center", justifyContent: "center", gap: 18, paddingHorizontal: 20 }}>
             <Mascot size={130} pose="celebrate" />

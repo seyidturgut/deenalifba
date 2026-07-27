@@ -218,6 +218,10 @@
     "chapterDone": "Maşallah! Artık harfleri kelime içinde de tanıyorsun! 🌟",
     "locked": "Önce 28 harfi bitir",
     "introSame": "Bu harfi tanıyorsun! 👀",
-    "introStill": "Yeri değişti ama HÂLÂ aynı harf! ✨"
+    "introStill": "Yeri değişti ama HÂLÂ aynı harf! ✨",
+    "chIntro1": "Maşallah! Artık bütün harfleri tanıyorsun!",
+    "chIntro2": "Harfler kelimede yan yana gelince el ele tutuşur, şekilleri biraz değişir.",
+    "chIntro3": "Ama hâlâ aynı harfler! Hadi birlikte tanıyalım.",
+    "chIntroStart": "Hadi başlayalım! 🚀"
   }
 }

@@ -251,9 +251,11 @@ function StageGate({
       {goal && (
         <View style={{ position: "absolute", top: NODE * 0.04, width: NODE * 0.96, height: NODE * 0.96, borderRadius: NODE * 0.48, backgroundColor: "#F5C451", opacity: 0.3 }} />
       )}
-      {open ? (
-        /* Açık bölüm — harf seviyeleriyle AYNI kart dili, ayrışsın diye yeşil çerçeve */
-        <View style={{ width: NODE, height: NODE, alignItems: "center", justifyContent: "center" }}>
+      {chapterGlyph ? (
+        /* Gerçek bir bölüm (yalnız "Yakında" değil) — harf seviyeleriyle AYNI kart dili,
+           ayrışsın diye yeşil çerçeve. Kilitliyse aynı kart soluk + kilit rozetiyle
+           gösterilir: çocuk hedefi baştan görür, bulut olarak "sıradan" görünmez. */
+        <View style={{ width: NODE, height: NODE, alignItems: "center", justifyContent: "center", opacity: open ? 1 : 0.55 }}>
           <Image source={images.nodeTileChapter} style={{ position: "absolute", width: NODE, height: NODE }} contentFit="contain" />
           <View
             style={{
@@ -266,16 +268,15 @@ function StageGate({
           >
             {/* Metin glifi yerine normalize SVG path — Amiri metin glifleri kutuda
                 kayıyor/küçük kalıyor (LetterIntro'da da bu yüzden path kullanılıyor). */}
-            {chapterGlyph ? (
-              <Svg width={innerSize * 0.92} height={innerSize * 0.92}>
-                <G transform={`scale(${(innerSize * 0.92) / PATH_BOX})`}>
-                  <Path d={chapterGlyph} fill="#2E7D5B" />
-                </G>
-              </Svg>
-            ) : (
-              <Text style={{ fontFamily: "Amiri_700Bold", fontSize: innerSize * 0.62, color: "#2E7D5B" }}>{emoji}</Text>
-            )}
+            <Svg width={innerSize * 0.92} height={innerSize * 0.92}>
+              <G transform={`scale(${(innerSize * 0.92) / PATH_BOX})`}>
+                <Path d={chapterGlyph} fill="#2E7D5B" />
+              </G>
+            </Svg>
           </View>
+          {!open && (
+            <Image source={images.icLock} style={{ position: "absolute", right: 2, top: 2, width: 28, height: 28 }} contentFit="contain" />
+          )}
         </View>
       ) : (
         <View style={{ width: NODE, height: NODE * 0.82, alignItems: "center", justifyContent: "center" }}>

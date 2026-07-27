@@ -179,23 +179,35 @@ export function stopFinaleLines() {
 // ---- Pırıl anlatımı — onboarding (cami konsepti) + cami inşa anı (Abdulkadir/Sohail
 // playtest: "parents have to explain, spoken guidance rather than text"). ElevenLabs
 // ile üretildi → sessizlikten 3'e bölündü (finale ile aynı yöntem).
-const NARRATION_SOURCES: Record<"en" | "tr", Record<"onboarding1" | "onboarding2" | "mosqueBuilt", number>> = {
+const NARRATION_SOURCES: Record<"en" | "tr", Record<"onboarding1" | "onboarding2" | "mosqueBuilt" | "chForms1" | "chForms2" | "chForms3", number>> = {
   en: {
     onboarding1: require("@/assets/audio/voice_onboarding1_en.mp3"),
     onboarding2: require("@/assets/audio/voice_onboarding2_en.mp3"),
     mosqueBuilt: require("@/assets/audio/voice_mosque_built_en.mp3"),
+    chForms1: require("@/assets/audio/voice_ch_forms1_en.mp3"),
+    chForms2: require("@/assets/audio/voice_ch_forms2_en.mp3"),
+    chForms3: require("@/assets/audio/voice_ch_forms3_en.mp3"),
   },
   tr: {
     onboarding1: require("@/assets/audio/voice_onboarding1_tr.mp3"),
     onboarding2: require("@/assets/audio/voice_onboarding2_tr.mp3"),
     mosqueBuilt: require("@/assets/audio/voice_mosque_built_tr.mp3"),
+    chForms1: require("@/assets/audio/voice_ch_forms1_tr.mp3"),
+    chForms2: require("@/assets/audio/voice_ch_forms2_tr.mp3"),
+    chForms3: require("@/assets/audio/voice_ch_forms3_tr.mp3"),
   },
+};
+
+/** Ölçülen anlatım klip süreleri (ms) — oto-ilerleyen ekranların zamanlaması için. */
+export const NARRATION_DURATIONS_MS: Record<"en" | "tr", Record<"chForms1" | "chForms2" | "chForms3", number>> = {
+  en: { chForms1: 4200, chForms2: 4750, chForms3: 4320 },
+  tr: { chForms1: 2400, chForms2: 6741, chForms3: 4496 },
 };
 
 const narrationPlayers: Partial<Record<string, AudioPlayer>> = {};
 
 /** Pırıl'ın anlatım repliğini (`key`) `lang` dilinde çalar. */
-export function playNarration(lang: "en" | "tr", key: "onboarding1" | "onboarding2" | "mosqueBuilt", volume = 1) {
+export function playNarration(lang: "en" | "tr", key: "onboarding1" | "onboarding2" | "mosqueBuilt" | "chForms1" | "chForms2" | "chForms3", volume = 1) {
   if (!soundOn()) return;
   try {
     const cacheKey = `${lang}_${key}`;
