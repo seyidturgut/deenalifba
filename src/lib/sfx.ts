@@ -200,7 +200,7 @@ const NARRATION_SOURCES: Record<"en" | "tr", Record<"onboarding1" | "onboarding2
 
 /** Ölçülen anlatım klip süreleri (ms) — oto-ilerleyen ekranların zamanlaması için. */
 export const NARRATION_DURATIONS_MS: Record<"en" | "tr", Record<"chForms1" | "chForms2" | "chForms3", number>> = {
-  en: { chForms1: 4200, chForms2: 4750, chForms3: 4320 },
+  en: { chForms1: 2720, chForms2: 6230, chForms3: 4320 },
   tr: { chForms1: 2400, chForms2: 6741, chForms3: 4496 },
 };
 

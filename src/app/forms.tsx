@@ -121,7 +121,9 @@ export default function FormsChapter() {
         )}
       </View>
 
-      <StageHost size={140} onReplay={() => letterId && playLetter(letterId)} />
+      {/* Açılış anlatımında kendi ortadaki Pırıl'ı var — alttaki sahne sunucusu
+          gösterilmez, yoksa ekranda İKİ Pırıl olur (kullanıcı fark etti). */}
+      {introSeen && <StageHost size={140} onReplay={() => letterId && playLetter(letterId)} />}
       <CheerOverlay />
       <Celebration visible={celebrate} onDone={goHome} />
     </GradientBg>
