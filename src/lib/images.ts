@@ -82,6 +82,7 @@ export const images = {
 
   // Yolculuk haritası düğümleri
   nodeTile: require("@/assets/illustrations/journey/node_tile.webp"),
+  nodeTileChapter: require("@/assets/illustrations/journey/node_tile_chapter.webp"),
   nodeCloud: require("@/assets/illustrations/journey/node_cloud.webp"),
   nodeGlow: require("@/assets/illustrations/journey/node_glow.webp"),
 

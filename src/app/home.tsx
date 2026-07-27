@@ -11,7 +11,7 @@ import Animated, {
   withRepeat,
   withTiming,
 } from "react-native-reanimated";
-import Svg, { Polyline } from "react-native-svg";
+import Svg, { G, Path, Polyline } from "react-native-svg";
 import { useTranslation } from "react-i18next";
 
 import { FeedbackModal } from "@/components/ui/FeedbackModal";
@@ -19,6 +19,7 @@ import { GradientBg } from "@/components/ui/GradientBg";
 import { Mascot } from "@/components/ui/Mascot";
 import { StarBadge } from "@/components/ui/StarBadge";
 import { LETTERS } from "@/data/letters";
+import { getLetterForms, PATH_BOX } from "@/data/letterForms";
 import type { Letter } from "@/data/types";
 import { images } from "@/lib/images";
 import { playSfx, syncMusicWithSetting } from "@/lib/sfx";
@@ -39,7 +40,8 @@ const JOURNEY_STAGES: { key: string; emoji: string; goal?: boolean; route?: stri
   // Harf Tanıma — Abdulkadir'in müfredat önerisi: Harakat'tan ÖNCE gelmeli, çünkü çocuk
   // harfi izole bilse de kelime içinde şekil değiştiği için tanıyamıyor. OYNANABİLİR
   // (28 harf bitince açılır); diğerleri hâlâ kilitli/"Yakında".
-  { key: "letterForms", emoji: "🔤", route: "/forms" },
+  // ـبـ = bir harfin "orta" formu — bölümün konusunu tek bakışta anlatır (emoji yerine gerçek glif)
+  { key: "letterForms", emoji: "ـبـ", route: "/forms" },
   { key: "harakat", emoji: "ﹶ" },
   { key: "joining", emoji: "🔗" },
   { key: "words", emoji: "📖" },
@@ -227,6 +229,7 @@ function StageGate({
   goalLabel,
   onPress,
   subtitle,
+  chapterGlyph,
 }: {
   cx: number;
   cy: number;
@@ -237,21 +240,50 @@ function StageGate({
   goalLabel: string;
   onPress?: () => void;
   subtitle?: string;
+  /** Açık bölümde kart içinde gösterilecek normalize glif path'i (emoji yerine) */
+  chapterGlyph?: string;
 }) {
   const W = NODE + 44;
   const open = !!onPress;
+  const innerSize = NODE * INNER;
   const body = (
     <>
-      {(goal || open) && (
-        <View style={{ position: "absolute", top: NODE * 0.04, width: NODE * 0.96, height: NODE * 0.96, borderRadius: NODE * 0.48, backgroundColor: open ? "#3FB984" : "#F5C451", opacity: 0.3 }} />
+      {goal && (
+        <View style={{ position: "absolute", top: NODE * 0.04, width: NODE * 0.96, height: NODE * 0.96, borderRadius: NODE * 0.48, backgroundColor: "#F5C451", opacity: 0.3 }} />
       )}
-      <View style={{ width: NODE, height: NODE * 0.82, alignItems: "center", justifyContent: "center" }}>
-        <Image source={images.nodeCloud} style={{ position: "absolute", width: NODE + 14, height: NODE * 0.78, opacity: goal || open ? 1 : 0.92 }} contentFit="contain" />
-        <Text style={{ fontSize: goal ? 38 : 30, opacity: goal || open ? 1 : 0.82 }}>{emoji}</Text>
-        {!open && (
+      {open ? (
+        /* Açık bölüm — harf seviyeleriyle AYNI kart dili, ayrışsın diye yeşil çerçeve */
+        <View style={{ width: NODE, height: NODE, alignItems: "center", justifyContent: "center" }}>
+          <Image source={images.nodeTileChapter} style={{ position: "absolute", width: NODE, height: NODE }} contentFit="contain" />
+          <View
+            style={{
+              width: innerSize,
+              height: innerSize,
+              alignItems: "center",
+              justifyContent: "center",
+              transform: [{ translateX: WIN_DX }, { translateY: WIN_DY }],
+            }}
+          >
+            {/* Metin glifi yerine normalize SVG path — Amiri metin glifleri kutuda
+                kayıyor/küçük kalıyor (LetterIntro'da da bu yüzden path kullanılıyor). */}
+            {chapterGlyph ? (
+              <Svg width={innerSize * 0.92} height={innerSize * 0.92}>
+                <G transform={`scale(${(innerSize * 0.92) / PATH_BOX})`}>
+                  <Path d={chapterGlyph} fill="#2E7D5B" />
+                </G>
+              </Svg>
+            ) : (
+              <Text style={{ fontFamily: "Amiri_700Bold", fontSize: innerSize * 0.62, color: "#2E7D5B" }}>{emoji}</Text>
+            )}
+          </View>
+        </View>
+      ) : (
+        <View style={{ width: NODE, height: NODE * 0.82, alignItems: "center", justifyContent: "center" }}>
+          <Image source={images.nodeCloud} style={{ position: "absolute", width: NODE + 14, height: NODE * 0.78, opacity: goal ? 1 : 0.92 }} contentFit="contain" />
+          <Text style={{ fontSize: goal ? 38 : 30, opacity: goal ? 1 : 0.82 }}>{emoji}</Text>
           <Image source={images.icLock} style={{ position: "absolute", right: NODE * 0.1, top: NODE * 0.04, width: 26, height: 26, opacity: 0.9 }} contentFit="contain" />
-        )}
-      </View>
+        </View>
+      )}
       <Text
         numberOfLines={1}
         style={{ fontFamily: "Fredoka_700Bold", fontSize: goal ? 15 : 13, color: goal ? "#C77F12" : open ? "#2E7D5B" : "#7C8A99", marginTop: 1, textShadowColor: "rgba(255,255,255,0.9)", textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 3 }}
@@ -512,6 +544,7 @@ export default function Home() {
                 soon={s.route && !allLettersDone ? t("forms.locked") : t("journey.soon")}
                 goalLabel={t("journey.goalLabel")}
                 subtitle={t("forms.progress", { n: formsDone, total: LETTERS.length })}
+                chapterGlyph={s.route ? getLetterForms(2)?.paths.medial : undefined}
                 onPress={playable ? () => { playSfx("ui_tap"); router.push(s.route as any); } : undefined}
               />
             );
