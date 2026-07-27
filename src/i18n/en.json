@@ -216,6 +216,8 @@
     "prompt": "Which one is the same letter?",
     "progress": "{{n}} / {{total}} letters",
     "chapterDone": "Maa shaa Allah! You can now spot letters inside words! 🌟",
-    "locked": "Finish the 28 letters first"
+    "locked": "Finish the 28 letters first",
+    "introSame": "You know this letter! 👀",
+    "introStill": "It moved, but it's STILL the same letter! ✨"
   }
 }

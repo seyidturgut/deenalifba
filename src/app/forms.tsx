@@ -11,6 +11,7 @@ import { JuicyButton } from "@/components/ui/JuicyButton";
 import { Mascot } from "@/components/ui/Mascot";
 import { SoundToggles } from "@/components/ui/SoundToggles";
 import { StageHost } from "@/components/ui/StageHost";
+import { FormIntro } from "@/features/forms/FormIntro";
 import { FormRecognition } from "@/features/forms/FormRecognition";
 import { LETTERS } from "@/data/letters";
 import { haptics } from "@/lib/haptics";
@@ -41,6 +42,8 @@ export default function FormsChapter() {
   );
   const [idx, setIdx] = useState(0);
   const [celebrate, setCelebrate] = useState(false);
+  // Her harf ÖNCE öğretilir (formları gösterilir), SONRA sorulur — öğretmeden test etme.
+  const [taught, setTaught] = useState(false);
 
   const allDone = queue.length === 0;
   const letterId = queue[idx];
@@ -50,7 +53,10 @@ export default function FormsChapter() {
     haptics.success();
     if (idx < queue.length - 1) {
       playSfx("step_complete");
-      setTimeout(() => setIdx((i) => i + 1), 450);
+      setTimeout(() => {
+        setIdx((i) => i + 1);
+        setTaught(false);
+      }, 450);
     } else {
       setCelebrate(true);
     }
@@ -100,7 +106,11 @@ export default function FormsChapter() {
             <JuicyButton label={t("finale.continue")} tone="success" onPress={goHome} />
           </View>
         ) : (
-          <FormRecognition key={`form-${letterId}`} letterId={letterId} onComplete={onRoundComplete} />
+          taught ? (
+            <FormRecognition key={`form-${letterId}`} letterId={letterId} onComplete={onRoundComplete} />
+          ) : (
+            <FormIntro key={`intro-${letterId}`} letterId={letterId} onDone={() => setTaught(true)} />
+          )
         )}
       </View>
 
