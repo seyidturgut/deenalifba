@@ -230,6 +230,7 @@
     "chIntroStart": "Let's start! 🚀",
     "posInitial": "At the beginning of the word",
     "posMedial": "In the middle of the word",
-    "posFinal": "At the end of the word"
+    "posFinal": "At the end of the word",
+    "bannerTitle": "Letter Positions"
   }
 }

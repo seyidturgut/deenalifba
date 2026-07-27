@@ -88,8 +88,14 @@ export default function FormsChapter() {
         <View style={{ width: 248, aspectRatio: 3.02 }}>
           <Image source={images.titleBanner} style={StyleSheet.absoluteFill} contentFit="contain" />
           <View style={{ position: "absolute", left: 0, right: 0, top: "5%", bottom: "42%", alignItems: "center", justifyContent: "center" }}>
-            <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 22, color: "#5B4A1E", includeFontPadding: false }}>
-              {t("journey.letterForms")}
+            {/* Banner sabit genişlikte — haritadaki uzun ad ("Başta · Ortada · Sonda")
+                hem TR hem EN'de taşıyordu; burada kısa başlık kullanılır. */}
+            <Text
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              style={{ fontFamily: "Fredoka_700Bold", fontSize: 20, color: "#5B4A1E", includeFontPadding: false, paddingHorizontal: 14 }}
+            >
+              {t("forms.bannerTitle")}
             </Text>
           </View>
         </View>
