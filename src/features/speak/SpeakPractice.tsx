@@ -10,7 +10,8 @@ import { RecordCompare } from "@/components/ui/RecordCompare";
 import { getLetter } from "@/data/letters";
 import { getLetterPath, PATH_BOX } from "@/data/letterPaths";
 import { images } from "@/lib/images";
-import { playLetter } from "@/lib/sfx";
+import { mascotVars } from "@/lib/mascot";
+import { playLetter, suspendMusic } from "@/lib/sfx";
 
 const DEMO_MS = 1600; // Pırıl'ın "önce ben söyleyeyim" anını gösterme süresi
 
@@ -32,6 +33,12 @@ export function SpeakPractice({ letterId, onComplete }: { letterId: number; onCo
   const lp = getLetterPath(letterId);
   const [hasRecorded, setHasRecorded] = useState(false);
   const [demoing, setDemoing] = useState(true);
+
+  // Konuşma adımı boyunca müzik DURUR — çocuğun kendi kaydı net duyulsun (Abdulkadir).
+  useEffect(() => {
+    suspendMusic(true);
+    return () => suspendMusic(false);
+  }, []);
 
   useEffect(() => {
     setDemoing(true);
@@ -67,7 +74,7 @@ export function SpeakPractice({ letterId, onComplete }: { letterId: number; onCo
         // Pırıl önce kendisi söyler — mikrofon henüz yok, "aniden konuş" hissi olmasın
         <View style={{ alignItems: "center", gap: 10 }}>
           <Mascot size={72} pose="point" talking />
-          <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 16, color: "#34618C" }}>{t("intro.speakDemo")}</Text>
+          <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 16, color: "#34618C" }}>{t("intro.speakDemo", mascotVars())}</Text>
         </View>
       ) : (
         <RecordCompare letterId={letterId} onRecordedChange={setHasRecorded} />

@@ -26,7 +26,7 @@
   "onboarding": {
     "welcomeTitle": "Alif'e hoş geldin!",
     "welcomeSubtitle": "Harfleri öğren, kendi camini inşa et.",
-    "p1": "Selam! 👋 Ben Pırıl.\nHadi birlikte harfleri öğrenelim!",
+    "p1": "Selam! 👋 Ben {{mascot}}.\nHadi birlikte harfleri öğrenelim!",
     "p2": "Her harfi öğrendikçe sihirli camin büyüyecek! 🕌✨",
     "askName": "Önce adını söyle bakalım 😊",
     "namePlaceholder": "Adını yaz",
@@ -61,7 +61,7 @@
     "trace": "Boya",
     "hearTap": "Duy & Dokun",
     "match": "Eşleştir",
-    "drag": "Pırıl'a Ver",
+    "drag": "{{mascotDative}} Ver",
     "balloon": "Balon",
     "catch": "Yakala",
     "word": "Kelime",
@@ -73,7 +73,7 @@
     "traceHint": "Harfi parmağınla boya ✨",
     "hearTapHint": "Dinle ve doğru harfe dokun 👂",
     "matchHint": "Aynı harfleri eşleştir 🃏",
-    "dragHint": "Doğru harfi Pırıl'a ver 🤲",
+    "dragHint": "Doğru harfi {{mascotDative}} ver 🤲",
     "balloonHint": "Doğru harfli balonları patlat 🎈",
     "catchHint": "Kayan harflerden doğrusunu yakala 🫧",
     "wordHint": "Doğru kelimeyi seç 📖",
@@ -98,12 +98,12 @@
   "intro": {
     "listen": "Dinle",
     "continue": "Hazırım ▶",
-    "speakDemo": "Pırıl nasıl söylüyor, dinle!",
+    "speakDemo": "{{mascot}} nasıl söylüyor, dinle!",
     "recordPrompt": "Sırası sende! 🎤",
     "recording": "Dinliyorum…",
     "recordCheer": "Harikasın! 🌟",
     "playYou": "Sen",
-    "playPiril": "Pırıl",
+    "playPiril": "{{mascot}}",
     "recordAgain": "Tekrar kaydet"
   },
   "finale": {

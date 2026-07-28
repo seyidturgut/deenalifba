@@ -26,7 +26,7 @@
   "onboarding": {
     "welcomeTitle": "Welcome to Alif!",
     "welcomeSubtitle": "Learn the letters, build your own mosque.",
-    "p1": "Hi! 👋 I'm Pırıl.\nLet's learn the letters together!",
+    "p1": "Hi! 👋 I'm {{mascot}}.\nLet's learn the letters together!",
     "p2": "Your magical mosque grows as you learn each letter! 🕌✨",
     "askName": "First, tell me your name 😊",
     "namePlaceholder": "Type your name",
@@ -61,7 +61,7 @@
     "trace": "Paint",
     "hearTap": "Hear & Tap",
     "match": "Match",
-    "drag": "Give to Pırıl",
+    "drag": "Give to {{mascot}}",
     "balloon": "Balloons",
     "catch": "Catch",
     "word": "Word",
@@ -73,7 +73,7 @@
     "traceHint": "Paint the letter with your finger ✨",
     "hearTapHint": "Listen and tap the right letter 👂",
     "matchHint": "Match the same letters 🃏",
-    "dragHint": "Give the right letter to Pırıl 🤲",
+    "dragHint": "Give the right letter to {{mascot}} 🤲",
     "balloonHint": "Pop the right letter balloons 🎈",
     "catchHint": "Catch the right sliding letter 🫧",
     "wordHint": "Pick the right word 📖",
@@ -98,12 +98,12 @@
   "intro": {
     "listen": "Listen",
     "continue": "I'm ready ▶",
-    "speakDemo": "Watch how Pırıl says it!",
+    "speakDemo": "Watch how {{mascot}} says it!",
     "recordPrompt": "Your turn! 🎤",
     "recording": "Listening…",
     "recordCheer": "Great job! 🌟",
     "playYou": "You",
-    "playPiril": "Pırıl",
+    "playPiril": "{{mascot}}",
     "recordAgain": "Record again"
   },
   "finale": {

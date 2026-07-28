@@ -28,6 +28,7 @@ import { ACTIVITY_META } from "@/data/lesson";
 import { getLetter, TOTAL_LETTERS } from "@/data/letters";
 import type { ActivityKind } from "@/data/types";
 import { haptics } from "@/lib/haptics";
+import { mascotVars } from "@/lib/mascot";
 import { images } from "@/lib/images";
 import { playLetter, playSfx } from "@/lib/sfx";
 import { useLearningStore } from "@/stores/learningStore";
@@ -214,7 +215,7 @@ export default function LearnScreen() {
   }
 
   const kind = activities[activeIndex];
-  const stepLabel = kind ? t(ACTIVITY_META[kind].labelKey) : "";
+  const stepLabel = kind ? t(ACTIVITY_META[kind].labelKey, mascotVars()) : "";
   const FLOOR_H = 118; // alt sahne zemini (büyük host orada durur; oyunlar üstte)
 
   return (
@@ -256,7 +257,7 @@ export default function LearnScreen() {
         style={{ maxWidth: "92%", shadowColor: "#1462B5", shadowOpacity: 0.14, shadowRadius: 7, shadowOffset: { width: 0, height: 4 } }}
       >
         <Text style={{ fontFamily: "Fredoka_600SemiBold", fontSize: 17, lineHeight: 23, textAlign: "center", color: "#34618C" }}>
-          {kind ? t(HINT_KEY[kind]) : ""}
+          {kind ? t(HINT_KEY[kind], mascotVars()) : ""}
         </Text>
       </View>
 

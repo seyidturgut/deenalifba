@@ -12,9 +12,12 @@ import { Nunito_400Regular, Nunito_600SemiBold, Nunito_700Bold } from "@expo-goo
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
-import { Platform } from "react-native";
+import { AppState, Platform } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+
+import { startMusic, stopMusic } from "@/lib/sfx";
+import { useSettingsStore } from "@/stores/settingsStore";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -33,6 +36,33 @@ export default function RootLayout() {
   useEffect(() => {
     if (fontsLoaded) SplashScreen.hideAsync();
   }, [fontsLoaded]);
+
+  // Uygulama arkaya alınınca müzik DURSUN (Abdulkadir: force-close'a kadar çalıyordu).
+  // Web/WebView'da AppState "background" vermiyor → visibilitychange ile de dinliyoruz.
+  useEffect(() => {
+    const pause = () => stopMusic();
+    const resume = () => {
+      if (useSettingsStore.getState().musicEnabled) startMusic();
+    };
+
+    const sub = AppState.addEventListener("change", (state) => {
+      if (state === "active") resume();
+      else pause();
+    });
+
+    let onVisibility: (() => void) | undefined;
+    if (Platform.OS === "web" && typeof document !== "undefined") {
+      onVisibility = () => (document.hidden ? pause() : resume());
+      document.addEventListener("visibilitychange", onVisibility);
+    }
+
+    return () => {
+      sub.remove();
+      if (onVisibility && typeof document !== "undefined") {
+        document.removeEventListener("visibilitychange", onVisibility);
+      }
+    };
+  }, []);
 
   // Web/APK WebView: viewport zoom/pan kilidi. SPA çıktısında +html.tsx uygulanmadığı
   // için meta'yı runtime'da ayarlıyoruz. Bu olmadan APK'da harf çizerken parmak

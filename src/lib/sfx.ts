@@ -232,16 +232,34 @@ export function playNarration(lang: "en" | "tr", key: "onboarding1" | "onboardin
 
 // ---- Arka plan müziği (dikişsiz loop, kısık) ----
 let music: AudioPlayer | null = null;
+const MUSIC_VOLUME = 0.3;
+/** Konuşma/kayıt ekranında müzik tamamen DURUR — kısmak yetmiyor, çocuğun kendi
+    kaydı net duyulmalı (Abdulkadir playtest + kullanıcı kararı). */
+let suspended = false;
 
 export function startMusic() {
-  if (!musicOn()) return;
+  if (!musicOn() || suspended) return;
   try {
     if (!music) {
       music = createAudioPlayer(require("@/assets/audio/bg_music_loop.mp3"));
       music.loop = true;
-      music.volume = 0.3;
     }
+    music.volume = MUSIC_VOLUME;
     music.play();
+  } catch {
+    // yoksay
+  }
+}
+
+/**
+ * Konuşma/kayıt aktivitesi süresince müziği DURDUR, çıkınca geri başlat.
+ * `suspended` bayrağı sayesinde bu sırada gelen startMusic() çağrıları da müziği açmaz.
+ */
+export function suspendMusic(on: boolean) {
+  suspended = on;
+  try {
+    if (on) music?.pause();
+    else if (musicOn()) startMusic();
   } catch {
     // yoksay
   }

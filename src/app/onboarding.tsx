@@ -58,7 +58,7 @@ export default function Onboarding() {
       <View className="flex-1 px-2">
         {/* Balon + maskot TEK küme (bitişik, ortada); maskot buluta basar */}
         <View className="flex-1 items-center justify-center" style={{ gap: 10 }}>
-          {step === 0 && <SpeechBubble key="s0">{t("onboarding.p1")}</SpeechBubble>}
+          {step === 0 && <SpeechBubble key="s0">{t("onboarding.p1", { mascot: buddy })}</SpeechBubble>}
           {step === 1 && <SpeechBubble key="s1">{t("onboarding.p2")}</SpeechBubble>}
           {step === 2 && (
             <View className="items-center gap-4">

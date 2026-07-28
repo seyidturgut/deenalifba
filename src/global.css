@@ -22,3 +22,18 @@ body {
   --font-rounded: 'SF Pro Rounded', 'Hiragino Maru Gothic ProN', Meiryo, 'MS PGothic', sans-serif;
   --font-serif: Georgia, 'Times New Roman', serif;
 }
+
+/* Boya/dokunma aktivitelerinde kazara METİN SEÇİMİ olmasın (Abdulkadir playtest):
+   parmak sürüklenince tarayıcı/WebView metni maviye boyuyordu. Girişler hariç. */
+html, body, #root {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+input, textarea, [contenteditable="true"] {
+  -webkit-user-select: text;
+  user-select: text;
+}

@@ -15,6 +15,7 @@ import { useTranslation } from "react-i18next";
 import { Mascot } from "@/components/ui/Mascot";
 import { haptics } from "@/lib/haptics";
 import { images } from "@/lib/images";
+import { mascotVars } from "@/lib/mascot";
 import { playLetter, playSfx } from "@/lib/sfx";
 
 const MAX_RECORD_MS = 3500;
@@ -191,7 +192,7 @@ export function RecordCompare({ letterId, onRecordedChange }: { letterId: number
               <View style={{ width: 62, height: 62, alignItems: "center", justifyContent: "center" }}>
                 <Image source={images.icListen} style={{ width: 56, height: 51 }} contentFit="contain" />
               </View>
-              <Text style={{ fontFamily: "Fredoka_600SemiBold", fontSize: 14, color: "#5B6470" }}>{t("intro.playPiril")}</Text>
+              <Text style={{ fontFamily: "Fredoka_600SemiBold", fontSize: 14, color: "#5B6470" }}>{t("intro.playPiril", mascotVars())}</Text>
             </Pressable>
           </View>
           <Pressable onPress={recordAgain} hitSlop={8} style={{ paddingVertical: 4 }}>
