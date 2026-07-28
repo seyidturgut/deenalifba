@@ -48,11 +48,6 @@ export default function Mosque() {
   const inGarden = garden > 0;
 
   const progress = inGarden ? garden / GARDEN_STAGE_COUNT : built / STAGES;
-  // Son iki bahçe aşaması akşam/gece — ekranın tamamı da onlarla birlikte kararır,
-  // yoksa kandilli gece adası parlak mavi gökyüzünde yapay duruyor.
-  const night = garden >= 7 ? 0.82 : garden === 6 ? 0.5 : 0;
-  const isNight = night > 0;
-  const titleColor = isNight ? "#FFE3A3" : "#0E5FC2";
   const gardenDone = garden >= GARDEN_STAGE_COUNT;
 
   // Pırıl'ın balonu: ilerlemeye göre teşvik (artık fener/çeşme görevi yok — cami kendi büyür)
@@ -108,7 +103,7 @@ export default function Mosque() {
   }));
 
   return (
-    <GradientBg variant="skyWarm" night={night}>
+    <GradientBg variant="skyWarm">
       <View className="flex-1 py-4">
         {/* Başlık: cami adı (oyun-tarzı) + düzenle */}
         {editing ? (
@@ -139,8 +134,8 @@ export default function Mosque() {
             style={{
               fontFamily: "Fredoka_700Bold",
               fontSize: 30,
-              color: titleColor,
-              textShadowColor: isNight ? "rgba(4,10,30,0.9)" : "rgba(255,255,255,0.9)",
+              color: "#0E5FC2",
+              textShadowColor: "rgba(255,255,255,0.9)",
               textShadowOffset: { width: 0, height: 1 },
               textShadowRadius: 4,
             }}
@@ -150,16 +145,10 @@ export default function Mosque() {
         )}
 
         <View
-          className="mt-2 self-start rounded-2xl px-4 py-2"
-          style={{
-            backgroundColor: isNight ? "rgba(12,26,66,0.78)" : "rgba(255,255,255,0.85)",
-            shadowColor: "#1462B5",
-            shadowOpacity: 0.1,
-            shadowRadius: 5,
-            shadowOffset: { width: 0, height: 3 },
-          }}
+          className="mt-2 self-start rounded-2xl bg-white/85 px-4 py-2"
+          style={{ shadowColor: "#1462B5", shadowOpacity: 0.1, shadowRadius: 5, shadowOffset: { width: 0, height: 3 } }}
         >
-          <Text style={{ fontFamily: "Nunito_700Bold", fontSize: 15, color: isNight ? "#D8E7FF" : "#34618C" }}>
+          <Text style={{ fontFamily: "Nunito_700Bold", fontSize: 15, color: "#34618C" }}>
             {t(inGarden ? "mosque.gardenSubtitle" : "mosque.subtitle")}
           </Text>
         </View>
@@ -196,25 +185,22 @@ export default function Mosque() {
         </View>
 
         {/* İlerleme */}
-        <View
-          className="mx-1 h-5 overflow-hidden rounded-full"
-          style={{ backgroundColor: isNight ? "rgba(10,22,60,0.7)" : "rgba(255,255,255,0.7)" }}
-        >
+        <View className="mx-1 h-5 overflow-hidden rounded-full bg-white/70">
           <View className="h-full rounded-full bg-accent" style={{ width: `${Math.round(progress * 100)}%` }} />
         </View>
-        <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 16, color: isNight ? "#EAF2FF" : "#4A5663", textAlign: "center", marginTop: 8 }}>
+        <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 16, color: "#4A5663", textAlign: "center", marginTop: 8 }}>
           {inGarden
             ? t("mosque.gardenParts", { built: garden, total: GARDEN_STAGE_COUNT })
             : t("mosque.parts", { built, total: STAGES })}
         </Text>
-        <Text style={{ fontFamily: "Nunito_700Bold", fontSize: 13, color: isNight ? "#9FB6E4" : "#7A8593", textAlign: "center", marginTop: 2 }}>
+        <Text style={{ fontFamily: "Nunito_700Bold", fontSize: 13, color: "#7A8593", textAlign: "center", marginTop: 2 }}>
           {t("mosque.lettersLearned", { n: completed, total: LETTERS.length })}
         </Text>
         {/* En iyi istikamet zinciri kupası */}
         {bestChainEver > 0 && (
           <View className="mt-2 flex-row items-center justify-center" style={{ gap: 6 }}>
             <Crescent size={18} color={accentColor} />
-            <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 14, color: isNight ? "#FFD98A" : "#0E5FC2" }}>
+            <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 14, color: "#0E5FC2" }}>
               {t("mosque.bestChain", { n: bestChainEver })}
             </Text>
           </View>
