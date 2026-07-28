@@ -13,7 +13,8 @@ import Animated, {
 } from "react-native-reanimated";
 
 import { useStageStore } from "@/stores/stageStore";
-import { getLetter, LETTERS } from "@/data/letters";
+import { getLetter } from "@/data/letters";
+import { glyphChar, pickDistractors, type LetterFormKind } from "@/lib/formGlyph";
 import { haptics } from "@/lib/haptics";
 import { images } from "@/lib/images";
 import { playLetter, playSfx } from "@/lib/sfx";
@@ -148,7 +149,16 @@ function Balloon({
   );
 }
 
-export function BalloonPop({ letterId, onComplete }: { letterId: number; onComplete: () => void }) {
+export function BalloonPop({
+  letterId,
+  onComplete,
+  formKind,
+}: {
+  letterId: number;
+  onComplete: () => void;
+  /** Verilirse balonlarda harfin bu POZİSYONEL formu görünür (Harf Tanıma bölümü). */
+  formKind?: LetterFormKind;
+}) {
   const { width } = useWindowDimensions();
   const target = getLetter(letterId);
   const [count, setCount] = useState(0);
@@ -161,11 +171,10 @@ export function BalloonPop({ letterId, onComplete }: { letterId: number; onCompl
   // 4 hedef + 4 çeldirici balon, sütunlara dağıtılmış
   const balloons = useMemo(() => {
     if (!target) return [];
-    const pool = LETTERS.filter((l) => l.id !== letterId && l.char !== target.char);
-    const distract: string[] = [];
-    for (let i = 0; i < 4 && pool.length; i++) distract.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0].char);
+    const targetChar = glyphChar(letterId, formKind);
+    const distract = pickDistractors(letterId, 4, formKind);
     const items: { char: string; isTarget: boolean }[] = [
-      ...Array.from({ length: 4 }, () => ({ char: target.char, isTarget: true })),
+      ...Array.from({ length: 4 }, () => ({ char: targetChar, isTarget: true })),
       ...distract.map((c) => ({ char: c, isTarget: false })),
     ];
     for (let i = items.length - 1; i > 0; i--) {
@@ -184,7 +193,7 @@ export function BalloonPop({ letterId, onComplete }: { letterId: number; onCompl
       delay: i * 460,
       duration: 4600 + (i % 3) * 850,
     }));
-  }, [letterId, target, areaW]);
+  }, [letterId, target, areaW, formKind]);
 
   // Girişte hedefi sesli söyle
   useEffect(() => {

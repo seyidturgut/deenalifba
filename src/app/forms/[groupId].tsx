@@ -13,7 +13,12 @@ import { ChapterIntro } from "@/features/forms/ChapterIntro";
 import { FormIntro } from "@/features/forms/FormIntro";
 import { FormRecognition } from "@/features/forms/FormRecognition";
 import { FormReverse } from "@/features/forms/FormReverse";
-import { formsGroup } from "@/data/formsLessons";
+import { BalloonPop } from "@/features/balloon/BalloonPop";
+import { SoundCatch } from "@/features/catch/SoundCatch";
+import { MatchGame } from "@/features/match/MatchGame";
+import { PaintTrace } from "@/features/trace/PaintTrace";
+import { formKindsFor, type LetterFormKind } from "@/data/letterForms";
+import { formsGroup, FORMS_GROUP_SIZE } from "@/data/formsLessons";
 import { LETTERS } from "@/data/letters";
 import { haptics } from "@/lib/haptics";
 import { images } from "@/lib/images";
@@ -84,7 +89,21 @@ export default function FormsLevel() {
   // Bölümün sesli açılışı yalnız İLK seviyenin ilk girişinde
   const showChapterIntro = gi === 0 && !introSeen;
   // Oyun türü değişsin (grup+harf indeksine göre) — tek tip tekrar olmasın
-  const useReverse = (gi + idx) % 2 === 1;
+  /**
+   * Abdulkadir (2. tur): "1-28'deki oyun çeşitliliği bu bölümde de korunmalı."
+   * Formlara özgü iki oyunun yanına 1-28'in dört sevilen mekaniği eklendi; hepsi
+   * artık harfi POZİSYONEL formuyla gösteriyor. Sıra deterministik — çocuk aynı
+   * harfe dönerse aynı oyunu görür, kafası karışmaz.
+   */
+  const GAME_COUNT = 6;
+  const gameIndex = (gi * FORMS_GROUP_SIZE + idx) % GAME_COUNT;
+
+  // Oyunun göstereceği form: bu harfin gerçekten sahip olduğu pozisyonel formlardan biri
+  // (bağlanmayan 6 harfte yalnız "son" vardır — var olmayan şekil gösterilmez).
+  const positional = formKindsFor(letterId ?? 0).filter((k) => k !== "isolated");
+  const gameForm: LetterFormKind | undefined = positional.length
+    ? positional[(gi + idx) % positional.length]
+    : undefined;
 
   return (
     <GradientBg>
@@ -156,10 +175,18 @@ export default function FormsLevel() {
         {showChapterIntro ? (
           <ChapterIntro onDone={markIntroSeen} />
         ) : taught ? (
-          useReverse ? (
-            <FormReverse key={`rev-${letterId}`} letterId={letterId} onComplete={onLetterDone} />
-          ) : (
+          gameIndex === 0 ? (
             <FormRecognition key={`rec-${letterId}`} letterId={letterId} onComplete={onLetterDone} />
+          ) : gameIndex === 1 ? (
+            <FormReverse key={`rev-${letterId}`} letterId={letterId} onComplete={onLetterDone} />
+          ) : gameIndex === 2 ? (
+            <MatchGame key={`mat-${letterId}`} letterId={letterId} formKind={gameForm} onComplete={onLetterDone} />
+          ) : gameIndex === 3 ? (
+            <BalloonPop key={`bal-${letterId}`} letterId={letterId} formKind={gameForm} onComplete={onLetterDone} />
+          ) : gameIndex === 4 ? (
+            <SoundCatch key={`cat-${letterId}`} letterId={letterId} formKind={gameForm} onComplete={onLetterDone} />
+          ) : (
+            <PaintTrace key={`tra-${letterId}`} letterId={letterId} formKind={gameForm} onComplete={onLetterDone} />
           )
         ) : (
           <FormIntro key={`fi-${letterId}`} letterId={letterId} onDone={() => setTaught(true)} />

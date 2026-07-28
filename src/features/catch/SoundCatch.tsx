@@ -4,7 +4,8 @@ import { Pressable, Text, useWindowDimensions, View } from "react-native";
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming } from "react-native-reanimated";
 
 import { useStageStore } from "@/stores/stageStore";
-import { getLetter, LETTERS } from "@/data/letters";
+import { getLetter } from "@/data/letters";
+import { glyphChar, pickDistractors, type LetterFormKind } from "@/lib/formGlyph";
 import { haptics } from "@/lib/haptics";
 import { images } from "@/lib/images";
 import { playLetter, playSfx } from "@/lib/sfx";
@@ -68,7 +69,16 @@ function CatchTile({
   );
 }
 
-export function SoundCatch({ letterId, onComplete }: { letterId: number; onComplete: () => void }) {
+export function SoundCatch({
+  letterId,
+  onComplete,
+  formKind,
+}: {
+  letterId: number;
+  onComplete: () => void;
+  /** Verilirse karolarda harfin bu POZİSYONEL formu görünür (Harf Tanıma bölümü). */
+  formKind?: LetterFormKind;
+}) {
   const { width } = useWindowDimensions();
   const target = getLetter(letterId);
   const [caught, setCaught] = useState<number[]>([]);
@@ -81,11 +91,10 @@ export function SoundCatch({ letterId, onComplete }: { letterId: number; onCompl
   // Şerit karoları: 7 karo, ~4 hedef + çeldiriciler, karışık
   const tiles = useMemo(() => {
     if (!target) return [];
-    const pool = LETTERS.filter((l) => l.id !== letterId && l.char !== target.char);
-    const distract: string[] = [];
-    for (let i = 0; i < 3 && pool.length; i++) distract.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0].char);
+    const targetChar = glyphChar(letterId, formKind);
+    const distract = pickDistractors(letterId, 3, formKind);
     const items: { char: string; isTarget: boolean }[] = [
-      ...Array.from({ length: 4 }, () => ({ char: target.char, isTarget: true })),
+      ...Array.from({ length: 4 }, () => ({ char: targetChar, isTarget: true })),
       ...distract.map((c) => ({ char: c, isTarget: false })),
     ];
     for (let i = items.length - 1; i > 0; i--) {
@@ -93,7 +102,7 @@ export function SoundCatch({ letterId, onComplete }: { letterId: number; onCompl
       [items[i], items[j]] = [items[j], items[i]];
     }
     return items.map((it, i) => ({ ...it, key: i }));
-  }, [letterId, target]);
+  }, [letterId, target, formKind]);
 
   const stripW = tiles.length * SPACING;
   const startX = laneW; // sağ kenardan gir

@@ -14,6 +14,7 @@ import Animated, {
 import Svg, { Circle, ClipPath, Defs, G, Path } from "react-native-svg";
 
 import { getLetterPath, PATH_BOX } from "@/data/letterPaths";
+import { glyphShape, type LetterFormKind } from "@/lib/formGlyph";
 import { haptics } from "@/lib/haptics";
 import { images } from "@/lib/images";
 import { playLetter, playSfx } from "@/lib/sfx";
@@ -60,8 +61,20 @@ function HintHand({ cx, cy, r }: { cx: number; cy: number; r: number }) {
   );
 }
 
-export function PaintTrace({ letterId, onComplete }: { letterId: number; onComplete: () => void }) {
-  const lp = getLetterPath(letterId);
+export function PaintTrace({
+  letterId,
+  onComplete,
+  formKind,
+}: {
+  letterId: number;
+  onComplete: () => void;
+  /** Verilirse harfin bu POZİSYONEL formu boyanır (Harf Tanıma bölümü). */
+  formKind?: LetterFormKind;
+}) {
+  // Formun kendi yolu VE kendi iç noktaları — ilerleme hesabı forma göre yapılmalı,
+  // izole harfin noktalarıyla "yeterince boyadım mı" sorusu yanlış cevaplanır.
+  const form = formKind ? glyphShape(letterId, formKind) : undefined;
+  const lp = form ?? getLetterPath(letterId);
   const [size, setSize] = useState({ w: 0, h: 0 });
   const [drops, setDrops] = useState<Drop[]>([]);
   const [done, setDone] = useState(false);
@@ -148,7 +161,7 @@ export function PaintTrace({ letterId, onComplete }: { letterId: number; onCompl
   const onLayout = (e: LayoutChangeEvent) => setSize({ w: e.nativeEvent.layout.width, h: e.nativeEvent.layout.height });
 
   if (!lp) return null;
-  const clipId = `letter-clip-${letterId}`;
+  const clipId = `letter-clip-${letterId}-${formKind ?? "iso"}`;
 
   return (
     <GestureDetector gesture={pan}>

@@ -4,6 +4,7 @@ import { Pressable, Text, View } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withSequence, withTiming } from "react-native-reanimated";
 
 import { getLetter, LETTERS } from "@/data/letters";
+import { glyphChar, lettersWithForm, type LetterFormKind } from "@/lib/formGlyph";
 import { haptics } from "@/lib/haptics";
 import { images } from "@/lib/images";
 import { playLetter, playSfx } from "@/lib/sfx";
@@ -84,7 +85,20 @@ function MatchCard({
   );
 }
 
-export function MatchGame({ letterId, onComplete }: { letterId: number; onComplete: () => void }) {
+export function MatchGame({
+  letterId,
+  onComplete,
+  formKind,
+}: {
+  letterId: number;
+  onComplete: () => void;
+  /**
+   * Verilirse eşleşecek ÇİFT "izole hâl ↔ pozisyonel form" olur (ب ↔ ﺒ).
+   * Bölümün asıl öğrettiği şey tam olarak bu bağ — mekanik aynı kalıyor,
+   * çocuk artık şekli tanımayı öğreniyor.
+   */
+  formKind?: LetterFormKind;
+}) {
   const target = getLetter(letterId);
 
   // TEK gerçek çift (hedef harf) + 4 TEKİL çeldirici (eşi yok) → 6 kart.
@@ -94,20 +108,29 @@ export function MatchGame({ letterId, onComplete }: { letterId: number; onComple
   // mümkün değil (her çeldirici tektir, eşi deste içinde yok).
   const cards = useMemo<CardData[]>(() => {
     if (!target) return [];
-    const pool = LETTERS.filter((l) => l.id !== letterId && l.char !== target.char);
+    const allowed = new Set(lettersWithForm(formKind));
+    const pool = LETTERS.filter(
+      (l) => l.id !== letterId && l.char !== target.char && (!formKind || allowed.has(l.id))
+    );
     const distractors: typeof LETTERS = [];
     for (let i = 0; i < 4 && pool.length; i++) distractors.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]);
     const deck: CardData[] = [
-      { key: 0, letterId: target.id, char: target.char },
-      { key: 0, letterId: target.id, char: target.char },
-      ...distractors.map((l) => ({ key: 0, letterId: l.id, char: l.char })),
+      // Formlu turda çift "izole ↔ form"; normal turda iki özdeş harf.
+      { key: 0, letterId: target.id, char: glyphChar(target.id) },
+      { key: 0, letterId: target.id, char: glyphChar(target.id, formKind) },
+      // Çeldiricilerin yarısı izole yarısı formlu — "izoleyi bul" kestirmesi olmasın.
+      ...distractors.map((l, i) => ({
+        key: 0,
+        letterId: l.id,
+        char: formKind && i % 2 === 1 ? glyphChar(l.id, formKind) : glyphChar(l.id),
+      })),
     ];
     for (let i = deck.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [deck[i], deck[j]] = [deck[j], deck[i]];
     }
     return deck.map((c, i) => ({ ...c, key: i }));
-  }, [letterId, target]);
+  }, [letterId, target, formKind]);
 
   const [flipped, setFlipped] = useState<number[]>([]); // açık (henüz eşleşmemiş) kart key'leri
   const [matched, setMatched] = useState<number[]>([]);

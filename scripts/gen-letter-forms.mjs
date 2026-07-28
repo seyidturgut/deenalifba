@@ -71,6 +71,60 @@ const buf = readFileSync(FONT);
 const font = opentype.parse(buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength));
 const r1 = (n) => Math.round(n * 10) / 10;
 
+
+/** Eğrileri düz çizgi parçalarına indirger (nokta-içinde testi için). */
+function flatten(commands, steps = 12) {
+  const polys = [];
+  let poly = null;
+  let cur = [0, 0];
+  for (const c of commands) {
+    if (c.type === "M") {
+      if (poly && poly.length > 2) polys.push(poly);
+      poly = [[c.x, c.y]];
+      cur = [c.x, c.y];
+    } else if (c.type === "L") {
+      poly.push([c.x, c.y]);
+      cur = [c.x, c.y];
+    } else if (c.type === "Q") {
+      for (let i = 1; i <= steps; i++) {
+        const t = i / steps;
+        const mt = 1 - t;
+        const x = mt * mt * cur[0] + 2 * mt * t * c.x1 + t * t * c.x;
+        const y = mt * mt * cur[1] + 2 * mt * t * c.y1 + t * t * c.y;
+        poly.push([x, y]);
+      }
+      cur = [c.x, c.y];
+    } else if (c.type === "C") {
+      for (let i = 1; i <= steps; i++) {
+        const t = i / steps;
+        const mt = 1 - t;
+        const x = mt * mt * mt * cur[0] + 3 * mt * mt * t * c.x1 + 3 * mt * t * t * c.x2 + t * t * t * c.x;
+        const y = mt * mt * mt * cur[1] + 3 * mt * mt * t * c.y1 + 3 * mt * t * t * c.y2 + t * t * t * c.y;
+        poly.push([x, y]);
+      }
+      cur = [c.x, c.y];
+    } else if (c.type === "Z") {
+      if (poly && poly.length > 2) polys.push(poly);
+      poly = null;
+    }
+  }
+  if (poly && poly.length > 2) polys.push(poly);
+  return polys;
+}
+
+/** Even-odd kuralıyla nokta-çokgen testi (delikler doğru çalışır). */
+function insideEvenOdd(polys, x, y) {
+  let inside = false;
+  for (const poly of polys) {
+    for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+      const [xi, yi] = poly[i];
+      const [xj, yj] = poly[j];
+      if (yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) inside = !inside;
+    }
+  }
+  return inside;
+}
+
 /** Glifi 1000×1000 kutuya normalize edip SVG path verisi üretir. */
 function normalizedPath(glyph) {
   const raw = glyph.getPath(0, 0, 1000);
@@ -90,7 +144,23 @@ function normalizedPath(glyph) {
     else if (c.type === "Q") d += `Q${r1(tx(c.x1))} ${r1(ty(c.y1))} ${r1(tx(c.x))} ${r1(ty(c.y))}`;
     else if (c.type === "Z") d += "Z";
   }
-  return d;
+
+  // Boyama ilerlemesi için harf-İÇİ örnek noktalar (Boya oyunu bunları sayar).
+  // Formun kendi noktaları olmadan izole harfin ızgarası kullanılırdı ve
+  // "yeterince boyadım mı" hesabı tutmazdı.
+  const polys = flatten(raw.commands).map((poly) => poly.map(([x, y]) => [tx(x), ty(y)]));
+  const inner = [];
+  const G = 30;
+  for (let gy = 0; gy < G; gy++) {
+    for (let gx = 0; gx < G; gx++) {
+      const x = PAD + ((BOX - PAD * 2) * (gx + 0.5)) / G;
+      const y = PAD + ((BOX - PAD * 2) * (gy + 0.5)) / G;
+      if (insideEvenOdd(polys, x, y)) inner.push([Math.round(x), Math.round(y)]);
+    }
+  }
+  const MAX = 220;
+  const step = Math.max(1, Math.ceil(inner.length / MAX));
+  return { d, inner: inner.filter((_, i) => i % step === 0) };
 }
 
 const FORM_KEYS = ["isolated", "final", "initial", "medial"];
@@ -104,6 +174,7 @@ for (const { id, char } of LETTERS) {
   }
   const count = NON_CONNECTING.has(id) ? 2 : 4;
   const forms = {};
+  const inners = {};
   const chars = {};
 
   // GÜVENLİK KONTROLÜ: izole gösterim formu, harfin KENDİ glifiyle aynı olmalı.
@@ -126,10 +197,12 @@ for (const { id, char } of LETTERS) {
       console.error(`✗ ${id} ${char} ${FORM_KEYS[i]}: glif yok (U+${cp.toString(16).toUpperCase()})`);
       process.exit(1);
     }
-    forms[FORM_KEYS[i]] = normalizedPath(glyph);
+    const np = normalizedPath(glyph);
+    forms[FORM_KEYS[i]] = np.d;
+    inners[FORM_KEYS[i]] = np.inner;
     chars[FORM_KEYS[i]] = ch;
   }
-  entries.push({ id, char, count, forms, chars });
+  entries.push({ id, char, count, forms, inners, chars });
   console.log(`✓ ${String(id).padStart(2)} ${char}  ${count} form  (${Object.keys(forms).join(", ")})`);
 }
 
@@ -149,6 +222,8 @@ export type LetterForms = {
   paths: Partial<Record<LetterFormKind, string>>;
   /** Formun Unicode gösterim karakteri (metin gerekirse) */
   chars: Partial<Record<LetterFormKind, string>>;
+  /** Form-İÇİ örnek noktalar — Boya oyununun ilerleme hesabı için */
+  inners: Partial<Record<LetterFormKind, [number, number][]>>;
   /** Sonraki harfe bağlanır mı? (false → yalnız 2 form) */
   connects: boolean;
 };
@@ -159,7 +234,7 @@ ${entries
     (e) =>
       `  // ${e.id} ${e.char}\n  ${e.id}: { paths: ${JSON.stringify(e.forms)}, chars: ${JSON.stringify(
         e.chars
-      )}, connects: ${e.count === 4} },`
+      )}, inners: ${JSON.stringify(e.inners)}, connects: ${e.count === 4} },`
   )
   .join("\n")}
 };
