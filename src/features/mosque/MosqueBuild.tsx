@@ -75,8 +75,8 @@ export function MosqueBuild({
     setBuilt(true);
     playSfx("mosque_build");
     playSfx("star_earned", 0.7);
-    // Pırıl: "Bak, camin büyüdü!" — bahçe adımları için henüz seslendirme yok.
-    if (!isGarden) setTimeout(() => playNarration(language, "mosqueBuilt"), 300);
+    // Pırıl: "Bak, camin büyüdü!" / bahçede "Bahçemiz bir adım daha güzelleşti!"
+    setTimeout(() => playNarration(language, isGarden ? "gardenGrown" : "mosqueBuilt"), 300);
     if (hapticsEnabled) haptics.celebrate();
     newOpacity.value = withTiming(1, { duration: GROW, easing: Easing.out(Easing.cubic) });
     if (hasPrev) prevOpacity.value = withTiming(0, { duration: GROW * 0.7 });
