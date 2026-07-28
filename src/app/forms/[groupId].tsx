@@ -20,6 +20,8 @@ import { images } from "@/lib/images";
 import { playLetter, playSfx } from "@/lib/sfx";
 import { useFormsStore } from "@/stores/formsStore";
 import { useStageStore } from "@/stores/stageStore";
+import { MosqueBuild } from "@/features/mosque/MosqueBuild";
+import { gardenStage } from "@/lib/garden";
 
 /**
  * "Harf Tanıma" seviyesi — haritada 29-35 olarak görünen kısa derslerden biri
@@ -43,6 +45,7 @@ export default function FormsLevel() {
   const [idx, setIdx] = useState(0);
   const [taught, setTaught] = useState(false);
   const [celebrate, setCelebrate] = useState(false);
+  const [gardenVisible, setGardenVisible] = useState(false);
 
   const letterId = letters[idx];
   const goHome = () => router.replace("/home");
@@ -60,6 +63,12 @@ export default function FormsLevel() {
     } else {
       setCelebrate(true);
     }
+  };
+
+  // Seviye bitti → bahçe büyüme anı (cami 28'de bitti, ödül artık bahçe).
+  const onCelebrationDone = () => {
+    setCelebrate(false);
+    setGardenVisible(true);
   };
 
   if (!letters.length) {
@@ -159,7 +168,13 @@ export default function FormsLevel() {
 
       {!showChapterIntro && <StageHost size={140} onReplay={() => letterId && playLetter(letterId)} />}
       <CheerOverlay />
-      <Celebration visible={celebrate} onDone={goHome} />
+      <Celebration visible={celebrate} onDone={onCelebrationDone} />
+      <MosqueBuild
+        visible={gardenVisible}
+        variant="garden"
+        stageIndex={gardenStage(useFormsStore.getState().completed) - 1}
+        onDone={goHome}
+      />
     </GradientBg>
   );
 }

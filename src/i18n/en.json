@@ -162,7 +162,12 @@
     "tapToBuild": "Tap to build! 🧱",
     "startLearning": "Let's learn your first letter! 📖",
     "growing": "Our mosque grows as you learn! 🕌",
-    "allReady": "Maa shaa Allah, our mosque is ready! ✨"
+    "allReady": "Maa shaa Allah, our mosque is ready! ✨",
+    "gardenSubtitle": "Your mosque is ready! Now the garden comes alive 🌸",
+    "gardenGrowing": "Our garden is growing! 🌸",
+    "gardenReady": "Maa shaa Allah! Our garden is glowing ✨",
+    "gardenParts": "{{built}} / {{total}} garden",
+    "gardenBuilding": "Your garden is coming alive! 🌸"
   },
   "parentGate": {
     "title": "Parents' Gate",

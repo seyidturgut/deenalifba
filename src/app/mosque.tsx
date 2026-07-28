@@ -11,9 +11,11 @@ import { JuicyButton } from "@/components/ui/JuicyButton";
 import { Mascot } from "@/components/ui/Mascot";
 import { Crescent } from "@/components/ui/IslamicMotifs";
 import { LETTERS } from "@/data/letters";
+import { GARDEN_STAGE_COUNT, gardenStage } from "@/lib/garden";
 import { haptics } from "@/lib/haptics";
 import { images } from "@/lib/images";
 import { playSfx } from "@/lib/sfx";
+import { useFormsStore } from "@/stores/formsStore";
 import { useProgressStore } from "@/stores/progressStore";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { useStreakStore } from "@/stores/streakStore";
@@ -22,7 +24,9 @@ export default function Mosque() {
   const { t } = useTranslation();
   const router = useRouter();
   const { width } = useWindowDimensions();
-  const WORLD = Math.min(width - 12, 392); // cami sahnesi ekranı doldurur (Sohail: çok daha büyük)
+  // Sahne ekranı doldurur. Görsellerin kenar boşluğu kırpıldı (ortak kutu), bu yüzden
+  // aynı genişlikte cami gözle görülür biçimde daha büyük görünüyor.
+  const WORLD = Math.min(width - 4, 430);
 
   const completed = useProgressStore((s) => LETTERS.filter((l) => s.isLetterComplete(l.id)).length);
   const mosqueName = useSettingsStore((s) => s.mosqueName);
@@ -36,11 +40,26 @@ export default function Mosque() {
   const STAGES = images.mosqueStages.length;
   const stageIdx = Math.min(STAGES - 1, Math.max(0, completed - 1));
   const built = Math.min(completed, STAGES);
-  const progress = built / STAGES;
   const allDone = built >= STAGES;
 
+  // Cami 28. harfte biter; sonrası Harf Tanıma seviyeleri için BAHÇE ödülü devralır.
+  const formsCompleted = useFormsStore((s) => s.completed);
+  const garden = allDone ? gardenStage(formsCompleted) : 0;
+  const inGarden = garden > 0;
+
+  const progress = inGarden ? garden / GARDEN_STAGE_COUNT : built / STAGES;
+  const gardenDone = garden >= GARDEN_STAGE_COUNT;
+
   // Pırıl'ın balonu: ilerlemeye göre teşvik (artık fener/çeşme görevi yok — cami kendi büyür)
-  const promptKey = allDone ? "mosque.allReady" : completed === 0 ? "mosque.startLearning" : "mosque.growing";
+  const promptKey = inGarden
+    ? gardenDone
+      ? "mosque.gardenReady"
+      : "mosque.gardenGrowing"
+    : allDone
+      ? "mosque.allReady"
+      : completed === 0
+        ? "mosque.startLearning"
+        : "mosque.growing";
 
   const displayName = mosqueName || t("mosque.defaultName");
   const [editing, setEditing] = useState(false);
@@ -57,12 +76,17 @@ export default function Mosque() {
     playSfx("correct_ding");
   };
 
-  // Aşama ilerleyince ses çal
+  // Aşama ilerleyince ses çal (cami parçası ya da yeni bahçe adımı)
   const prevStage = useRef(stageIdx);
+  const prevGarden = useRef(garden);
   useEffect(() => {
     if (completed > 0 && stageIdx > prevStage.current) playSfx("mosque_build");
     prevStage.current = stageIdx;
   }, [stageIdx, completed]);
+  useEffect(() => {
+    if (garden > prevGarden.current) playSfx("mosque_build");
+    prevGarden.current = garden;
+  }, [garden]);
 
   // Pırıl camide "yaşar" — dokununca zıplar (companion bağı)
   const pirilJump = useSharedValue(0);
@@ -125,7 +149,7 @@ export default function Mosque() {
           style={{ shadowColor: "#1462B5", shadowOpacity: 0.1, shadowRadius: 5, shadowOffset: { width: 0, height: 3 } }}
         >
           <Text style={{ fontFamily: "Nunito_700Bold", fontSize: 15, color: "#34618C" }}>
-            {t("mosque.subtitle")}
+            {t(inGarden ? "mosque.gardenSubtitle" : "mosque.subtitle")}
           </Text>
         </View>
 
@@ -133,9 +157,9 @@ export default function Mosque() {
         <View className="my-2 flex-1 items-center justify-center">
           <View style={{ width: WORLD, height: WORLD }}>
             <Floating distance={10} duration={2400}>
-              <Animated.View key={stageIdx} entering={FadeIn.duration(500)}>
+              <Animated.View key={inGarden ? `g${garden}` : `m${stageIdx}`} entering={FadeIn.duration(500)}>
                 <Image
-                  source={images.mosqueStages[stageIdx]}
+                  source={inGarden ? images.gardenStages[garden - 1] : images.mosqueStages[stageIdx]}
                   style={{ width: WORLD, height: WORLD, opacity: completed === 0 ? 0.4 : 1 }}
                   contentFit="contain"
                 />
@@ -165,7 +189,9 @@ export default function Mosque() {
           <View className="h-full rounded-full bg-accent" style={{ width: `${Math.round(progress * 100)}%` }} />
         </View>
         <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 16, color: "#4A5663", textAlign: "center", marginTop: 8 }}>
-          {t("mosque.parts", { built, total: STAGES })}
+          {inGarden
+            ? t("mosque.gardenParts", { built: garden, total: GARDEN_STAGE_COUNT })
+            : t("mosque.parts", { built, total: STAGES })}
         </Text>
         <Text style={{ fontFamily: "Nunito_700Bold", fontSize: 13, color: "#7A8593", textAlign: "center", marginTop: 2 }}>
           {t("mosque.lettersLearned", { n: completed, total: LETTERS.length })}

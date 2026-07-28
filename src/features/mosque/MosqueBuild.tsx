@@ -35,10 +35,13 @@ export function MosqueBuild({
   visible,
   stageIndex,
   onDone,
+  variant = "mosque",
 }: {
   visible: boolean;
   stageIndex: number;
   onDone: () => void;
+  /** "garden": cami 28'de bitti, Harf Tanıma seviyeleri bahçeyi büyütüyor. */
+  variant?: "mosque" | "garden";
 }) {
   const { t } = useTranslation();
   const hapticsEnabled = useSettingsStore((s) => s.hapticsEnabled);
@@ -57,9 +60,14 @@ export function MosqueBuild({
   const marker = useSharedValue(0); // "dokun" işareti nabzı
   const pirilBounce = useSharedValue(0);
 
-  const idx = Math.min(Math.max(stageIndex, 0), images.mosqueStages.length - 1);
-  const hasPrev = idx > 0;
-  const prevIdx = hasPrev ? idx - 1 : idx;
+  const isGarden = variant === "garden";
+  const STAGE_IMAGES = isGarden ? images.gardenStages : images.mosqueStages;
+  const idx = Math.min(Math.max(stageIndex, 0), STAGE_IMAGES.length - 1);
+  // Bahçenin ilk adımında "önceki" görsel tamamlanmış CAMİ olmalı — çocuk
+  // caminin yerinde durduğunu, sadece etrafının canlandığını görsün.
+  const hasPrev = idx > 0 || isGarden;
+  const prevSource =
+    idx > 0 ? STAGE_IMAGES[idx - 1] : images.mosqueStages[images.mosqueStages.length - 1];
 
   const doBuild = () => {
     if (builtRef.current) return;
@@ -67,7 +75,8 @@ export function MosqueBuild({
     setBuilt(true);
     playSfx("mosque_build");
     playSfx("star_earned", 0.7);
-    setTimeout(() => playNarration(language, "mosqueBuilt"), 300); // Pırıl: "Bak, camin büyüdü!"
+    // Pırıl: "Bak, camin büyüdü!" — bahçe adımları için henüz seslendirme yok.
+    if (!isGarden) setTimeout(() => playNarration(language, "mosqueBuilt"), 300);
     if (hapticsEnabled) haptics.celebrate();
     newOpacity.value = withTiming(1, { duration: GROW, easing: Easing.out(Easing.cubic) });
     if (hasPrev) prevOpacity.value = withTiming(0, { duration: GROW * 0.7 });
@@ -151,7 +160,7 @@ export function MosqueBuild({
           ]}
         >
           <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 20, color: "#208AEF", textAlign: "center", marginBottom: 6 }}>
-            {built ? t("mosque.builtCheer") : t("mosque.building")}
+            {built ? t("mosque.builtCheer") : t(isGarden ? "mosque.gardenBuilding" : "mosque.building")}
           </Text>
           <View style={{ width: BOX, height: BOX, alignItems: "center", justifyContent: "center" }}>
             {/* sıcak parıltı (inşa anı) */}
@@ -164,12 +173,12 @@ export function MosqueBuild({
             {/* önceki aşama */}
             {hasPrev && (
               <Animated.View style={[{ position: "absolute", width: IMG, height: IMG }, prevStyle]}>
-                <Image source={images.mosqueStages[prevIdx]} style={{ width: IMG, height: IMG }} contentFit="contain" />
+                <Image source={prevSource} style={{ width: IMG, height: IMG }} contentFit="contain" />
               </Animated.View>
             )}
             {/* yeni aşama */}
             <Animated.View style={[{ position: "absolute", width: IMG, height: IMG }, newStyle]}>
-              <Image source={images.mosqueStages[idx]} style={{ width: IMG, height: IMG }} contentFit="contain" />
+              <Image source={STAGE_IMAGES[idx]} style={{ width: IMG, height: IMG }} contentFit="contain" />
             </Animated.View>
 
             {/* "DOKUN" işareti (inşadan önce) */}
@@ -180,7 +189,7 @@ export function MosqueBuild({
                   markerStyle,
                 ]}
               >
-                <Text style={{ fontSize: 34 }}>🧱</Text>
+                <Text style={{ fontSize: 34 }}>{isGarden ? "🌱" : "🧱"}</Text>
               </Animated.View>
             )}
 

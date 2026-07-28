@@ -162,7 +162,12 @@
     "tapToBuild": "Dokun ve inşa et! 🧱",
     "startLearning": "Hadi ilk harfini öğren! 📖",
     "growing": "Harf öğrendikçe camimiz büyüyor! 🕌",
-    "allReady": "Maşallah, camimiz hazır! ✨"
+    "allReady": "Maşallah, camimiz hazır! ✨",
+    "gardenSubtitle": "Camin hazır! Şimdi bahçesi canlanıyor 🌸",
+    "gardenGrowing": "Bahçemiz büyüyor! 🌸",
+    "gardenReady": "Maşallah! Bahçemiz ışıl ışıl oldu ✨",
+    "gardenParts": "{{built}} / {{total}} bahçe",
+    "gardenBuilding": "Bahçen canlanıyor! 🌸"
   },
   "parentGate": {
     "title": "Ebeveyn Kapısı",

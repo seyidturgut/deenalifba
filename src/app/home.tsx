@@ -22,6 +22,7 @@ import { FORMS_GROUPS, formsGroup } from "@/data/formsLessons";
 import { LETTERS } from "@/data/letters";
 
 import type { Letter } from "@/data/types";
+import { GARDEN_STAGE_COUNT, gardenStage } from "@/lib/garden";
 import { images } from "@/lib/images";
 import { playSfx, syncMusicWithSetting } from "@/lib/sfx";
 import { useFormsStore } from "@/stores/formsStore";
@@ -184,7 +185,13 @@ function BottomNav() {
   // Cami ilerlemesi → "Mosque" sekmesinde minik rozet (büyüyen cami hatırlatıcısı)
   const mosqueDone = useProgressStore((s) => LETTERS.filter((l) => s.isLetterComplete(l.id)).length);
   const mosqueStages = images.mosqueStages.length;
-  const mosquePct = Math.round((Math.min(mosqueDone, mosqueStages) / mosqueStages) * 100);
+  // Cami 28'de biter; sonrası bahçe ödülü — rozet o zaman bahçe yüzdesini gösterir.
+  const formsDone = useFormsStore((s) => s.completed);
+  const garden = mosqueDone >= LETTERS.length ? gardenStage(formsDone) : 0;
+  const mosquePct =
+    mosqueDone >= LETTERS.length
+      ? Math.round((garden / GARDEN_STAGE_COUNT) * 100)
+      : Math.round((Math.min(mosqueDone, mosqueStages) / mosqueStages) * 100);
   const items: { label: string; src: number; onPress: () => void; badge?: number }[] = [
     { label: t("nav.home"), src: images.icHome, onPress: () => {} },
     { label: t("nav.lessons"), src: images.icLessons, onPress: () => router.push("/harfler") },

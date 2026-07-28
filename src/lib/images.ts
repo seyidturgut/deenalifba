@@ -29,6 +29,19 @@ export const images = {
     require("@/assets/illustrations/mosque/mosque_stage_12.webp"),
   ],
 
+  // Bahçe — cami 28. harfte tamamlandıktan SONRAKİ ödül (Harf Tanıma 29-35).
+  // Aynı ada, her seviyede bir adım daha canlanır: ağaçlar → çiçekler → şelale →
+  // bahçe kapısı → okuma köşesi → akşam kandilleri → yıldızlı gece.
+  gardenStages: [
+    require("@/assets/illustrations/garden/garden_stage_1.webp"),
+    require("@/assets/illustrations/garden/garden_stage_2.webp"),
+    require("@/assets/illustrations/garden/garden_stage_3.webp"),
+    require("@/assets/illustrations/garden/garden_stage_4.webp"),
+    require("@/assets/illustrations/garden/garden_stage_5.webp"),
+    require("@/assets/illustrations/garden/garden_stage_6.webp"),
+    require("@/assets/illustrations/garden/garden_stage_7.webp"),
+  ],
+
   // Ödüller
   star: require("@/assets/illustrations/rewards/star.webp"),
   trophy: require("@/assets/illustrations/rewards/trophy.webp"),
