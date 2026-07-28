@@ -356,8 +356,15 @@ export default function Home() {
   // "İlk boşluğa" göre DEĞİL → çocuk bir harfi atlasa bile kuş geri seviyeye dönmez,
   // hep en ileride durur (Duolingo gibi parlar).
   const lastDoneIndex = LETTERS.reduce((m, l, i) => (isLetterComplete(l.id) ? i : m), -1);
-  const activeIndex = Math.min(lastDoneIndex + 1, LETTERS.length - 1);
-  const activeId = LETTERS[activeIndex].id;
+  // Rehberin durduğu düğüm. 28 harf bitmemişse sıradaki harf; bitmişse Harf Tanıma
+  // gruplarının ilk tamamlanmamışı — yoksa Pırıl 28'de park kalıyor ve çocuk 28'i
+  // bitirip haritaya dönünce "sıradaki burası" işaretini hiç görmüyordu.
+  const lettersAllDone = lastDoneIndex === LETTERS.length - 1;
+  const firstOpenFormsGroup = FORMS_GROUPS.findIndex((g) => g.some((id) => !formsDoneIds.includes(id)));
+  const activeIndex = lettersAllDone
+    ? LETTERS.length + (firstOpenFormsGroup === -1 ? FORMS_GROUPS.length - 1 : firstOpenFormsGroup)
+    : Math.min(lastDoneIndex + 1, LETTERS.length - 1);
+  const activeId = lettersAllDone ? -1 : LETTERS[activeIndex].id;
 
   // Düğüm konumları (zig-zag)
   const nodes = LETTERS.map((l, i) => ({
@@ -375,8 +382,9 @@ export default function Home() {
   const pathPoints = [...nodes, ...stageNodes].map((n) => `${n.cx},${n.cy}`).join(" ");
 
 
-  // Rehber karakterin durduğu aktif düğüm
-  const activeNode = nodes[activeIndex];
+  // Rehber karakterin durduğu aktif düğüm (harf düğümleri VE bölüm düğümleri dahil)
+  const allNodes = [...nodes, ...stageNodes];
+  const activeNode = allNodes[activeIndex];
   // Rehber Hüdhüd yerleşimi: düğümün boş tarafında, kendi bulutunda, büyük
   const GUIDE = 124;
   const guideSide = activeNode && activeNode.cx <= contentW / 2 ? 1 : -1;
@@ -385,7 +393,8 @@ export default function Home() {
 
   // Bir düğüm konumunun "rehber" yerleşimi (uçuş başlangıcı için)
   const guidePosOf = (i: number) => {
-    const n = nodes[i];
+    const n = allNodes[i];
+    if (!n) return { x: 0, top: 0 };
     const side = n.cx <= contentW / 2 ? 1 : -1;
     return { x: n.cx + side * (NODE * 0.74), top: Math.max(4, n.cy - GUIDE * 0.5) };
   };
@@ -457,7 +466,7 @@ export default function Home() {
     }, 350);
     return () => clearTimeout(tmr);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeId]);
+  }, [activeIndex]);
 
   const stateOf = (l: Letter): "done" | "active" | "open" | "locked" => {
     if (isLetterComplete(l.id)) return "done";
