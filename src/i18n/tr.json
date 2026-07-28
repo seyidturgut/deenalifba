@@ -104,7 +104,11 @@
     "recordCheer": "Harikasın! 🌟",
     "playYou": "Sen",
     "playPiril": "{{mascot}}",
-    "recordAgain": "Tekrar kaydet"
+    "recordAgain": "Tekrar kaydet",
+    "stepListen": "Önce dinle 👂",
+    "stepRecord": "Şimdi sen söyle 🎤",
+    "stepRecording": "Dinliyorum…",
+    "stepPlayback": "Kendini dinle!"
   },
   "finale": {
     "title": "Maşallah!",

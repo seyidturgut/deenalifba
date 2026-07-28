@@ -1,38 +1,27 @@
-import { Image } from "expo-image";
 import { useEffect, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import Svg, { G, Path } from "react-native-svg";
 import { useTranslation } from "react-i18next";
 
 import { JuicyButton } from "@/components/ui/JuicyButton";
-import { Mascot } from "@/components/ui/Mascot";
 import { RecordCompare } from "@/components/ui/RecordCompare";
 import { getLetter } from "@/data/letters";
 import { getLetterPath, PATH_BOX } from "@/data/letterPaths";
-import { images } from "@/lib/images";
-import { mascotVars } from "@/lib/mascot";
-import { playLetter, suspendMusic } from "@/lib/sfx";
-
-const DEMO_MS = 1600; // Pırıl'ın "önce ben söyleyeyim" anını gösterme süresi
+import { suspendMusic } from "@/lib/sfx";
 
 /**
- * "Konuş" (kaydet & karşılaştır) adımı — dersin GERÇEK son adımı (Abdulkadir video
- * geri bildirimi: dinleme/yazma/pratik/tekrar BİTMEDEN çocuktan konuşmasını istemek
- * yanlıştı; artık her harfte, ama trace+pratik+recall'dan SONRA geliyor).
+ * "Konuş" adımı — dersin son adımı. Üstte hangi harfi söyleyeceği sabit durur,
+ * altında üç adımlı akış: dinle → kaydet → kendini dinle (bkz. RecordCompare).
  *
- * Kendi tek-amaçlı ekranı: küçük "tekrar dinle" hapı + mikrofon ortada + tek kısa
- * davet metni altında (Abdulkadir: kalabalık/scroll gerektiren tek ekran yerine sade).
- *
- * Sohail (playtest): "sudden context switch" — çocuk boya/dokun/sürükle gibi
- * aktivitelerden aniden "şimdi konuş"a geçiyordu. Önce Pırıl KENDİSİ harfi söyler
- * (konuşma pozu + otomatik ses), mikrofon o kısa "demo" anından SONRA ortaya çıkar.
+ * NOT: Burada eskiden ayrı bir "Pırıl önce gösterir" demo fazı vardı. Abdulkadir'in
+ * 2. tur geri bildiriminden sonra akışın 1. adımı zaten "dinle" olduğu için kaldırıldı —
+ * iki ayrı dinleme anı çocuğu şaşırtıyor ve "ne zaman basacağım" belirsizliğini artırıyordu.
  */
 export function SpeakPractice({ letterId, onComplete }: { letterId: number; onComplete: () => void }) {
   const { t } = useTranslation();
   const letter = getLetter(letterId);
   const lp = getLetterPath(letterId);
   const [hasRecorded, setHasRecorded] = useState(false);
-  const [demoing, setDemoing] = useState(true);
 
   // Konuşma adımı boyunca müzik DURUR — çocuğun kendi kaydı net duyulsun (Abdulkadir).
   useEffect(() => {
@@ -40,47 +29,37 @@ export function SpeakPractice({ letterId, onComplete }: { letterId: number; onCo
     return () => suspendMusic(false);
   }, []);
 
-  useEffect(() => {
-    setDemoing(true);
-    const playTt = setTimeout(() => playLetter(letterId), 300);
-    const revealTt = setTimeout(() => setDemoing(false), DEMO_MS);
-    return () => {
-      clearTimeout(playTt);
-      clearTimeout(revealTt);
-    };
-  }, [letterId]);
-
   if (!letter) return null;
 
   return (
-    <View style={{ flex: 1, width: "100%", alignItems: "center", justifyContent: "center", gap: 36 }}>
-      <Pressable
-        onPress={() => playLetter(letterId)}
-        style={{ flexDirection: "row", alignItems: "center", gap: 12, backgroundColor: "rgba(255,255,255,0.55)", borderRadius: 999, paddingVertical: 12, paddingHorizontal: 26 }}
+    <View style={{ flex: 1, width: "100%", alignItems: "center", justifyContent: "center", gap: 16 }}>
+      {/* Hangi harfi söyleyeceği — sabit referans (dinleme akışın 1. adımında) */}
+      <View
+        style={{
+          width: 88,
+          height: 88,
+          borderRadius: 22,
+          backgroundColor: "rgba(255,255,255,0.9)",
+          borderWidth: 3,
+          borderColor: "#F5A524",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
       >
-        <Image source={images.icListen} style={{ width: 46, height: 42 }} contentFit="contain" />
         {lp ? (
-          <Svg width={56} height={56}>
-            <G transform={`scale(${56 / PATH_BOX})`}>
+          <Svg width={58} height={58}>
+            <G transform={`scale(${58 / PATH_BOX})`}>
               <Path d={lp.d} fill="#2A2A33" />
             </G>
           </Svg>
         ) : (
-          <Text style={{ fontFamily: "Amiri_700Bold", fontSize: 44, color: "#2A2A33" }}>{letter.char}</Text>
+          <Text style={{ fontFamily: "Amiri_700Bold", fontSize: 46, color: "#2A2A33" }}>{letter.char}</Text>
         )}
-      </Pressable>
+      </View>
 
-      {demoing ? (
-        // Pırıl önce kendisi söyler — mikrofon henüz yok, "aniden konuş" hissi olmasın
-        <View style={{ alignItems: "center", gap: 10 }}>
-          <Mascot size={72} pose="point" talking />
-          <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 16, color: "#34618C" }}>{t("intro.speakDemo", mascotVars())}</Text>
-        </View>
-      ) : (
-        <RecordCompare letterId={letterId} onRecordedChange={setHasRecorded} />
-      )}
+      <RecordCompare letterId={letterId} onRecordedChange={setHasRecorded} />
 
-      <JuicyButton label={t("intro.continue")} tone="success" onPress={onComplete} disabled={demoing || !hasRecorded} />
+      <JuicyButton label={t("intro.continue")} tone="success" onPress={onComplete} disabled={!hasRecorded} />
     </View>
   );
 }

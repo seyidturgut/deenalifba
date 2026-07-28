@@ -9,7 +9,8 @@ import {
 } from "expo-audio";
 import { useEffect, useRef, useState } from "react";
 import { Pressable, Text, View } from "react-native";
-import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming } from "react-native-reanimated";
+import Animated, { Easing, useAnimatedProps, useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming } from "react-native-reanimated";
+import Svg, { Circle } from "react-native-svg";
 import { useTranslation } from "react-i18next";
 
 import { Mascot } from "@/components/ui/Mascot";
@@ -19,59 +20,90 @@ import { mascotVars } from "@/lib/mascot";
 import { playLetter, playSfx } from "@/lib/sfx";
 
 const MAX_RECORD_MS = 3500;
-// Artık kendi tek-amaçlı "speak" ekranında (LetterIntro), bol boşluk var — 84'te kesilme
-// büyük harf kartıyla AYNI ekranı paylaştığı için oluyordu, o sorun artık yok, tekrar büyüttük.
-const MIC = 110;
+const MIC = 104;
 const MIC_ASPECT = 480 / 313; // ic_mic.webp kaynak oranı (h/w)
-const MIC_BOX = MIC + 16; // nabız animasyonunun taşması için pay (görsel kesilmeyi önler)
+const RING = MIC + 34; // geri sayım halkası çapı
+
+const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 /**
- * "Kaydet ve karşılaştır" (Sohail/Abdulkadir onayladı; Abdulkadir canlıda deneyip
- * netleştirdi): çocuk kendi sesini kaydeder, Pırıl SICAK bir tepki verir (yargı/doğruluk
- * puanı YOK — yalnız "seni duydum, harikasın!"), sonra isterse kendi kaydı+Pırıl'ın
- * sesini karşılaştırmalı dinleyebilir.
+ * "Dinle → Kaydet → Kendini dinle" — üç adımlı, her adımı BARİZ konuşma aktivitesi.
  *
- * Abdulkadir'in somut istekleri: büyük mikrofon + net "Senin sıran!" daveti + kayıt
- * sırasında BARİZ "dinliyorum" animasyonu + kayıt sonrası sıcak tebrik.
+ * Abdulkadir (2. playtest turu): çocuklar (a) mikrofona NE ZAMAN basacaklarını bilmiyor,
+ * (b) kaydın başladığını/bittiğini anlamıyor, (c) akış küçük çocuk için sezgisel değil,
+ * (d) kendi seslerini duymak istiyorlar — geri oynatma öne çıkmalı.
  *
- * GİZLİLİK: kayıt yalnız bu ekranda, YALNIZ bellekte tutulur; hiçbir depoya/uzak
- * sunucuya yazılmaz/gönderilmez. Harf değişince veya ekrandan çıkınca serbest bırakılır.
- * Mikrofon izni reddedilirse veya desteklenmiyorsa bileşen sessizce gizlenir — ana akışı
- * hiçbir zaman engellemez (ebeveyn onDisabled ile "Hazırım"ı yalnız GÖSTERİLİYORSA kilitler).
+ * Bu yüzden:
+ *   - Üstte 3 adımlı gösterge (kulak → mikrofon → hoparlör): çocuk nerede olduğunu görür.
+ *   - Her adımda TEK bir büyük buton nabız atar → "şimdi buna bas" belirsizliği kalmaz.
+ *   - Kayıt sırasında halka GERİ SAYAR (dolu → boş): ne zaman biteceği görünür.
+ *   - Kayıt bitince kendi sesi BÜYÜK butonla öne çıkar; karşılaştırma ikincil kalır.
+ *
+ * GİZLİLİK: kayıt yalnız bellekte; hiçbir yere yazılmaz/gönderilmez, harf değişince silinir.
+ * İzin yoksa/desteklenmiyorsa bileşen kendini gizler ve akışı ASLA bloklamaz.
  */
+type Step = "listen" | "record" | "playback" | "unsupported";
+
+function StepDots({ step }: { step: Step }) {
+  const order: Step[] = ["listen", "record", "playback"];
+  const icons = ["👂", "🎤", "🔊"];
+  const idx = order.indexOf(step);
+  return (
+    <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+      {order.map((s, i) => {
+        const active = i === idx;
+        const done = i < idx;
+        return (
+          <View key={s} style={{ flexDirection: "row", alignItems: "center" }}>
+            {i > 0 && (
+              <View style={{ width: 12, height: 4, borderRadius: 2, marginHorizontal: 2, backgroundColor: i <= idx ? "#3FB984" : "rgba(0,0,0,0.12)" }} />
+            )}
+            <View
+              style={{
+                width: active ? 38 : 30,
+                height: active ? 38 : 30,
+                borderRadius: 19,
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: active ? "#FFFFFF" : "transparent",
+                borderWidth: done ? 3 : 0,
+                borderColor: "#3FB984",
+              }}
+            >
+              <Text style={{ fontSize: active ? 20 : 16, opacity: active || done ? 1 : 0.4 }}>{icons[i]}</Text>
+            </View>
+          </View>
+        );
+      })}
+    </View>
+  );
+}
+
 export function RecordCompare({ letterId, onRecordedChange }: { letterId: number; onRecordedChange?: (recorded: boolean) => void }) {
   const { t } = useTranslation();
-  const [phase, setPhase] = useState<"idle" | "recording" | "recorded" | "unsupported">("idle");
+  const [step, setStep] = useState<Step>("listen");
+  const [recording, setRecording] = useState(false);
   const youPlayerRef = useRef<AudioPlayer | null>(null);
   const stopTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const recorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
 
-  // Nabız (idle/recording buton daveti)
+  // Aktif butonun nabzı — "şimdi buna bas" daveti
   const pulse = useSharedValue(0);
   useEffect(() => {
-    pulse.value = withRepeat(withSequence(withTiming(1, { duration: 550, easing: Easing.inOut(Easing.ease) }), withTiming(0, { duration: 550, easing: Easing.inOut(Easing.ease) })), -1, false);
+    pulse.value = withRepeat(withSequence(withTiming(1, { duration: 600, easing: Easing.inOut(Easing.ease) }), withTiming(0, { duration: 600, easing: Easing.inOut(Easing.ease) })), -1, false);
   }, []);
-  const pulseStyle = useAnimatedStyle(() => ({ transform: [{ scale: 1 + pulse.value * (phase === "recording" ? 0.16 : 0.08) }] }));
+  const pulseStyle = useAnimatedStyle(() => ({ transform: [{ scale: 1 + pulse.value * (recording ? 0.03 : 0.07) }] }));
 
-  // "Dinliyorum" radar halkası — Abdulkadir: kayıt sırasında BARİZ bir animasyon olsun
-  const ring = useSharedValue(0);
-  useEffect(() => {
-    if (phase === "recording") {
-      ring.value = 0;
-      ring.value = withRepeat(withTiming(1, { duration: 900, easing: Easing.out(Easing.ease) }), -1, false);
-    } else {
-      ring.value = 0;
-    }
-  }, [phase]);
-  const ringStyle = useAnimatedStyle(() => ({
-    opacity: phase === "recording" ? 0.5 * (1 - ring.value) : 0,
-    transform: [{ scale: 1 + ring.value * 0.9 }],
-  }));
+  // Kayıt geri sayımı — halka dolu başlar, süre bitince boşalır (ne zaman biteceği GÖRÜNÜR)
+  const CIRC = Math.PI * (RING - 8);
+  const countdown = useSharedValue(0);
+  const ringStyle = useAnimatedStyle(() => ({ opacity: recording ? 1 : 0 }));
+  const countdownProps = useAnimatedProps(() => ({ strokeDashoffset: CIRC * (1 - countdown.value) }));
 
-  // Harf değişince (yeni intro) sıfırla + eski kaydı serbest bırak
   useEffect(() => {
-    setPhase("idle");
+    setStep("listen");
+    setRecording(false);
     onRecordedChange?.(false);
     youPlayerRef.current?.remove();
     youPlayerRef.current = null;
@@ -83,26 +115,34 @@ export function RecordCompare({ letterId, onRecordedChange }: { letterId: number
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [letterId]);
 
+  /** 1) Dinle — Pırıl harfi söyler, sonra kayıt adımı açılır */
+  const doListen = () => {
+    playLetter(letterId);
+    haptics.tap();
+    setTimeout(() => setStep("record"), 900);
+  };
+
+  /** 2) Kaydet */
   const startRecording = async () => {
     try {
       const perm = await requestRecordingPermissionsAsync();
       if (!perm.granted) {
-        setPhase("unsupported");
-        onRecordedChange?.(true); // izin yok — ana akışı ("Hazırım") kilitli bırakma
+        setStep("unsupported");
+        onRecordedChange?.(true); // izin yok — akışı kilitli bırakma
         return;
       }
       await setAudioModeAsync({ allowsRecording: true });
       await recorder.prepareToRecordAsync();
       recorder.record();
       haptics.tap();
-      setPhase("recording");
+      playSfx("ui_tap");
+      setRecording(true);
+      countdown.value = 1;
+      countdown.value = withTiming(0, { duration: MAX_RECORD_MS, easing: Easing.linear });
       stopTimerRef.current = setTimeout(stopRecording, MAX_RECORD_MS);
     } catch (err) {
-      // mikrofon yok/izin yok/desteklenmiyor → sessizce gizle, ana akışı bozma
-      // (console.error: chrome://inspect ile WebView'a bağlanınca GERÇEK hatayı görmek için —
-      // izin verildiği halde kayıt başlamıyorsa buradaki mesaj kök nedeni gösterir)
       console.error("RecordCompare: kayıt başlatılamadı", err);
-      setPhase("unsupported");
+      setStep("unsupported");
       onRecordedChange?.(true);
     }
   };
@@ -115,24 +155,27 @@ export function RecordCompare({ letterId, onRecordedChange }: { letterId: number
     try {
       await recorder.stop();
       await setAudioModeAsync({ allowsRecording: false });
+      setRecording(false);
       if (recorder.uri) {
         youPlayerRef.current?.remove();
         youPlayerRef.current = createAudioPlayer(recorder.uri);
-        setPhase("recorded");
+        setStep("playback");
         onRecordedChange?.(true);
         haptics.success();
-        playSfx("star_earned", 0.8); // Pırıl'ın sıcak tepkisi — yargı yok, yalnız kutlama
+        playSfx("star_earned", 0.8);
       } else {
-        setPhase("idle");
+        setStep("record");
       }
     } catch (err) {
       console.error("RecordCompare: kayıt durdurulamadı", err);
-      setPhase("idle");
+      setRecording(false);
+      setStep("record");
     }
   };
 
+  /** 3) Kendini dinle */
   const playYou = () => {
-    playSfx("ui_tap");
+    haptics.tap();
     youPlayerRef.current?.seekTo(0);
     youPlayerRef.current?.play();
   };
@@ -142,62 +185,133 @@ export function RecordCompare({ letterId, onRecordedChange }: { letterId: number
   };
   const recordAgain = () => {
     haptics.tap();
-    setPhase("idle");
+    setStep("record");
     onRecordedChange?.(false);
   };
 
-  if (phase === "unsupported") return null;
+  if (step === "unsupported") return null;
 
   return (
-    <View style={{ alignItems: "center", gap: 6 }}>
-      {phase !== "recorded" && (
-        // Abdulkadir: mikrofon ORTADA, tek/kısa bir davet metni ALTINDA (yan yana değil) +
-        // kayıt sırasında bariz "dinliyorum" halkası.
-        <Pressable onPress={phase === "recording" ? stopRecording : startRecording} hitSlop={10} style={{ alignItems: "center", gap: 8 }}>
-          <View style={{ width: MIC_BOX, height: MIC_BOX, alignItems: "center", justifyContent: "center" }}>
-            {phase === "recording" && (
-              <Animated.View
-                pointerEvents="none"
-                style={[{ position: "absolute", width: MIC, height: MIC, borderRadius: MIC / 2, backgroundColor: "#F0645A" }, ringStyle]}
-              />
-            )}
+    <View style={{ alignItems: "center", gap: 14 }}>
+      <StepDots step={step} />
+
+      {/* 1) DİNLE */}
+      {step === "listen" && (
+        <Animated.View style={pulseStyle}>
+          <Pressable onPress={doListen} hitSlop={10} style={{ alignItems: "center", gap: 10 }}>
+            <View
+              style={{
+                width: MIC,
+                height: MIC,
+                borderRadius: MIC / 2,
+                backgroundColor: "#FFFFFF",
+                borderWidth: 4,
+                borderColor: "#F5A524",
+                alignItems: "center",
+                justifyContent: "center",
+                shadowColor: "#1462B5",
+                shadowOpacity: 0.2,
+                shadowRadius: 8,
+                shadowOffset: { width: 0, height: 4 },
+              }}
+            >
+              <Image source={images.icListen} style={{ width: 58, height: 53 }} contentFit="contain" />
+            </View>
+            <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 18, color: "#34618C" }}>{t("intro.stepListen")}</Text>
+          </Pressable>
+        </Animated.View>
+      )}
+
+      {/* 2) KAYDET — halka geri sayar, bitişi görünür */}
+      {step === "record" && (
+        <Pressable onPress={recording ? stopRecording : startRecording} hitSlop={10} style={{ alignItems: "center", gap: 10 }}>
+          <View style={{ width: RING, height: RING, alignItems: "center", justifyContent: "center" }}>
+            <Animated.View style={[{ position: "absolute", width: RING, height: RING }, ringStyle]}>
+              <Svg width={RING} height={RING}>
+                <Circle cx={RING / 2} cy={RING / 2} r={(RING - 8) / 2} stroke="rgba(240,100,90,0.2)" strokeWidth={8} fill="none" />
+                <AnimatedCircle
+                  cx={RING / 2}
+                  cy={RING / 2}
+                  r={(RING - 8) / 2}
+                  stroke="#F0645A"
+                  strokeWidth={8}
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeDasharray={CIRC}
+                  animatedProps={countdownProps}
+                  transform={`rotate(-90 ${RING / 2} ${RING / 2})`}
+                />
+              </Svg>
+            </Animated.View>
             <Animated.View style={pulseStyle}>
-              <Image source={images.icMic} style={{ width: MIC / MIC_ASPECT, height: MIC }} contentFit="contain" />
+              <View
+                style={{
+                  width: MIC,
+                  height: MIC,
+                  borderRadius: MIC / 2,
+                  backgroundColor: recording ? "#FFEDEB" : "#FFFFFF",
+                  borderWidth: 4,
+                  borderColor: recording ? "#F0645A" : "#3FB984",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  shadowColor: "#1462B5",
+                  shadowOpacity: 0.2,
+                  shadowRadius: 8,
+                  shadowOffset: { width: 0, height: 4 },
+                }}
+              >
+                <Image source={images.icMic} style={{ width: 62 / MIC_ASPECT, height: 62 }} contentFit="contain" />
+              </View>
             </Animated.View>
           </View>
-          <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 18, color: "#34618C" }}>
-            {phase === "recording" ? t("intro.recording") : t("intro.recordPrompt")}
+          <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 18, color: recording ? "#D8493F" : "#2E7D5B" }}>
+            {recording ? t("intro.stepRecording") : t("intro.stepRecord")}
           </Text>
         </Pressable>
       )}
 
-      {phase === "recorded" && (
+      {/* 3) KENDİNİ DİNLE — kendi sesi BÜYÜK, karşılaştırma ikincil */}
+      {step === "playback" && (
         <View style={{ alignItems: "center", gap: 10 }}>
-          {/* Pırıl'ın sıcak tepkisi — yargı yok, yalnız kutlama (Abdulkadir) */}
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
-            <Mascot size={56} pose="celebrate" />
-            <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 19, color: "#3FB984" }}>{t("intro.recordCheer")}</Text>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+            <Mascot size={46} pose="celebrate" />
+            <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 17, color: "#3FB984" }}>{t("intro.recordCheer")}</Text>
           </View>
 
-          <View style={{ flexDirection: "row", gap: 18 }}>
-            <Pressable onPress={playYou} style={{ alignItems: "center", gap: 4 }}>
+          <Animated.View style={pulseStyle}>
+            <Pressable onPress={playYou} hitSlop={10} style={{ alignItems: "center", gap: 8 }}>
               <View
-                style={{ width: 62, height: 62, borderRadius: 31, backgroundColor: "#FFFFFF", borderWidth: 3, borderColor: "#3FB984", alignItems: "center", justifyContent: "center", shadowColor: "#1462B5", shadowOpacity: 0.18, shadowRadius: 5, shadowOffset: { width: 0, height: 3 } }}
+                style={{
+                  width: MIC,
+                  height: MIC,
+                  borderRadius: MIC / 2,
+                  backgroundColor: "#FFFFFF",
+                  borderWidth: 4,
+                  borderColor: "#3FB984",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  shadowColor: "#1462B5",
+                  shadowOpacity: 0.2,
+                  shadowRadius: 8,
+                  shadowOffset: { width: 0, height: 4 },
+                }}
               >
-                <Image source={images.icMic} style={{ width: 42 / MIC_ASPECT, height: 42 }} contentFit="contain" />
+                <Text style={{ fontSize: 42 }}>🔊</Text>
               </View>
-              <Text style={{ fontFamily: "Fredoka_600SemiBold", fontSize: 14, color: "#5B6470" }}>{t("intro.playYou")}</Text>
+              <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 18, color: "#2E7D5B" }}>{t("intro.stepPlayback")}</Text>
             </Pressable>
-            <Pressable onPress={playPiril} style={{ alignItems: "center", gap: 4 }}>
-              <View style={{ width: 62, height: 62, alignItems: "center", justifyContent: "center" }}>
-                <Image source={images.icListen} style={{ width: 56, height: 51 }} contentFit="contain" />
-              </View>
+          </Animated.View>
+
+          {/* İkincil: Pırıl'la karşılaştır + tekrar kaydet */}
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 18, marginTop: 2 }}>
+            <Pressable onPress={playPiril} hitSlop={8} style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+              <Image source={images.icListen} style={{ width: 30, height: 27 }} contentFit="contain" />
               <Text style={{ fontFamily: "Fredoka_600SemiBold", fontSize: 14, color: "#5B6470" }}>{t("intro.playPiril", mascotVars())}</Text>
             </Pressable>
+            <Pressable onPress={recordAgain} hitSlop={8}>
+              <Text style={{ fontFamily: "Fredoka_600SemiBold", fontSize: 14, color: "#7A8593" }}>{t("intro.recordAgain")}</Text>
+            </Pressable>
           </View>
-          <Pressable onPress={recordAgain} hitSlop={8} style={{ paddingVertical: 4 }}>
-            <Text style={{ fontFamily: "Fredoka_600SemiBold", fontSize: 14, color: "#7A8593" }}>{t("intro.recordAgain")}</Text>
-          </Pressable>
         </View>
       )}
     </View>

@@ -104,7 +104,11 @@
     "recordCheer": "Great job! 🌟",
     "playYou": "You",
     "playPiril": "{{mascot}}",
-    "recordAgain": "Record again"
+    "recordAgain": "Record again",
+    "stepListen": "Listen first 👂",
+    "stepRecord": "Now you say it 🎤",
+    "stepRecording": "Listening…",
+    "stepPlayback": "Hear yourself!"
   },
   "finale": {
     "title": "Maa shaa Allah!",
