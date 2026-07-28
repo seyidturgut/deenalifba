@@ -235,6 +235,7 @@
     "posInitial": "Kelimenin başında",
     "posMedial": "Kelimenin ortasında",
     "posFinal": "Kelimenin sonunda",
-    "bannerTitle": "Harfin Yeri"
+    "bannerTitle": "Harfin Yeri",
+    "reversePrompt": "Bu hangi harf?"
   }
 }

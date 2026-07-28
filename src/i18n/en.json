@@ -235,6 +235,7 @@
     "posInitial": "At the beginning of the word",
     "posMedial": "In the middle of the word",
     "posFinal": "At the end of the word",
-    "bannerTitle": "Letter Positions"
+    "bannerTitle": "Letter Positions",
+    "reversePrompt": "Which letter is this?"
   }
 }

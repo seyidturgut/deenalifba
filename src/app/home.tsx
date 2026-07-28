@@ -18,6 +18,7 @@ import { FeedbackModal } from "@/components/ui/FeedbackModal";
 import { GradientBg } from "@/components/ui/GradientBg";
 import { Mascot } from "@/components/ui/Mascot";
 import { StarBadge } from "@/components/ui/StarBadge";
+import { FORMS_GROUPS, formsGroup } from "@/data/formsLessons";
 import { LETTERS } from "@/data/letters";
 
 import type { Letter } from "@/data/types";
@@ -36,12 +37,11 @@ let lastSeenActiveIndex: number | null = null;
 
 // 28 harften sonraki BÜYÜK yolculuk aşamaları (kilitli, gelecek) — Elif'ten Namaz'a.
 // Haritada görünür → "28 harf" değil, hedefin Namaz olduğu bir macera hissi (Sohail #7).
-const JOURNEY_STAGES: { key: string; emoji: string; goal?: boolean; route?: string }[] = [
-  // Harf Tanıma — Abdulkadir'in müfredat önerisi: Harakat'tan ÖNCE gelmeli, çünkü çocuk
-  // harfi izole bilse de kelime içinde şekil değiştiği için tanıyamıyor. OYNANABİLİR
-  // (28 harf bitince açılır); diğerleri hâlâ kilitli/"Yakında".
-  // ـبـ = bir harfin "orta" formu — bölümün konusunu tek bakışta anlatır (emoji yerine gerçek glif)
-  { key: "letterForms", emoji: "ـبـ", route: "/forms" },
+const JOURNEY_STAGES: { key: string; emoji: string; goal?: boolean; route?: string; formsGroup?: number }[] = [
+  // Harf Tanıma (Abdulkadir): Harakat'tan ÖNCE gelir ve YEDİ seviyeye yayılır (29-35),
+  // seviye başına 4 harf — hepsi tek seviyede olunca bilişsel yük fazlaydı ve 1-28'deki
+  // "bir düğüm = bir kısa ders" ritmi bozuluyordu.
+  ...FORMS_GROUPS.map((_, i) => ({ key: "letterForms", emoji: "ـبـ", route: `/forms/${i + 1}`, formsGroup: i })),
   { key: "harakat", emoji: "ﹶ" },
   { key: "joining", emoji: "🔗" },
   { key: "words", emoji: "📖" },
@@ -337,7 +337,7 @@ export default function Home() {
   const isLetterComplete = useProgressStore((s) => s.isLetterComplete);
   // Harf Tanıma bölümü (Abdulkadir) — 28 harf bitince açılır
   const allLettersDone = useProgressStore((s) => LETTERS.every((l) => s.isLetterComplete(l.id)));
-  const formsDone = useFormsStore((s) => s.completed.length);
+  const formsDoneIds = useFormsStore((s) => s.completed);
   const scrollRef = useRef<any>(null);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
 
@@ -545,20 +545,32 @@ export default function Home() {
           ))}
 
           {/* 28 harften sonra: büyük yolculuğun ileriki aşamaları (kilitli, görünür) */}
-          {stageNodes.map((s) => {
-            // Oynanabilir aşama (şu an yalnız Harf Tanıma) — ama 28 harf bitmeden kilitli kalır
-            const playable = !!s.route && allLettersDone;
+          {stageNodes.map((s, si) => {
+            // 1. grup 28 harf bitince, sonrakiler bir öncekinin harfleri bitince açılır
+            // (harf seviyeleri gibi kademeli ilerleme).
+            const gi = s.formsGroup;
+            const groupLetters = gi === undefined ? [] : formsGroup(gi);
+            const groupDone = groupLetters.filter((id) => formsDoneIds.includes(id)).length;
+            const prevDone =
+              gi === undefined || gi === 0 ? true : formsGroup(gi - 1).every((id) => formsDoneIds.includes(id));
+            const playable = !!s.route && allLettersDone && prevDone;
             return (
               <StageGate
-                key={s.key}
+                key={`${s.key}-${si}`}
                 cx={s.cx}
                 cy={s.cy}
                 emoji={s.emoji}
-                name={t(`journey.${s.key}`)}
+                name={gi === undefined || gi === 0 ? t(`journey.${s.key}`) : ""}
                 goal={s.goal}
-                soon={s.route && !allLettersDone ? t("forms.locked") : t("journey.soon")}
+                soon={
+                  s.route
+                    ? !allLettersDone
+                      ? t("forms.locked")
+                      : t("forms.progress", { n: groupDone, total: groupLetters.length })
+                    : t("journey.soon")
+                }
                 goalLabel={t("journey.goalLabel")}
-                subtitle={t("forms.progress", { n: formsDone, total: LETTERS.length })}
+                subtitle={t("forms.progress", { n: groupDone, total: groupLetters.length })}
                 levelNo={LETTERS.length + stageNodes.indexOf(s) + 1}
                 isChapter={!!s.route}
                 onPress={playable ? () => { playSfx("ui_tap"); router.push(s.route as any); } : undefined}
