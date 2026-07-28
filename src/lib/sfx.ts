@@ -179,7 +179,7 @@ export function stopFinaleLines() {
 // ---- Pırıl anlatımı — onboarding (cami konsepti) + cami inşa anı (Abdulkadir/Sohail
 // playtest: "parents have to explain, spoken guidance rather than text"). ElevenLabs
 // ile üretildi → sessizlikten 3'e bölündü (finale ile aynı yöntem).
-const NARRATION_SOURCES: Record<"en" | "tr", Record<"onboarding1" | "onboarding2" | "mosqueBuilt" | "chForms1" | "chForms2" | "chForms3" | "posInitial" | "posMedial" | "posFinal", number>> = {
+const NARRATION_SOURCES: Record<"en" | "tr", Record<"onboarding1" | "onboarding2" | "mosqueBuilt" | "chForms1" | "chForms2" | "chForms3" | "posInitial" | "posMedial" | "posFinal" | "stepListen" | "stepRecord" | "stepPlayback", number>> = {
   en: {
     onboarding1: require("@/assets/audio/voice_onboarding1_en.mp3"),
     onboarding2: require("@/assets/audio/voice_onboarding2_en.mp3"),
@@ -190,6 +190,9 @@ const NARRATION_SOURCES: Record<"en" | "tr", Record<"onboarding1" | "onboarding2
     posInitial: require("@/assets/audio/voice_pos_initial_en.mp3"),
     posMedial: require("@/assets/audio/voice_pos_medial_en.mp3"),
     posFinal: require("@/assets/audio/voice_pos_final_en.mp3"),
+    stepListen: require("@/assets/audio/voice_step_listen_en.mp3"),
+    stepRecord: require("@/assets/audio/voice_step_record_en.mp3"),
+    stepPlayback: require("@/assets/audio/voice_step_playback_en.mp3"),
   },
   tr: {
     onboarding1: require("@/assets/audio/voice_onboarding1_tr.mp3"),
@@ -201,6 +204,9 @@ const NARRATION_SOURCES: Record<"en" | "tr", Record<"onboarding1" | "onboarding2
     posInitial: require("@/assets/audio/voice_pos_initial_tr.mp3"),
     posMedial: require("@/assets/audio/voice_pos_medial_tr.mp3"),
     posFinal: require("@/assets/audio/voice_pos_final_tr.mp3"),
+    stepListen: require("@/assets/audio/voice_step_listen_tr.mp3"),
+    stepRecord: require("@/assets/audio/voice_step_record_tr.mp3"),
+    stepPlayback: require("@/assets/audio/voice_step_playback_tr.mp3"),
   },
 };
 
@@ -213,7 +219,7 @@ export const NARRATION_DURATIONS_MS: Record<"en" | "tr", Record<"chForms1" | "ch
 const narrationPlayers: Partial<Record<string, AudioPlayer>> = {};
 
 /** Pırıl'ın anlatım repliğini (`key`) `lang` dilinde çalar. */
-export function playNarration(lang: "en" | "tr", key: "onboarding1" | "onboarding2" | "mosqueBuilt" | "chForms1" | "chForms2" | "chForms3" | "posInitial" | "posMedial" | "posFinal", volume = 1) {
+export function playNarration(lang: "en" | "tr", key: "onboarding1" | "onboarding2" | "mosqueBuilt" | "chForms1" | "chForms2" | "chForms3" | "posInitial" | "posMedial" | "posFinal" | "stepListen" | "stepRecord" | "stepPlayback", volume = 1) {
   if (!soundOn()) return;
   try {
     const cacheKey = `${lang}_${key}`;

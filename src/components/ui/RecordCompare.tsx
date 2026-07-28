@@ -17,7 +17,8 @@ import { Mascot } from "@/components/ui/Mascot";
 import { haptics } from "@/lib/haptics";
 import { images } from "@/lib/images";
 import { mascotVars } from "@/lib/mascot";
-import { playLetter, playSfx } from "@/lib/sfx";
+import { playLetter, playNarration, playSfx } from "@/lib/sfx";
+import { useSettingsStore } from "@/stores/settingsStore";
 
 const MAX_RECORD_MS = 3500;
 const MIC = 104;
@@ -87,6 +88,7 @@ export function RecordCompare({ letterId, onRecordedChange }: { letterId: number
   const stopTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const recorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
+  const language = useSettingsStore((st) => st.language);
 
   // Aktif butonun nabzı — "şimdi buna bas" daveti
   const pulse = useSharedValue(0);
@@ -115,10 +117,20 @@ export function RecordCompare({ letterId, onRecordedChange }: { letterId: number
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [letterId]);
 
+  // Her adımda Pırıl ne yapılacağını SÖYLER — yazı tek başına yetmiyor (çocuk okuyamaz).
+  // Kayıt sırasında konuşmaz (çocuğun kaydına karışmasın).
+  useEffect(() => {
+    if (recording) return;
+    const key = step === "listen" ? "stepListen" : step === "record" ? "stepRecord" : step === "playback" ? "stepPlayback" : null;
+    if (!key) return;
+    const tt = setTimeout(() => playNarration(language, key), 250);
+    return () => clearTimeout(tt);
+  }, [step, recording, language]);
+
   /** 1) Dinle — Pırıl harfi söyler, sonra kayıt adımı açılır */
   const doListen = () => {
-    playLetter(letterId);
     haptics.tap();
+    playLetter(letterId);
     setTimeout(() => setStep("record"), 900);
   };
 
