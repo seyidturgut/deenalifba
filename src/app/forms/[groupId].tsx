@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 
 import { Celebration } from "@/components/ui/Celebration";
 import { CheerOverlay } from "@/components/ui/CheerOverlay";
+import { CorrectBurst } from "@/components/ui/CorrectBurst";
 import { GradientBg } from "@/components/ui/GradientBg";
 import { SoundToggles } from "@/components/ui/SoundToggles";
 import { StageHost } from "@/components/ui/StageHost";
@@ -22,7 +23,7 @@ import { formsGroup, FORMS_GROUP_SIZE } from "@/data/formsLessons";
 import { LETTERS } from "@/data/letters";
 import { haptics } from "@/lib/haptics";
 import { images } from "@/lib/images";
-import { playLetter, playSfx } from "@/lib/sfx";
+import { playLetter, playSfx, resetCombo } from "@/lib/sfx";
 import { useFormsStore } from "@/stores/formsStore";
 import { useStageStore } from "@/stores/stageStore";
 import { MosqueBuild } from "@/features/mosque/MosqueBuild";
@@ -57,6 +58,7 @@ export default function FormsLevel() {
 
   const onLetterDone = () => {
     complete(letterId);
+    resetCombo(); // seri harf başına
     haptics.success();
     if (idx < letters.length - 1) {
       playSfx("step_complete");
@@ -194,6 +196,7 @@ export default function FormsLevel() {
       </View>
 
       {!showChapterIntro && <StageHost size={140} onReplay={() => letterId && playLetter(letterId)} />}
+      <CorrectBurst />
       <CheerOverlay />
       <Celebration visible={celebrate} onDone={onCelebrationDone} />
       <MosqueBuild

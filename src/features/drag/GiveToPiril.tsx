@@ -17,7 +17,7 @@ import Animated, {
 import { getLetter, LETTERS } from "@/data/letters";
 import { haptics } from "@/lib/haptics";
 import { images } from "@/lib/images";
-import { playLetter, playSfx } from "@/lib/sfx";
+import { playCorrect, playLetter, playSfx, resetCombo } from "@/lib/sfx";
 import { useStageStore } from "@/stores/stageStore";
 
 /**
@@ -194,11 +194,12 @@ export function GiveToPiril({ letterId, onComplete }: { letterId: number; onComp
     if (!correct) {
       haptics.tap();
       playSfx("gentle_try_again");
+      resetCombo();
       useStageStore.getState().oops();
       return;
     }
     haptics.success();
-    playSfx("correct_ding");
+    playCorrect();
     useStageStore.getState().cheer();
     setLocked(true);
     if (round + 1 >= ROUNDS) {

@@ -8,7 +8,7 @@ import { getLetter, LETTERS } from "@/data/letters";
 import { getLetterForms, PATH_BOX, type LetterFormKind } from "@/data/letterForms";
 import { getLetterPath } from "@/data/letterPaths";
 import { haptics } from "@/lib/haptics";
-import { playLetter, playSfx } from "@/lib/sfx";
+import { playCorrect, playLetter, playSfx, resetCombo } from "@/lib/sfx";
 import { useStageStore } from "@/stores/stageStore";
 
 /**
@@ -50,7 +50,7 @@ function OptionCard({ d, isTarget, locked, onSolved }: { d: string; isTarget: bo
       setDone(true);
       sc.value = withSequence(withTiming(1.1, { duration: 130 }), withTiming(1, { duration: 130 }));
       haptics.success();
-      playSfx("correct_ding");
+      playCorrect();
       useStageStore.getState().cheer();
       onSolved();
     } else {
@@ -62,6 +62,7 @@ function OptionCard({ d, isTarget, locked, onSolved }: { d: string; isTarget: bo
       );
       haptics.tap();
       playSfx("gentle_try_again");
+      resetCombo();
       useStageStore.getState().oops();
     }
   };

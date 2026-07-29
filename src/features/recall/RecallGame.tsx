@@ -7,7 +7,7 @@ import { useTranslation } from "react-i18next";
 import { getLetter, LETTERS } from "@/data/letters";
 import { haptics } from "@/lib/haptics";
 import { images } from "@/lib/images";
-import { playLetter, playSfx } from "@/lib/sfx";
+import { playCorrect, playLetter, playSfx, resetCombo } from "@/lib/sfx";
 import { useProgressStore } from "@/stores/progressStore";
 import { useStageStore } from "@/stores/stageStore";
 import { useSrsStore } from "@/stores/srsStore";
@@ -154,7 +154,7 @@ export function RecallGame({ letterId, onComplete }: { letterId: number; onCompl
     const quality = (wrong === 0 ? 3 : wrong === 1 ? 2 : 1) as 1 | 2 | 3;
     grade(q.id, quality, Date.now());
     haptics.success();
-    playSfx("correct_ding");
+    playCorrect();
     useStageStore.getState().cheer();
     if (qi + 1 < questions.length) {
       setTimeout(() => {
@@ -170,6 +170,7 @@ export function RecallGame({ letterId, onComplete }: { letterId: number; onCompl
     setWrong((w) => w + 1);
     haptics.tap();
     playSfx("gentle_try_again");
+    resetCombo();
     useStageStore.getState().oops();
   };
 

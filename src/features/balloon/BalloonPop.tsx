@@ -17,7 +17,7 @@ import { getLetter } from "@/data/letters";
 import { glyphChar, pickDistractors, type LetterFormKind } from "@/lib/formGlyph";
 import { haptics } from "@/lib/haptics";
 import { images } from "@/lib/images";
-import { playLetter, playSfx } from "@/lib/sfx";
+import { playCorrect, playLetter, playSfx, resetCombo } from "@/lib/sfx";
 
 /**
  * "Balon Patlat" (balloon): hedef harf SESLİ söylenir. Harfli balonlar aşağıdan
@@ -86,6 +86,7 @@ function Balloon({
       tx.value = withSequence(withTiming(-7, { duration: 45 }), withTiming(7, { duration: 45 }), withTiming(0, { duration: 45 }));
       haptics.tap();
       playSfx("gentle_try_again");
+      resetCombo();
       useStageStore.getState().oops();
       onPop(false);
     }
@@ -207,7 +208,7 @@ export function BalloonPop({
     if (!correct || done) return;
     const n = count + 1;
     setCount(n);
-    playSfx("correct_ding", 0.7);
+    playCorrect(0.7);
     useStageStore.getState().cheer();
     if (n >= NEED && !finishedRef.current) {
       finishedRef.current = true;

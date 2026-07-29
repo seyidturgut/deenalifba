@@ -8,7 +8,7 @@ import { getLetter } from "@/data/letters";
 import { glyphChar, pickDistractors, type LetterFormKind } from "@/lib/formGlyph";
 import { haptics } from "@/lib/haptics";
 import { images } from "@/lib/images";
-import { playLetter, playSfx } from "@/lib/sfx";
+import { playCorrect, playLetter, playSfx, resetCombo } from "@/lib/sfx";
 
 /**
  * "Yakala" (catch): hedef harf SESLİ söylenir. Harf karoları bir şeritte
@@ -129,11 +129,12 @@ export function SoundCatch({
     if (!isTarget) {
       haptics.tap();
       playSfx("gentle_try_again");
+      resetCombo();
       useStageStore.getState().oops();
       return;
     }
     haptics.success();
-    playSfx("correct_ding");
+    playCorrect();
     useStageStore.getState().cheer();
     const nc = [...caught, key];
     setCaught(nc);

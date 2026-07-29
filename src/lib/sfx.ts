@@ -14,6 +14,11 @@ const SOURCES = {
   trace_start: require("@/assets/audio/trace_start.mp3"),
   trace_success: require("@/assets/audio/trace_success.mp3"),
   correct_ding: require("@/assets/audio/correct_ding.mp3"),
+  // Doğru cevap "combo" seti — art arda doğruda perde yükselir (bkz. playCorrect)
+  combo_1: require("@/assets/audio/combo_1.mp3"),
+  combo_2: require("@/assets/audio/combo_2.mp3"),
+  combo_3: require("@/assets/audio/combo_3.mp3"),
+  combo_4: require("@/assets/audio/combo_4.mp3"),
   gentle_try_again: require("@/assets/audio/gentle_try_again.mp3"),
   star_earned: require("@/assets/audio/star_earned.mp3"),
   step_complete: require("@/assets/audio/step_complete.mp3"),
@@ -287,4 +292,30 @@ export function stopMusic() {
 export function syncMusicWithSetting() {
   if (musicOn()) startMusic();
   else stopMusic();
+}
+
+/**
+ * Doğru cevap sesi — ARDIŞIK doğrularda perde yükselir (combo).
+ *
+ * Can (AdMob/Voodoo, Sohail üzerinden): "Doğru cevaplar renk, animasyon ve sesle
+ * anında tatmin edici bir geri bildirim vermeli." Her seferinde aynı 'ding' çalmak
+ * seriyi duyulmaz kılıyordu; yükselen perde çocuğa 'üst üste doğru yapıyorum'
+ * hissini veriyor — Royal Match'in bağımlılık yapan kısmı büyük ölçüde bu.
+ */
+const COMBO_MAX = 4;
+let comboStep = 0;
+
+export function playCorrect(volume = 1) {
+  comboStep = Math.min(comboStep + 1, COMBO_MAX);
+  playSfx(`combo_${comboStep}` as SfxKey, volume);
+}
+
+/** Yanlış cevapta / yeni etkinliğe geçişte seriyi sıfırla. */
+export function resetCombo() {
+  comboStep = 0;
+}
+
+/** Şu anki seri uzunluğu (görsel efektin şiddetini ayarlamak için). */
+export function comboLevel(): number {
+  return comboStep;
 }

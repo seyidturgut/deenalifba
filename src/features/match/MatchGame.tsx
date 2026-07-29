@@ -7,7 +7,7 @@ import { getLetter, LETTERS } from "@/data/letters";
 import { glyphChar, lettersWithForm, type LetterFormKind } from "@/lib/formGlyph";
 import { haptics } from "@/lib/haptics";
 import { images } from "@/lib/images";
-import { playLetter, playSfx } from "@/lib/sfx";
+import { playCorrect, playLetter, playSfx, resetCombo } from "@/lib/sfx";
 import { useStageStore } from "@/stores/stageStore";
 
 /**
@@ -160,7 +160,7 @@ export function MatchGame({
           setFlipped([]);
           setLocked(false);
           haptics.success();
-          playSfx("correct_ding");
+          playCorrect();
           useStageStore.getState().cheer();
           // Destede tek gerçek çift var (hedef harf) → herhangi bir eşleşme = hedefi buldu demek
           if (!finishedRef.current) {
@@ -171,6 +171,7 @@ export function MatchGame({
         }, 420);
       } else {
         playSfx("gentle_try_again");
+        resetCombo();
         useStageStore.getState().oops();
         setTimeout(() => {
           setFlipped([]);

@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 
 import { Celebration } from "@/components/ui/Celebration";
 import { CheerOverlay } from "@/components/ui/CheerOverlay";
+import { CorrectBurst } from "@/components/ui/CorrectBurst";
 import { NewGameUnlock } from "@/components/ui/NewGameUnlock";
 import { GradientBg } from "@/components/ui/GradientBg";
 import { SoundToggles } from "@/components/ui/SoundToggles";
@@ -31,7 +32,7 @@ import type { ActivityKind } from "@/data/types";
 import { haptics } from "@/lib/haptics";
 import { mascotVars } from "@/lib/mascot";
 import { images } from "@/lib/images";
-import { playLetter, playSfx } from "@/lib/sfx";
+import { playLetter, playSfx, resetCombo } from "@/lib/sfx";
 import { useLearningStore } from "@/stores/learningStore";
 import { useMosqueStore } from "@/stores/mosqueStore";
 import { useProgressStore } from "@/stores/progressStore";
@@ -170,6 +171,7 @@ export default function LearnScreen() {
     startLetter(id);
     useStageStore.getState().resetIdle();
     setUnlockShownFor(null);
+    resetCombo(); // seri harfe özeldir, önceki harften taşımasın
   }, [id, startLetter]);
 
   // Bu harfte yeni açılan oyunun sırası geldiğinde, oyundan ÖNCE ödül ekranı.
@@ -359,6 +361,7 @@ export default function LearnScreen() {
         <Image source={images.nodeCloud} style={{ position: "absolute", right: -6, bottom: -8, width: 196, height: 92, opacity: 0.8 }} contentFit="contain" />
       </View>
       <StageHost size={148} onReplay={() => playLetter(id)} />
+      <CorrectBurst />
       <CheerOverlay />
 
       <NewGameUnlock visible={unlockVisible} kind={newGame ?? null} onDone={() => setUnlockVisible(false)} />
