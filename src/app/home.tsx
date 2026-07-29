@@ -442,7 +442,11 @@ export default function Home() {
   const flying = flyFrom != null;
 
   // Pırıl'ın periyodik mini balonu — camiye/hedefe atıf (Sohail #1, ikon-ağırlıklı)
-  const TIPS = [t("home.tip1"), t("home.tip2"), t("home.tip3"), t("home.tip4")];
+  // 28 harf bitince cami tamamlanır — rehber artık "camimizi büyütüyoruz" diyemez,
+  // o aşamada büyüyen şey bahçe.
+  const TIPS = lettersAllDone
+    ? [t("home.tipGarden1"), t("home.tipGarden2"), t("home.tipGarden3"), t("home.tipGarden4")]
+    : [t("home.tip1"), t("home.tip2"), t("home.tip3"), t("home.tip4")];
   const [tipIdx, setTipIdx] = useState(0);
   const [tipShown, setTipShown] = useState(false);
   useEffect(() => {

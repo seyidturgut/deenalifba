@@ -1,6 +1,6 @@
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 
@@ -167,6 +167,18 @@ export default function LearnScreen() {
   const [emailOptinVisible, setEmailOptinVisible] = useState(false);
   const [feedbackVisible, setFeedbackVisible] = useState(false);
 
+  /**
+   * Bu harf derse GİRERKEN zaten tamamlanmış mıydı?
+   * Tamamlanmış bir harfi yeniden oynamak bir TEKRAR turudur: cami zaten o parçayı
+   * aldı, 28 biterse final zaten izlendi. Bunu ayırt etmezsek 28'i bitirmiş bir çocuk
+   * herhangi bir harfi tekrar oynadığında büyük finali (ve ebeveyn e-posta ekranını)
+   * baştan görüyordu.
+   */
+  const wasComplete = useRef(false);
+  useEffect(() => {
+    wasComplete.current = useProgressStore.getState().isLetterComplete(id);
+  }, [id]);
+
   useEffect(() => {
     startLetter(id);
     useStageStore.getState().resetIdle();
@@ -177,6 +189,7 @@ export default function LearnScreen() {
   // Bu harfte yeni açılan oyunun sırası geldiğinde, oyundan ÖNCE ödül ekranı.
   useEffect(() => {
     const current = activities[activeIndex];
+    if (wasComplete.current) return; // tekrar turunda "yeni oyun" sürprizi yok
     if (!current || !newGame || current !== newGame || unlockShownFor === newGame) return;
     setUnlockShownFor(newGame);
     setUnlockVisible(true);
@@ -186,6 +199,11 @@ export default function LearnScreen() {
 
   const finishLetter = () => {
     setCelebrate(false); // kutlamayı kapat → cami sahnesiyle çakışmasın
+    // Tekrar turu: yeni cami parçası yok, final yok — kutlamayı gördü, haritaya dön.
+    if (wasComplete.current) {
+      goHome();
+      return;
+    }
     const isComplete = useProgressStore.getState().isLetterComplete;
     let completed = 0;
     for (let i = 1; i <= TOTAL_LETTERS; i++) if (isComplete(i)) completed++;
