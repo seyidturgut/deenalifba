@@ -297,7 +297,9 @@ export default function LearnScreen() {
           }}
         />
         <View style={{ flex: 1, marginBottom: FLOOR_H }}>
-        {kind === "intro" ? (
+        {/* "Yeni oyun!" ekranı açıkken oyunu MOUNT ETME: her oyun açılışta hedef harfi
+            sesli söylüyor, o ses Pırıl'ın "yeni bir oyun açıldı" anlatımına biniyordu. */}
+        {unlockVisible ? null : kind === "intro" ? (
         <View className="flex-1 items-center justify-center">
           <LetterIntro key={`intro-${id}`} letterId={id} onComplete={onCompleteStep} />
         </View>

@@ -20,7 +20,7 @@ import { useSettingsStore } from "@/stores/settingsStore";
  * Can (AdMob/Voodoo, Sohail üzerinden): "Yeni mini-oyunlar ilerleme ödülü olarak
  * açılsın — çocuğa devam etmek için sebep verir."
  */
-const AUTO_MS = 6000; // çocuk dokunmazsa kendiliğinden devam (takılma yok)
+const AUTO_MS = 7000; // çocuk dokunmazsa kendiliğinden devam (Pırıl anlatımı ~3.9sn sürüyor)
 
 export function NewGameUnlock({
   visible,
