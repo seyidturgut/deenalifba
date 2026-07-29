@@ -15,6 +15,39 @@ import { hasLetterSound } from "@/lib/sfx";
 const PRACTICE: ActivityKind[] = ["hearTap", "match", "drag", "balloon", "catch", "word", "dots", "confuseSound"];
 
 /**
+ * Mini-oyunlar KADEMELİ açılır (Can — AdMob/Voodoo, Sohail üzerinden):
+ * "İlk harfte beş mini-oyun fazla; ilk seviye uygulamanın nasıl oynandığını
+ * öğretmeli. Yeni oyunlar ilerleme ÖDÜLÜ olarak açılsın."
+ *
+ * 1. harf yalnız öğret → boya → konuş. Sonraki her harfte bir oyun daha açılır ve
+ * çocuk "Yeni oyun!" anını yaşar.
+ *
+ * ⚠️ BURASI TEK AYAR NOKTASI. Abdulkadir müfredat açısından "daha erken/geç olsun"
+ * derse yalnız bu tablodaki sayılar değişir, kodun geri kalanına dokunulmaz.
+ */
+export const GAME_UNLOCKS: Partial<Record<ActivityKind, number>> = {
+  hearTap: 2,
+  match: 3,
+  balloon: 4,
+  catch: 5,
+  drag: 6,
+  word: 7,
+  dots: 8,
+  confuseSound: 9,
+};
+
+/** Bu oyun bu harfte açık mı? (tabloda yoksa hep açık) */
+export function isGameUnlocked(kind: ActivityKind, letterId: number): boolean {
+  const from = GAME_UNLOCKS[kind];
+  return from === undefined || letterId >= from;
+}
+
+/** Tam bu harfte İLK KEZ açılan oyun (varsa) — "Yeni oyun!" anını tetikler. */
+export function newlyUnlockedGame(letterId: number): ActivityKind | undefined {
+  return (Object.keys(GAME_UNLOCKS) as ActivityKind[]).find((k) => GAME_UNLOCKS[k] === letterId);
+}
+
+/**
  * Harf için ders etkinlik listesini üretir (deterministik).
  * PEDAGOJİ: önce ÖĞRET (intro → trace), sonra 1-2 PRATİK (havuzdan, harfe göre
  * değişir → tekdüzelik kırılır), önceki harf varsa sonda kısa TEKRAR.
@@ -26,6 +59,7 @@ export function buildLesson(letterId: number): ActivityKind[] {
 
   // Uygun pratik oyunları — sesli oyunlar harf sesi gerektirir
   const practice = PRACTICE.filter((k) => {
+    if (!isGameUnlocked(k, letterId)) return false; // henüz açılmadı (kademeli açılım)
     if (k === "word") return hasWordImage(letterId);
     if (k === "dots") return hasLetterSound(letterId) && hasDotConfusable(letterId);
     if (k === "confuseSound") return hasLetterSound(letterId) && hasSoundConfusable(letterId);

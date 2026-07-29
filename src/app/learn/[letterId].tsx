@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 
 import { Celebration } from "@/components/ui/Celebration";
 import { CheerOverlay } from "@/components/ui/CheerOverlay";
+import { NewGameUnlock } from "@/components/ui/NewGameUnlock";
 import { GradientBg } from "@/components/ui/GradientBg";
 import { SoundToggles } from "@/components/ui/SoundToggles";
 import { StageHost } from "@/components/ui/StageHost";
@@ -24,7 +25,7 @@ import { RecallGame } from "@/features/recall/RecallGame";
 import { SpeakPractice } from "@/features/speak/SpeakPractice";
 import { PaintTrace } from "@/features/trace/PaintTrace";
 import { dotSiblings, soundSiblings } from "@/data/confusables";
-import { ACTIVITY_META } from "@/data/lesson";
+import { ACTIVITY_META, newlyUnlockedGame } from "@/data/lesson";
 import { getLetter, TOTAL_LETTERS } from "@/data/letters";
 import type { ActivityKind } from "@/data/types";
 import { haptics } from "@/lib/haptics";
@@ -153,13 +154,31 @@ export default function LearnScreen() {
   const [buildVisible, setBuildVisible] = useState(false);
   const [buildStage, setBuildStage] = useState(0);
   const [finaleVisible, setFinaleVisible] = useState(false);
+
+  /**
+   * "Yeni oyun!" anı — mini-oyunlar kademeli açıldığı için (GAME_UNLOCKS) çocuk
+   * bir oyunu İLK kez oynayacağı adımda kısa bir ödül ekranı görür.
+   * Aynı ders içinde bir kez gösterilir.
+   */
+  const [unlockShownFor, setUnlockShownFor] = useState<ActivityKind | null>(null);
+  const [unlockVisible, setUnlockVisible] = useState(false);
+  const newGame = id ? newlyUnlockedGame(id) : undefined;
   const [emailOptinVisible, setEmailOptinVisible] = useState(false);
   const [feedbackVisible, setFeedbackVisible] = useState(false);
 
   useEffect(() => {
     startLetter(id);
     useStageStore.getState().resetIdle();
+    setUnlockShownFor(null);
   }, [id, startLetter]);
+
+  // Bu harfte yeni açılan oyunun sırası geldiğinde, oyundan ÖNCE ödül ekranı.
+  useEffect(() => {
+    const current = activities[activeIndex];
+    if (!current || !newGame || current !== newGame || unlockShownFor === newGame) return;
+    setUnlockShownFor(newGame);
+    setUnlockVisible(true);
+  }, [activities, activeIndex, newGame, unlockShownFor]);
 
   const goHome = () => router.replace("/home");
 
@@ -340,6 +359,7 @@ export default function LearnScreen() {
       <StageHost size={148} onReplay={() => playLetter(id)} />
       <CheerOverlay />
 
+      <NewGameUnlock visible={unlockVisible} kind={newGame ?? null} onDone={() => setUnlockVisible(false)} />
       <Celebration visible={celebrate} onDone={finishLetter} />
       <MosqueBuild visible={buildVisible} stageIndex={buildStage} onDone={goHome} />
       {/* 28 finali → Continue → ebeveyn e-posta opt-in → geri bildirim → home (Sohail) */}

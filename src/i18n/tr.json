@@ -82,7 +82,9 @@
     "recallHint": "Hadi eski harfleri\nhatırlayalım",
     "speakHint": "Şimdi senin sıran, sesli söyle! 🎤",
     "redraw": "Yeniden çiz",
-    "soon": "Bu oyun yakında ✨"
+    "soon": "Bu oyun yakında ✨",
+    "newGameTitle": "🎉 Yeni oyun!",
+    "newGameHint": "Hadi {{mascot}} ile deneyelim!"
   },
   "spot": {
     "prompt": "Hangisi {{name}}?"

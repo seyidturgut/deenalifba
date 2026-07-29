@@ -82,7 +82,9 @@
     "recallHint": "Let's remember the\nletters we learned",
     "speakHint": "Now it's your turn to say it! 🎤",
     "redraw": "Redraw",
-    "soon": "Coming soon ✨"
+    "soon": "Coming soon ✨",
+    "newGameTitle": "🎉 New game!",
+    "newGameHint": "Let's try it with {{mascot}}!"
   },
   "spot": {
     "prompt": "Which one is {{name}}?"
