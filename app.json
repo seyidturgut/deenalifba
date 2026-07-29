@@ -2,7 +2,7 @@
   "expo": {
     "name": "Alif",
     "slug": "AlifBa-Game",
-    "version": "1.13.0",
+    "version": "1.13.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "alifbagame",

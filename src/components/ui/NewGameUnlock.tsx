@@ -10,7 +10,8 @@ import { ACTIVITY_META } from "@/data/lesson";
 import type { ActivityKind } from "@/data/types";
 import { haptics } from "@/lib/haptics";
 import { mascotVars } from "@/lib/mascot";
-import { playSfx } from "@/lib/sfx";
+import { playNarration, playSfx } from "@/lib/sfx";
+import { useSettingsStore } from "@/stores/settingsStore";
 
 /**
  * "Yeni oyun!" anı — mini-oyunlar kademeli açıldığı için (bkz. GAME_UNLOCKS) çocuk
@@ -31,6 +32,7 @@ export function NewGameUnlock({
   onDone: () => void;
 }) {
   const { t } = useTranslation();
+  const language = useSettingsStore((s) => s.language);
   const doneRef = useRef(false);
 
   const appear = useSharedValue(0);
@@ -52,9 +54,13 @@ export function NewGameUnlock({
     haptics.celebrate();
     playSfx("star_earned");
     playSfx("correct_ding", 0.6);
-    // TODO: Pırıl "Yeni bir oyun açıldı!" anlatımı — kayıt gelince playNarration(language, "newGame")
+    // Pırıl: "Vay canına! Yeni bir oyun açıldı! Hadi hemen deneyelim!"
+    const nt = setTimeout(() => playNarration(language, "newGame"), 500);
     const auto = setTimeout(() => finish(), AUTO_MS);
-    return () => clearTimeout(auto);
+    return () => {
+      clearTimeout(nt);
+      clearTimeout(auto);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible, kind]);
 
