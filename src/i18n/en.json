@@ -111,11 +111,11 @@
     "playYou": "You",
     "playPiril": "{{mascot}}",
     "recordAgain": "Record again",
-    "stepListen": "Listen 👂",
-    "stepRecord": "Tap the mic and say it 🎤",
+    "stepListen": "Listen",
+    "stepRecord": "Tap the mic and say it",
     "stepRecording": "Listening…",
     "stepPlayback": "Hear yourself!",
-    "stepHearing": "Can you hear it? 👂"
+    "stepHearing": "Can you hear it?"
   },
   "finale": {
     "title": "Maa shaa Allah!",

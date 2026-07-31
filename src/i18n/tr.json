@@ -111,11 +111,11 @@
     "playYou": "Sen",
     "playPiril": "{{mascot}}",
     "recordAgain": "Tekrar kaydet",
-    "stepListen": "Dinle 👂",
-    "stepRecord": "Mikrofona dokun ve söyle 🎤",
+    "stepListen": "Dinle",
+    "stepRecord": "Mikrofona dokun ve söyle",
     "stepRecording": "Dinliyorum…",
     "stepPlayback": "Kendini dinle!",
-    "stepHearing": "Duyuyor musun? 👂"
+    "stepHearing": "Duyuyor musun?"
   },
   "finale": {
     "title": "Maşallah!",
