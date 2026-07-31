@@ -55,7 +55,7 @@ type Step = "listen" | "record" | "playback" | "unsupported";
 
 function StepDots({ step }: { step: Step }) {
   const order: Step[] = ["listen", "record", "playback"];
-  const icons = ["👂", "🎤", "🔊"];
+  const icons = [images.icEar, images.icMic, images.icSpeaker];
   const idx = order.indexOf(step);
   return (
     <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
@@ -79,7 +79,11 @@ function StepDots({ step }: { step: Step }) {
                 borderColor: "#3FB984",
               }}
             >
-              <Text style={{ fontSize: active ? 20 : 16, opacity: active || done ? 1 : 0.4 }}>{icons[i]}</Text>
+              <Image
+                source={icons[i]}
+                style={{ width: active ? 22 : 18, height: active ? 22 : 18, opacity: active || done ? 1 : 0.4 }}
+                contentFit="contain"
+              />
             </View>
           </View>
         );
@@ -262,9 +266,8 @@ export function RecordCompare({ letterId, onRecordedChange }: { letterId: number
                 shadowOffset: { width: 0, height: 4 },
               }}
             >
-              {/* Anlatım "kulağa dokun" diyor — buton da kulak olmalı; hoparlör
-                  görseli çocuğa başka bir şey işaret ediyordu. */}
-              <Text style={{ fontSize: 46 }}>👂</Text>
+              {/* Anlatım "kulağa dokun" diyor — buton da kulak olmalı. */}
+              <Image source={images.icEar} style={{ width: 56, height: 56 }} contentFit="contain" />
             </View>
             <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 18, color: hearing ? "#C97C10" : "#34618C" }}>
               {t(hearing ? "intro.stepHearing" : "intro.stepListen")}
@@ -347,7 +350,7 @@ export function RecordCompare({ letterId, onRecordedChange }: { letterId: number
                   shadowOffset: { width: 0, height: 4 },
                 }}
               >
-                <Text style={{ fontSize: 42 }}>🔊</Text>
+                <Image source={images.icSpeaker} style={{ width: 56, height: 56 }} contentFit="contain" />
               </View>
               <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 18, color: "#2E7D5B" }}>{t("intro.stepPlayback")}</Text>
             </Pressable>
@@ -356,7 +359,7 @@ export function RecordCompare({ letterId, onRecordedChange }: { letterId: number
           {/* İkincil: Pırıl'la karşılaştır + tekrar kaydet */}
           <View style={{ flexDirection: "row", alignItems: "center", gap: 18, marginTop: 2 }}>
             <Pressable onPress={playPiril} hitSlop={8} style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
-              <Image source={images.icListen} style={{ width: 30, height: 27 }} contentFit="contain" />
+              <Image source={images.icSpeaker} style={{ width: 28, height: 28 }} contentFit="contain" />
               <Text style={{ fontFamily: "Fredoka_600SemiBold", fontSize: 14, color: "#5B6470" }}>{t("intro.playPiril", mascotVars())}</Text>
             </Pressable>
             <Pressable onPress={recordAgain} hitSlop={8}>

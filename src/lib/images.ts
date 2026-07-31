@@ -82,6 +82,9 @@ export const images = {
 
   // Kaydet & karşılaştır — 3D cıvıl mikrofon (Abdulkadir: "büyük mikrofon")
   icMic: require("@/assets/illustrations/decor/ic_mic.webp"),
+  // Konuşma adımının üç ikonu tek set: dinle → söyle → kendini dinle
+  icEar: require("@/assets/illustrations/decor/ic_ear.webp"),
+  icSpeaker: require("@/assets/illustrations/decor/ic_speaker.webp"),
 
   // İstikamet zinciri
   chainBead: require("@/assets/illustrations/decor/chain_bead.webp"), // altın hilal boncuk (tekrarlanan)
