@@ -21,6 +21,11 @@ import { playLetter, playNarration, playSfx } from "@/lib/sfx";
 import { useSettingsStore } from "@/stores/settingsStore";
 
 const MAX_RECORD_MS = 3500;
+/** Adım anlatımlarının süresi — harf sesi Pırıl konuşurken araya girmesin diye. */
+const STEP_MS: Record<"en" | "tr", { listen: number; record: number; playback: number }> = {
+  en: { listen: 680, record: 820, playback: 1269 },
+  tr: { listen: 750, record: 970, playback: 1206 },
+};
 const MIC = 104;
 const MIC_ASPECT = 480 / 313; // ic_mic.webp kaynak oranı (h/w)
 const RING = MIC + 34; // geri sayım halkası çapı
@@ -37,6 +42,12 @@ const AnimatedCircle = Animated.createAnimatedComponent(Circle);
  * Bu yüzden:
  *   - Üstte 3 adımlı gösterge (kulak → mikrofon → hoparlör): çocuk nerede olduğunu görür.
  *   - Her adımda TEK bir büyük buton nabız atar → "şimdi buna bas" belirsizliği kalmaz.
+ *
+ * 3. tur (Abdulkadir, video): akış hâlâ karışıktı. "Önce dinle" diyordu ama harfi
+ * duymak için BASMAK gerekiyordu ("harfi duyduğumdan emin değilim"); "şimdi sen söyle"
+ * diyordu ama aslında mikrofona basmak gerekiyordu ("söyleyecek miyim, basacak mıyım?").
+ * Çözüm: çocuk hiçbir şeye karar vermek zorunda kalmasın — harf KENDİLİĞİNDEN çalar,
+ * kayıt bitince kendi sesi KENDİLİĞİNDEN geri çalar. Dokunması gereken tek an, kayıt.
  *   - Kayıt sırasında halka GERİ SAYAR (dolu → boş): ne zaman biteceği görünür.
  *   - Kayıt bitince kendi sesi BÜYÜK butonla öne çıkar; karşılaştırma ikincil kalır.
  *
@@ -127,12 +138,23 @@ export function RecordCompare({ letterId, onRecordedChange }: { letterId: number
     return () => clearTimeout(tt);
   }, [step, recording, language]);
 
-  /** 1) Dinle — Pırıl harfi söyler, sonra kayıt adımı açılır */
+  /** 1) Dinle — harf KENDİLİĞİNDEN çalar; butona basmak yalnızca tekrar dinlemek için. */
   const doListen = () => {
     haptics.tap();
     playLetter(letterId);
-    setTimeout(() => setStep("record"), 900);
   };
+
+  // Harfi otomatik duyur, sonra kayıt adımına kendiliğinden geç (çocuk beklemesin).
+  useEffect(() => {
+    if (step !== "listen") return;
+    const ms = STEP_MS[language].listen;
+    const a = setTimeout(() => playLetter(letterId), 250 + ms + 250);
+    const b = setTimeout(() => setStep("record"), 250 + ms + 250 + 1400);
+    return () => {
+      clearTimeout(a);
+      clearTimeout(b);
+    };
+  }, [step, letterId, language]);
 
   /** 2) Kaydet */
   const startRecording = async () => {
@@ -175,6 +197,12 @@ export function RecordCompare({ letterId, onRecordedChange }: { letterId: number
         onRecordedChange?.(true);
         haptics.success();
         playSfx("star_earned", 0.8);
+        // Çocuk kendi sesini duymak için ayrıca basmak zorunda kalmasın (Abdulkadir:
+        // "kendi seslerini duymak istiyorlar, geri oynatma öne çıkmalı").
+        setTimeout(() => {
+          youPlayerRef.current?.seekTo(0);
+          youPlayerRef.current?.play();
+        }, 900 + STEP_MS[language].playback);
       } else {
         setStep("record");
       }

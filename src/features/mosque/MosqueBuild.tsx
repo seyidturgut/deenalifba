@@ -23,7 +23,9 @@ import { Crescent, Star8 } from "@/components/ui/IslamicMotifs";
 const { width: SCREEN_W } = Dimensions.get("window");
 const GROW = 850; // parça belirme süresi
 const ADMIRE = 2400; // inşadan sonra hayran kalma süresi
-const AUTOBUILD = 5200; // çocuk dokunmazsa otomatik inşa (takılmasın)
+// Abdulkadir (video): "hiçbir şeye dokunmadım ve kendiliğinden geçti" — 5,2 sn
+// çocuğun parlayan işareti fark edip dokunmasına yetmiyordu.
+const AUTOBUILD = 11000;
 
 /**
  * Seviye sonu cami anı — ETKİLEŞİMLİ "dokun ve inşa et" (Sohail #6):

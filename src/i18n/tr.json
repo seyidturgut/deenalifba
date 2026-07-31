@@ -111,8 +111,8 @@
     "playYou": "Sen",
     "playPiril": "{{mascot}}",
     "recordAgain": "Tekrar kaydet",
-    "stepListen": "Önce dinle 👂",
-    "stepRecord": "Şimdi sen söyle 🎤",
+    "stepListen": "Dinle 👂",
+    "stepRecord": "Mikrofona dokun ve söyle 🎤",
     "stepRecording": "Dinliyorum…",
     "stepPlayback": "Kendini dinle!"
   },
