@@ -108,6 +108,11 @@ const LETTER_SOURCES: Record<number, number> = {
 
 const letterPlayers: Record<number, AudioPlayer> = {};
 
+/** Bir harf sesinin süresi (ms) — akışı ona göre bekletmek için. */
+export function letterDurationMs(id: number) {
+  return LETTER_MS[id] ?? 900;
+}
+
 /** Belirli bir harfin sesi var mı? */
 export function hasLetterSound(id: number): boolean {
   return !!LETTER_SOURCES[id];

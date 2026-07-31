@@ -17,7 +17,7 @@ import { Mascot } from "@/components/ui/Mascot";
 import { haptics } from "@/lib/haptics";
 import { images } from "@/lib/images";
 import { mascotVars } from "@/lib/mascot";
-import { playLetter, playNarration, playSfx, speechRemainingMs } from "@/lib/sfx";
+import { letterDurationMs, playLetter, playNarration, playSfx, speechRemainingMs } from "@/lib/sfx";
 import { useSettingsStore } from "@/stores/settingsStore";
 
 const MAX_RECORD_MS = 3500;
@@ -148,14 +148,31 @@ export function RecordCompare({ letterId, onRecordedChange }: { letterId: number
   // playLetter konuşma kuyruğunda bekler: talimat bitmeden harf çalmaz.
   useEffect(() => {
     if (step !== "listen") return;
+    let alive = true;
+    const timers: ReturnType<typeof setTimeout>[] = [];
+
     // Etkinlik talimatı bu bileşenden 260ms SONRA başlıyor; harfi hemen çalarsak
     // sıraya ilk biz gireriz ve talimat harfin arkasında kalır. Kısa bir pay
     // bırakıp kuyruğa talimattan sonra giriyoruz.
-    const a = setTimeout(() => playLetter(letterId), 600);
-    const b = setTimeout(() => setStep("record"), 600 + speechRemainingMs() + 1800);
+    timers.push(
+      setTimeout(() => {
+        if (!alive) return;
+        // Kalan konuşmayı harfi SIRAYA KOYMADAN ÖNCE ölç: sonra ölçersek harf
+        // henüz kuyrukta beklerken sıfır görünüyor ve çocuk harfi duymadan
+        // kayıt adımına atlıyordu.
+        const queued = speechRemainingMs();
+        playLetter(letterId);
+        timers.push(
+          setTimeout(() => {
+            if (alive) setStep("record");
+          }, queued + letterDurationMs(letterId) + 900)
+        );
+      }, 600)
+    );
+
     return () => {
-      clearTimeout(a);
-      clearTimeout(b);
+      alive = false;
+      timers.forEach(clearTimeout);
     };
   }, [step, letterId]);
 
