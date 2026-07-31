@@ -197,6 +197,9 @@ export default function LearnScreen() {
     const current = activities[activeIndex];
     if (!current || unlockVisible) return;
     stopSpeech(); // önceki adımın repliği burada çalmasın
+    // "Konuş" adımının talimatı iki parçaya bölündü (kulak / mikrofon) ve
+    // RecordCompare'in içinden, ilgili buton belirdiği anda söyleniyor.
+    if (current === "speak") return;
     const tt = setTimeout(() => playHint(language, current as HintKey), 260);
     return () => clearTimeout(tt);
   }, [activities, activeIndex, unlockVisible, language]);

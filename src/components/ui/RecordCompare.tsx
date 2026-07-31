@@ -135,54 +135,33 @@ export function RecordCompare({ letterId, onRecordedChange }: { letterId: number
    * diyor — ikisi arka arkaya çalınca aynı şey iki kez söylenmiş oluyordu.
    */
   useEffect(() => {
-    if (recording || step !== "playback") return;
-    const tt = setTimeout(() => playNarration(language, "stepPlayback"), 250);
+    if (recording) return;
+    const key = step === "listen" ? "speak1" : step === "record" ? "speak2" : step === "playback" ? "stepPlayback" : null;
+    if (!key) return;
+    const tt = setTimeout(() => playNarration(language, key), 250);
     return () => clearTimeout(tt);
   }, [step, recording, language]);
 
-  /** 1) Dinle — harf KENDİLİĞİNDEN çalar; butona basmak yalnızca tekrar dinlemek için. */
-  const doListen = () => {
-    haptics.tap();
-    playLetter(letterId);
-  };
-
   // Harfi otomatik duyur, sonra kayıt adımına kendiliğinden geç (çocuk beklemesin).
   // playLetter konuşma kuyruğunda bekler: talimat bitmeden harf çalmaz.
-  useEffect(() => {
-    if (step !== "listen") return;
-    let alive = true;
-    const timers: ReturnType<typeof setTimeout>[] = [];
-
-    // Etkinlik talimatı bu bileşenden 260ms SONRA başlıyor; harfi hemen çalarsak
-    // sıraya ilk biz gireriz ve talimat harfin arkasında kalır. Kısa bir pay
-    // bırakıp kuyruğa talimattan sonra giriyoruz.
-    timers.push(
-      setTimeout(() => {
-        if (!alive) return;
-        // Kalan konuşmayı harfi SIRAYA KOYMADAN ÖNCE ölç: sonra ölçersek harf
-        // henüz kuyrukta beklerken sıfır görünüyor ve çocuk harfi duymadan
-        // kayıt adımına atlıyordu.
-        const queued = speechRemainingMs();
-        const dur = letterDurationMs(letterId);
-        playLetter(letterId);
-        // Harf çalarken butonu canlandır: ses geliyor ama ekranda hiçbir şey
-        // olmuyordu, çocuk harfi duyduğunu fark etmiyordu.
-        timers.push(setTimeout(() => alive && setHearing(true), queued));
-        timers.push(setTimeout(() => alive && setHearing(false), queued + dur));
-        // Harf bittikten sonra çocuğun sindirmesi için rahat bir pay bırak.
-        timers.push(
-          setTimeout(() => {
-            if (alive) setStep("record");
-          }, queued + dur + 1600)
-        );
-      }, 600)
-    );
-
-    return () => {
-      alive = false;
-      timers.forEach(clearTimeout);
-    };
-  }, [step, letterId]);
+  /**
+   * Adımlar OTOMATİK İLERLEMEZ — her adımı çocuk kendi başlatır.
+   *
+   * Bir süre otomatik akış denendi (harf kendiliğinden çalıyor, adım kendiliğinden
+   * geçiyordu) ama çocuğun kontrolünü elinden alıyordu: harfi duymadan mikrofon
+   * ekranı geliyor gibi hissettiriyordu. Artık kulağa DOKUNUR → harfi duyar →
+   * ses biter bitmez mikrofon adımı açılır.
+   */
+  const doListen = () => {
+    if (hearing) return;
+    haptics.tap();
+    const queued = speechRemainingMs();
+    const dur = letterDurationMs(letterId);
+    playLetter(letterId);
+    setTimeout(() => setHearing(true), queued);
+    setTimeout(() => setHearing(false), queued + dur);
+    setTimeout(() => setStep((cur) => (cur === "listen" ? "record" : cur)), queued + dur + 900);
+  };
 
   /** 2) Kaydet */
   const startRecording = async () => {

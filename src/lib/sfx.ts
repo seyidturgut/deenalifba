@@ -204,7 +204,7 @@ export function stopFinaleLines() {
 // ---- Pırıl anlatımı — onboarding (cami konsepti) + cami inşa anı (Abdulkadir/Sohail
 // playtest: "parents have to explain, spoken guidance rather than text"). ElevenLabs
 // ile üretildi → sessizlikten 3'e bölündü (finale ile aynı yöntem).
-const NARRATION_SOURCES: Record<"en" | "tr", Record<"onboarding1" | "onboarding2" | "mosqueBuilt" | "gardenGrown" | "newGame" | "level1Intro" | "mosqueHowto" | "gardenHowto" | "chForms1" | "chForms2" | "chForms3" | "posInitial" | "posMedial" | "posFinal" | "stepListen" | "stepRecord" | "stepPlayback", number>> = {
+const NARRATION_SOURCES: Record<"en" | "tr", Record<"onboarding1" | "onboarding2" | "mosqueBuilt" | "gardenGrown" | "newGame" | "level1Intro" | "mosqueHowto" | "gardenHowto" | "speak1" | "speak2" | "chForms1" | "chForms2" | "chForms3" | "posInitial" | "posMedial" | "posFinal" | "stepListen" | "stepRecord" | "stepPlayback", number>> = {
   en: {
     onboarding1: require("@/assets/audio/voice_onboarding1_en.mp3"),
     onboarding2: require("@/assets/audio/voice_onboarding2_en.mp3"),
@@ -214,6 +214,8 @@ const NARRATION_SOURCES: Record<"en" | "tr", Record<"onboarding1" | "onboarding2
     level1Intro: require("@/assets/audio/voice_level1_intro_en.mp3"),
     mosqueHowto: require("@/assets/audio/voice_mosque_howto_en.mp3"),
     gardenHowto: require("@/assets/audio/voice_garden_howto_en.mp3"),
+    speak1: require("@/assets/audio/voice_speak1_en.mp3"),
+    speak2: require("@/assets/audio/voice_speak2_en.mp3"),
     chForms1: require("@/assets/audio/voice_ch_forms1_en.mp3"),
     chForms2: require("@/assets/audio/voice_ch_forms2_en.mp3"),
     chForms3: require("@/assets/audio/voice_ch_forms3_en.mp3"),
@@ -233,6 +235,8 @@ const NARRATION_SOURCES: Record<"en" | "tr", Record<"onboarding1" | "onboarding2
     level1Intro: require("@/assets/audio/voice_level1_intro_tr.mp3"),
     mosqueHowto: require("@/assets/audio/voice_mosque_howto_tr.mp3"),
     gardenHowto: require("@/assets/audio/voice_garden_howto_tr.mp3"),
+    speak1: require("@/assets/audio/voice_speak1_tr.mp3"),
+    speak2: require("@/assets/audio/voice_speak2_tr.mp3"),
     chForms1: require("@/assets/audio/voice_ch_forms1_tr.mp3"),
     chForms2: require("@/assets/audio/voice_ch_forms2_tr.mp3"),
     chForms3: require("@/assets/audio/voice_ch_forms3_tr.mp3"),
@@ -247,8 +251,8 @@ const NARRATION_SOURCES: Record<"en" | "tr", Record<"onboarding1" | "onboarding2
 
 /** Ölçülen anlatım klip süreleri (ms) — oto-ilerleyen ekranların zamanlaması için. */
 export const NARRATION_DURATIONS_MS: Record<"en" | "tr", Record<string, number>> = {
-  en: {"chForms1":2720,"chForms2":6230,"chForms3":4320,"gardenGrown":3562,"gardenHowto":7525,"level1Intro":8816,"mosqueBuilt":3071,"mosqueHowto":7291,"newGame":3108,"onboarding1":3620,"onboarding2":3000,"posFinal":1362,"posInitial":1250,"posMedial":1150,"stepListen":680,"stepPlayback":1269,"stepRecord":820},
-  tr: {"chForms1":2400,"chForms2":6741,"chForms3":4496,"gardenGrown":2529,"gardenHowto":6400,"level1Intro":8187,"mosqueBuilt":2537,"mosqueHowto":7455,"newGame":3438,"onboarding1":3050,"onboarding2":3190,"posFinal":1495,"posInitial":1240,"posMedial":1340,"stepListen":750,"stepPlayback":1206,"stepRecord":970},
+  en: {"chForms1":2720,"chForms2":6230,"chForms3":4320,"gardenGrown":3562,"gardenHowto":7525,"speak1":6420,"speak2":2737,"level1Intro":8816,"mosqueBuilt":3071,"mosqueHowto":7291,"newGame":3108,"onboarding1":3620,"onboarding2":3000,"posFinal":1362,"posInitial":1250,"posMedial":1150,"stepListen":680,"stepPlayback":1269,"stepRecord":820},
+  tr: {"chForms1":2400,"chForms2":6741,"chForms3":4496,"gardenGrown":2529,"gardenHowto":6400,"speak1":3774,"speak2":2839,"level1Intro":8187,"mosqueBuilt":2537,"mosqueHowto":7455,"newGame":3438,"onboarding1":3050,"onboarding2":3190,"posFinal":1495,"posInitial":1240,"posMedial":1340,"stepListen":750,"stepPlayback":1206,"stepRecord":970},
 };
 
 const narrationPlayers: Partial<Record<string, AudioPlayer>> = {};
@@ -271,7 +275,9 @@ export type NarrationKey =
   | "posFinal"
   | "stepListen"
   | "stepRecord"
-  | "stepPlayback";
+  | "stepPlayback"
+  | "speak1"
+  | "speak2";
 
 function playNarrationRaw(lang: "en" | "tr", key: NarrationKey, volume = 1) {
   if (!soundOn()) return;
