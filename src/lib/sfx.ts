@@ -117,7 +117,7 @@ export function playLetter(id: number, volume = 1) {
   if (!src) return;
   // Pırıl talimatı söylerken harfin sesi araya girmesin — oyunlar açılır açılmaz
   // harfi çalıyor, talimat da o an başlıyordu. Beklemeyi burada tek noktada çözüyoruz.
-  const wait = hintRemainingMs();
+  const wait = speechRemainingMs();
   if (wait > 0) {
     setTimeout(() => playLetter(id, volume), wait + 180);
     return;
@@ -233,18 +233,34 @@ const NARRATION_SOURCES: Record<"en" | "tr", Record<"onboarding1" | "onboarding2
 };
 
 /** Ölçülen anlatım klip süreleri (ms) — oto-ilerleyen ekranların zamanlaması için. */
-export const NARRATION_DURATIONS_MS: Record<
-  "en" | "tr",
-  Record<"chForms1" | "chForms2" | "chForms3" | "level1Intro" | "mosqueHowto" | "gardenHowto", number>
-> = {
-  en: { chForms1: 2720, chForms2: 6230, chForms3: 4320, level1Intro: 8816, mosqueHowto: 7291, gardenHowto: 7525 },
-  tr: { chForms1: 2400, chForms2: 6741, chForms3: 4496, level1Intro: 8187, mosqueHowto: 7455, gardenHowto: 6400 },
+export const NARRATION_DURATIONS_MS: Record<"en" | "tr", Record<string, number>> = {
+  en: {"chForms1":2720,"chForms2":6230,"chForms3":4320,"gardenGrown":3562,"gardenHowto":7525,"level1Intro":8816,"mosqueBuilt":3071,"mosqueHowto":7291,"newGame":3108,"onboarding1":3620,"onboarding2":3000,"posFinal":1362,"posInitial":1250,"posMedial":1150,"stepListen":680,"stepPlayback":1269,"stepRecord":820},
+  tr: {"chForms1":2400,"chForms2":6741,"chForms3":4496,"gardenGrown":2529,"gardenHowto":6400,"level1Intro":8187,"mosqueBuilt":2537,"mosqueHowto":7455,"newGame":3438,"onboarding1":3050,"onboarding2":3190,"posFinal":1495,"posInitial":1240,"posMedial":1340,"stepListen":750,"stepPlayback":1206,"stepRecord":970},
 };
 
 const narrationPlayers: Partial<Record<string, AudioPlayer>> = {};
 
 /** Pırıl'ın anlatım repliğini (`key`) `lang` dilinde çalar. */
-export function playNarration(lang: "en" | "tr", key: "onboarding1" | "onboarding2" | "mosqueBuilt" | "gardenGrown" | "newGame" | "level1Intro" | "mosqueHowto" | "gardenHowto" | "chForms1" | "chForms2" | "chForms3" | "posInitial" | "posMedial" | "posFinal" | "stepListen" | "stepRecord" | "stepPlayback", volume = 1) {
+export type NarrationKey =
+  | "onboarding1"
+  | "onboarding2"
+  | "mosqueBuilt"
+  | "gardenGrown"
+  | "newGame"
+  | "level1Intro"
+  | "mosqueHowto"
+  | "gardenHowto"
+  | "chForms1"
+  | "chForms2"
+  | "chForms3"
+  | "posInitial"
+  | "posMedial"
+  | "posFinal"
+  | "stepListen"
+  | "stepRecord"
+  | "stepPlayback";
+
+function playNarrationRaw(lang: "en" | "tr", key: NarrationKey, volume = 1) {
   if (!soundOn()) return;
   try {
     const cacheKey = `${lang}_${key}`;
@@ -256,9 +272,24 @@ export function playNarration(lang: "en" | "tr", key: "onboarding1" | "onboardin
     p.volume = volume;
     p.seekTo(0);
     p.play();
+    reserveSpeech(NARRATION_DURATIONS_MS[lang][key] ?? 0);
   } catch {
     // ses kullanılamıyorsa sessizce geç
   }
+}
+
+/**
+ * Pırıl'ın anlatım repliğini çalar. Başka bir replik konuşuyorsa SIRAYA GİRER —
+ * "Konuş" adımında talimat, adım anlatımı ve harf sesi üst üste biniyordu.
+ */
+export function playNarration(lang: "en" | "tr", key: NarrationKey, volume = 1) {
+  if (!soundOn()) return;
+  const wait = speechRemainingMs();
+  if (wait > 0) {
+    setTimeout(() => playNarration(lang, key, volume), wait);
+    return;
+  }
+  playNarrationRaw(lang, key, volume);
 }
 
 // ---- Arka plan müziği (dikişsiz loop, kısık) ----
@@ -402,11 +433,34 @@ const HINT_MS: Record<"en" | "tr", Record<HintKey, number>> = {
 };
 
 const hintPlayers: Partial<Record<string, AudioPlayer>> = {};
-/** Talimat konuşurken harf sesi araya girmesin — playLetter bunu bekler. */
-let hintBusyUntil = 0;
+
+/**
+ * TEK KONUŞMA KANALI.
+ *
+ * Pırıl üç ayrı yerden konuşabiliyordu — etkinlik talimatı (playHint), adım
+ * anlatımı (playNarration) ve harfin kendi sesi (playLetter) — ve hiçbiri
+ * diğerinden haberdar değildi; "Konuş" adımında üçü aynı anda başlayıp
+ * üst üste biniyordu. Artık hepsi bu tek kanaldan geçiyor: konuşan varsa
+ * sonraki, o bitene kadar bekliyor.
+ */
+let speechBusyUntil = 0;
+const SPEECH_GAP = 220; // replikler arası kısa nefes payı
+
+/** Konuşmanın bitmesine kalan süre (ms). */
+export function speechRemainingMs() {
+  return Math.max(0, speechBusyUntil - Date.now());
+}
+function reserveSpeech(ms: number) {
+  speechBusyUntil = Date.now() + ms + SPEECH_GAP;
+}
 
 export function playHint(lang: "en" | "tr", key: HintKey, volume = 1) {
   if (!soundOn()) return;
+  const wait = speechRemainingMs();
+  if (wait > 0) {
+    setTimeout(() => playHint(lang, key, volume), wait);
+    return;
+  }
   try {
     const id = lang + ":" + key;
     let p = hintPlayers[id];
@@ -417,13 +471,8 @@ export function playHint(lang: "en" | "tr", key: HintKey, volume = 1) {
     p.volume = volume;
     p.seekTo(0);
     p.play();
-    hintBusyUntil = Date.now() + HINT_MS[lang][key];
+    reserveSpeech(HINT_MS[lang][key]);
   } catch {
     // ses kullanılamıyorsa sessizce geç
   }
-}
-
-/** Talimatın bitmesine kalan süre (ms) — 0 ise serbest. */
-export function hintRemainingMs() {
-  return Math.max(0, hintBusyUntil - Date.now());
 }

@@ -17,15 +17,12 @@ import { Mascot } from "@/components/ui/Mascot";
 import { haptics } from "@/lib/haptics";
 import { images } from "@/lib/images";
 import { mascotVars } from "@/lib/mascot";
-import { playLetter, playNarration, playSfx } from "@/lib/sfx";
+import { playLetter, playNarration, playSfx, speechRemainingMs } from "@/lib/sfx";
 import { useSettingsStore } from "@/stores/settingsStore";
 
 const MAX_RECORD_MS = 3500;
-/** Adım anlatımlarının süresi — harf sesi Pırıl konuşurken araya girmesin diye. */
-const STEP_MS: Record<"en" | "tr", { listen: number; record: number; playback: number }> = {
-  en: { listen: 680, record: 820, playback: 1269 },
-  tr: { listen: 750, record: 970, playback: 1206 },
-};
+/** "Kendini dinle" anlatımının süresi — kayıt onun ardından geri çalsın. */
+const PLAYBACK_MS: Record<"en" | "tr", number> = { en: 1269, tr: 1206 };
 const MIC = 104;
 const MIC_ASPECT = 480 / 313; // ic_mic.webp kaynak oranı (h/w)
 const RING = MIC + 34; // geri sayım halkası çapı
@@ -128,13 +125,16 @@ export function RecordCompare({ letterId, onRecordedChange }: { letterId: number
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [letterId]);
 
-  // Her adımda Pırıl ne yapılacağını SÖYLER — yazı tek başına yetmiyor (çocuk okuyamaz).
-  // Kayıt sırasında konuşmaz (çocuğun kaydına karışmasın).
+  /**
+   * Yalnız SON adımda konuşur ("kendini dinle").
+   *
+   * Dinle/kaydet adımlarının kendi anlatımları KALDIRILDI: etkinliğin talimatı
+   * (hint_speak) zaten "önce beni dinle, sonra mikrofona dokun ve harfi sen söyle"
+   * diyor — ikisi arka arkaya çalınca aynı şey iki kez söylenmiş oluyordu.
+   */
   useEffect(() => {
-    if (recording) return;
-    const key = step === "listen" ? "stepListen" : step === "record" ? "stepRecord" : step === "playback" ? "stepPlayback" : null;
-    if (!key) return;
-    const tt = setTimeout(() => playNarration(language, key), 250);
+    if (recording || step !== "playback") return;
+    const tt = setTimeout(() => playNarration(language, "stepPlayback"), 250);
     return () => clearTimeout(tt);
   }, [step, recording, language]);
 
@@ -145,16 +145,13 @@ export function RecordCompare({ letterId, onRecordedChange }: { letterId: number
   };
 
   // Harfi otomatik duyur, sonra kayıt adımına kendiliğinden geç (çocuk beklemesin).
+  // playLetter konuşma kuyruğunda bekler: talimat bitmeden harf çalmaz.
   useEffect(() => {
     if (step !== "listen") return;
-    const ms = STEP_MS[language].listen;
-    const a = setTimeout(() => playLetter(letterId), 250 + ms + 250);
-    const b = setTimeout(() => setStep("record"), 250 + ms + 250 + 1400);
-    return () => {
-      clearTimeout(a);
-      clearTimeout(b);
-    };
-  }, [step, letterId, language]);
+    playLetter(letterId);
+    const b = setTimeout(() => setStep("record"), speechRemainingMs() + 1600);
+    return () => clearTimeout(b);
+  }, [step, letterId]);
 
   /** 2) Kaydet */
   const startRecording = async () => {
@@ -202,7 +199,7 @@ export function RecordCompare({ letterId, onRecordedChange }: { letterId: number
         setTimeout(() => {
           youPlayerRef.current?.seekTo(0);
           youPlayerRef.current?.play();
-        }, 900 + STEP_MS[language].playback);
+        }, 900 + PLAYBACK_MS[language]);
       } else {
         setStep("record");
       }
