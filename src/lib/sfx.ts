@@ -184,13 +184,16 @@ export function stopFinaleLines() {
 // ---- Pırıl anlatımı — onboarding (cami konsepti) + cami inşa anı (Abdulkadir/Sohail
 // playtest: "parents have to explain, spoken guidance rather than text"). ElevenLabs
 // ile üretildi → sessizlikten 3'e bölündü (finale ile aynı yöntem).
-const NARRATION_SOURCES: Record<"en" | "tr", Record<"onboarding1" | "onboarding2" | "mosqueBuilt" | "gardenGrown" | "newGame" | "chForms1" | "chForms2" | "chForms3" | "posInitial" | "posMedial" | "posFinal" | "stepListen" | "stepRecord" | "stepPlayback", number>> = {
+const NARRATION_SOURCES: Record<"en" | "tr", Record<"onboarding1" | "onboarding2" | "mosqueBuilt" | "gardenGrown" | "newGame" | "level1Intro" | "mosqueHowto" | "gardenHowto" | "chForms1" | "chForms2" | "chForms3" | "posInitial" | "posMedial" | "posFinal" | "stepListen" | "stepRecord" | "stepPlayback", number>> = {
   en: {
     onboarding1: require("@/assets/audio/voice_onboarding1_en.mp3"),
     onboarding2: require("@/assets/audio/voice_onboarding2_en.mp3"),
     mosqueBuilt: require("@/assets/audio/voice_mosque_built_en.mp3"),
     gardenGrown: require("@/assets/audio/voice_garden_grown_en.mp3"),
     newGame: require("@/assets/audio/voice_new_game_en.mp3"),
+    level1Intro: require("@/assets/audio/voice_level1_intro_en.mp3"),
+    mosqueHowto: require("@/assets/audio/voice_mosque_howto_en.mp3"),
+    gardenHowto: require("@/assets/audio/voice_garden_howto_en.mp3"),
     chForms1: require("@/assets/audio/voice_ch_forms1_en.mp3"),
     chForms2: require("@/assets/audio/voice_ch_forms2_en.mp3"),
     chForms3: require("@/assets/audio/voice_ch_forms3_en.mp3"),
@@ -207,6 +210,9 @@ const NARRATION_SOURCES: Record<"en" | "tr", Record<"onboarding1" | "onboarding2
     mosqueBuilt: require("@/assets/audio/voice_mosque_built_tr.mp3"),
     gardenGrown: require("@/assets/audio/voice_garden_grown_tr.mp3"),
     newGame: require("@/assets/audio/voice_new_game_tr.mp3"),
+    level1Intro: require("@/assets/audio/voice_level1_intro_tr.mp3"),
+    mosqueHowto: require("@/assets/audio/voice_mosque_howto_tr.mp3"),
+    gardenHowto: require("@/assets/audio/voice_garden_howto_tr.mp3"),
     chForms1: require("@/assets/audio/voice_ch_forms1_tr.mp3"),
     chForms2: require("@/assets/audio/voice_ch_forms2_tr.mp3"),
     chForms3: require("@/assets/audio/voice_ch_forms3_tr.mp3"),
@@ -220,15 +226,18 @@ const NARRATION_SOURCES: Record<"en" | "tr", Record<"onboarding1" | "onboarding2
 };
 
 /** Ölçülen anlatım klip süreleri (ms) — oto-ilerleyen ekranların zamanlaması için. */
-export const NARRATION_DURATIONS_MS: Record<"en" | "tr", Record<"chForms1" | "chForms2" | "chForms3", number>> = {
-  en: { chForms1: 2720, chForms2: 6230, chForms3: 4320 },
-  tr: { chForms1: 2400, chForms2: 6741, chForms3: 4496 },
+export const NARRATION_DURATIONS_MS: Record<
+  "en" | "tr",
+  Record<"chForms1" | "chForms2" | "chForms3" | "level1Intro" | "mosqueHowto" | "gardenHowto", number>
+> = {
+  en: { chForms1: 2720, chForms2: 6230, chForms3: 4320, level1Intro: 8816, mosqueHowto: 7291, gardenHowto: 7525 },
+  tr: { chForms1: 2400, chForms2: 6741, chForms3: 4496, level1Intro: 8187, mosqueHowto: 7455, gardenHowto: 6400 },
 };
 
 const narrationPlayers: Partial<Record<string, AudioPlayer>> = {};
 
 /** Pırıl'ın anlatım repliğini (`key`) `lang` dilinde çalar. */
-export function playNarration(lang: "en" | "tr", key: "onboarding1" | "onboarding2" | "mosqueBuilt" | "gardenGrown" | "newGame" | "chForms1" | "chForms2" | "chForms3" | "posInitial" | "posMedial" | "posFinal" | "stepListen" | "stepRecord" | "stepPlayback", volume = 1) {
+export function playNarration(lang: "en" | "tr", key: "onboarding1" | "onboarding2" | "mosqueBuilt" | "gardenGrown" | "newGame" | "level1Intro" | "mosqueHowto" | "gardenHowto" | "chForms1" | "chForms2" | "chForms3" | "posInitial" | "posMedial" | "posFinal" | "stepListen" | "stepRecord" | "stepPlayback", volume = 1) {
   if (!soundOn()) return;
   try {
     const cacheKey = `${lang}_${key}`;

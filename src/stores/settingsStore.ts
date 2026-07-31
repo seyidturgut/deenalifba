@@ -25,6 +25,12 @@ type SettingsState = {
   hapticsEnabled: boolean;
   isSubscribed: boolean;
   onboardingComplete: boolean;
+  /**
+   * Pırıl'ın "bu bölümde ne yapıyoruz" açıklamalarından hangileri dinlendi.
+   * Abdulkadir (madde 1/8): çocuk bir bölüme ilk girdiğinde Pırıl ne yapacağını
+   * anlatmalı — ama her seferinde tekrarlarsa sıkıcı olur, bir kez yeter.
+   */
+  seenTips: string[];
   lastRewardDay: string | null;
 
   setChildName: (name: string) => void;
@@ -38,6 +44,8 @@ type SettingsState = {
   toggleHaptics: () => void;
   setSubscribed: (value: boolean) => void;
   completeOnboarding: () => void;
+  /** Bu açıklama daha önce dinlendi mi? (dinlenmediyse işaretler ve true döner) */
+  claimTip: (key: string) => boolean;
   /** Günlük ödülü dener; bugün ilk kezse true döner ve işaretler. */
   claimDailyReward: () => boolean;
   /** "Yeni Oyun" (test): profil + onboarding + cami kozmetiğini başa al.
@@ -59,6 +67,7 @@ export const useSettingsStore = create<SettingsState>()(
       hapticsEnabled: true,
       isSubscribed: false,
       onboardingComplete: false,
+      seenTips: [],
       lastRewardDay: null,
 
       setChildName: (name) => set({ childName: name.trim() }),
@@ -78,6 +87,12 @@ export const useSettingsStore = create<SettingsState>()(
       toggleHaptics: () => set((s) => ({ hapticsEnabled: !s.hapticsEnabled })),
       setSubscribed: (value) => set({ isSubscribed: value }),
       completeOnboarding: () => set({ onboardingComplete: true }),
+
+      claimTip: (key) => {
+        if (get().seenTips.includes(key)) return false;
+        set((s) => ({ seenTips: [...s.seenTips, key] }));
+        return true;
+      },
       claimDailyReward: () => {
         const today = new Date().toDateString();
         if (get().lastRewardDay === today) return false;
@@ -92,6 +107,7 @@ export const useSettingsStore = create<SettingsState>()(
           mosqueName: null,
           onboardingComplete: false,
           lastRewardDay: null,
+          seenTips: [], // "Yeni Oyun" → açıklamalar da baştan dinlensin
         }),
     }),
     {

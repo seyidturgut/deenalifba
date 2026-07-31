@@ -10,7 +10,8 @@ import { JuicyButton } from "@/components/ui/JuicyButton";
 import { getLetter } from "@/data/letters";
 import { getLetterPath, PATH_BOX } from "@/data/letterPaths";
 import { images } from "@/lib/images";
-import { playLetter } from "@/lib/sfx";
+import { NARRATION_DURATIONS_MS, playLetter, playNarration } from "@/lib/sfx";
+import { useSettingsStore } from "@/stores/settingsStore";
 
 const CARD = 250;
 const GLYPH = 176; // kart içi glif alanı (altın çerçeveye değmesin)
@@ -40,8 +41,18 @@ export function LetterIntro({ letterId, onComplete }: { letterId: number; onComp
   }, []);
   const badgeStyle = useAnimatedStyle(() => ({ transform: [{ scale: 1 + pulse.value * 0.14 }] }));
 
+  /**
+   * Abdulkadir (madde 1): "Level 1'de Pırıl, çocuk başlamadan ÖNCE ne yapacağımızı
+   * anlatsın." Açıklama yalnız ilk kez dinlenir (claimTip); harfin sesi de o zaman
+   * araya girmesin diye anlatım bitince çalar.
+   */
   useEffect(() => {
-    const tt = setTimeout(() => playLetter(letterId), 350);
+    const intro =
+      letterId === 1 && useSettingsStore.getState().claimTip("level1Intro")
+        ? NARRATION_DURATIONS_MS[useSettingsStore.getState().language].level1Intro
+        : 0;
+    if (intro) playNarration(useSettingsStore.getState().language, "level1Intro");
+    const tt = setTimeout(() => playLetter(letterId), 350 + intro);
     return () => clearTimeout(tt);
   }, [letterId]);
 

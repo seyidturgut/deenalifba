@@ -15,7 +15,7 @@ import { useTranslation } from "react-i18next";
 
 import { haptics } from "@/lib/haptics";
 import { images } from "@/lib/images";
-import { playNarration, playSfx } from "@/lib/sfx";
+import { NARRATION_DURATIONS_MS, playNarration, playSfx } from "@/lib/sfx";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { Mascot } from "@/components/ui/Mascot";
 import { Crescent, Star8 } from "@/components/ui/IslamicMotifs";
@@ -113,8 +113,24 @@ export function MosqueBuild({
     // "dokun" işareti nabzı (inşaya kadar)
     marker.value = withRepeat(withSequence(withTiming(1, { duration: 700, easing: Easing.inOut(Easing.ease) }), withTiming(0, { duration: 700, easing: Easing.inOut(Easing.ease) })), -1, false);
 
-    const auto = setTimeout(doBuild, AUTOBUILD);
-    return () => clearTimeout(auto);
+    /**
+     * Abdulkadir (madde 8): "Cami ve bahçe inşasında da Pırıl açıklasın — küçük
+     * çocuklar bu bölümü başta anlamıyor, ebeveyn anlatınca çok seviyorlar."
+     * Yalnız İLK kez; sonra sessizce geçer. Anlatım sürerken otomatik inşa da
+     * beklesin, yoksa Pırıl daha konuşurken parça yerine oturuyor.
+     */
+    const tipKey = isGarden ? "gardenHowto" : "mosqueHowto";
+    const tipMs = useSettingsStore.getState().claimTip(tipKey)
+      ? NARRATION_DURATIONS_MS[language][tipKey]
+      : 0;
+    let tip: ReturnType<typeof setTimeout> | null = null;
+    if (tipMs) tip = setTimeout(() => playNarration(language, tipKey), 400);
+
+    const auto = setTimeout(doBuild, AUTOBUILD + tipMs);
+    return () => {
+      if (tip) clearTimeout(tip);
+      clearTimeout(auto);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible, stageIndex]);
 
