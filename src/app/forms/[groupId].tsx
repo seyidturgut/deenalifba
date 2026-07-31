@@ -23,7 +23,7 @@ import { formsGroup, FORMS_GROUP_SIZE } from "@/data/formsLessons";
 import { LETTERS } from "@/data/letters";
 import { haptics } from "@/lib/haptics";
 import { images } from "@/lib/images";
-import { playHint, playLetter, playSfx, resetCombo, type HintKey } from "@/lib/sfx";
+import { playHint, playLetter, playSfx, resetCombo, stopSpeech, type HintKey } from "@/lib/sfx";
 import { useFormsStore } from "@/stores/formsStore";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { useStageStore } from "@/stores/stageStore";
@@ -113,6 +113,7 @@ export default function FormsLevel() {
       gameIndex === 0 ? "formFind" : gameIndex === 1 ? "formWhich"
       : gameIndex === 2 ? "match" : gameIndex === 3 ? "balloon"
       : gameIndex === 4 ? "catch" : "trace";
+    stopSpeech(); // önceki oyunun repliği burada çalmasın
     const tt = setTimeout(() => playHint(language, key), 260);
     return () => clearTimeout(tt);
   }, [taught, showChapterIntro, letterId, gameIndex, language]);

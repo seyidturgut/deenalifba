@@ -148,9 +148,15 @@ export function RecordCompare({ letterId, onRecordedChange }: { letterId: number
   // playLetter konuşma kuyruğunda bekler: talimat bitmeden harf çalmaz.
   useEffect(() => {
     if (step !== "listen") return;
-    playLetter(letterId);
-    const b = setTimeout(() => setStep("record"), speechRemainingMs() + 1600);
-    return () => clearTimeout(b);
+    // Etkinlik talimatı bu bileşenden 260ms SONRA başlıyor; harfi hemen çalarsak
+    // sıraya ilk biz gireriz ve talimat harfin arkasında kalır. Kısa bir pay
+    // bırakıp kuyruğa talimattan sonra giriyoruz.
+    const a = setTimeout(() => playLetter(letterId), 600);
+    const b = setTimeout(() => setStep("record"), 600 + speechRemainingMs() + 1800);
+    return () => {
+      clearTimeout(a);
+      clearTimeout(b);
+    };
   }, [step, letterId]);
 
   /** 2) Kaydet */

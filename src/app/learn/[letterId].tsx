@@ -32,7 +32,7 @@ import type { ActivityKind } from "@/data/types";
 import { haptics } from "@/lib/haptics";
 import { mascotVars } from "@/lib/mascot";
 import { images } from "@/lib/images";
-import { playHint, playLetter, playSfx, resetCombo, type HintKey } from "@/lib/sfx";
+import { playHint, playLetter, playSfx, resetCombo, stopSpeech, type HintKey } from "@/lib/sfx";
 import { useLearningStore } from "@/stores/learningStore";
 import { useMosqueStore } from "@/stores/mosqueStore";
 import { useProgressStore } from "@/stores/progressStore";
@@ -196,6 +196,7 @@ export default function LearnScreen() {
   useEffect(() => {
     const current = activities[activeIndex];
     if (!current || unlockVisible) return;
+    stopSpeech(); // önceki adımın repliği burada çalmasın
     const tt = setTimeout(() => playHint(language, current as HintKey), 260);
     return () => clearTimeout(tt);
   }, [activities, activeIndex, unlockVisible, language]);

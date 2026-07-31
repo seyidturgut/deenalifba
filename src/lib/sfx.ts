@@ -72,6 +72,9 @@ export function playSuccess() {
 
 // ---- Harf telaffuzları (Sesler oyunu) ----
 // Metro statik require ister; harf id → ses dosyası (btn_N.mp3).
+/** Harf seslerinin süresi — konuşma kuyruğunda yer ayırmak için (ms). */
+const LETTER_MS: Record<number, number> = {"1":830,"2":748,"3":660,"4":728,"5":792,"6":694,"7":858,"8":855,"9":863,"10":626,"11":788,"12":867,"13":947,"14":900,"15":902,"16":578,"17":692,"18":794,"19":867,"20":688,"21":790,"22":774,"23":884,"24":848,"25":901,"26":744,"27":662,"28":676};
+
 const LETTER_SOURCES: Record<number, number> = {
   1: require("@/assets/audio/alifba/btn_1.mp3"),
   2: require("@/assets/audio/alifba/btn_2.mp3"),
@@ -119,7 +122,10 @@ export function playLetter(id: number, volume = 1) {
   // harfi çalıyor, talimat da o an başlıyordu. Beklemeyi burada tek noktada çözüyoruz.
   const wait = speechRemainingMs();
   if (wait > 0) {
-    setTimeout(() => playLetter(id, volume), wait + 180);
+    const gen = speechGen;
+    setTimeout(() => {
+      if (gen === speechGen) playLetter(id, volume);
+    }, wait + 180);
     return;
   }
   try {
@@ -131,6 +137,8 @@ export function playLetter(id: number, volume = 1) {
     p.volume = volume;
     p.seekTo(0);
     p.play();
+    // Harf de konuşma kanalını meşgul eder — yoksa talimat/anlatım üstüne biner.
+    reserveSpeech(LETTER_MS[id] ?? 900);
   } catch {
     // ses kullanılamıyorsa sessizce geç
   }
@@ -286,7 +294,10 @@ export function playNarration(lang: "en" | "tr", key: NarrationKey, volume = 1) 
   if (!soundOn()) return;
   const wait = speechRemainingMs();
   if (wait > 0) {
-    setTimeout(() => playNarration(lang, key, volume), wait);
+    const gen = speechGen;
+    setTimeout(() => {
+      if (gen === speechGen) playNarration(lang, key, volume);
+    }, wait);
     return;
   }
   playNarrationRaw(lang, key, volume);
@@ -445,6 +456,29 @@ const hintPlayers: Partial<Record<string, AudioPlayer>> = {};
  */
 let speechBusyUntil = 0;
 const SPEECH_GAP = 220; // replikler arası kısa nefes payı
+/**
+ * Kuyruk NESLİ. Ekran/adım değişince artar; o ana kadar sıraya girmiş ama henüz
+ * çalmamış replikler iptal olur. Yoksa bir adımın talimatı, çocuk sonraki adıma
+ * geçtikten sonra orada çalıyordu.
+ */
+let speechGen = 0;
+
+/** Konuşan her şeyi kes ve bekleyen replikleri iptal et (ekran/adım değişimi). */
+export function stopSpeech() {
+  speechGen++;
+  speechBusyUntil = 0;
+  const stop = (p?: AudioPlayer) => {
+    try {
+      p?.pause();
+      p?.seekTo(0);
+    } catch {
+      // oynatıcı yoksa/hazır değilse sessizce geç
+    }
+  };
+  Object.values(hintPlayers).forEach(stop);
+  Object.values(narrationPlayers).forEach(stop);
+  Object.values(letterPlayers).forEach(stop);
+}
 
 /** Konuşmanın bitmesine kalan süre (ms). */
 export function speechRemainingMs() {
@@ -458,7 +492,10 @@ export function playHint(lang: "en" | "tr", key: HintKey, volume = 1) {
   if (!soundOn()) return;
   const wait = speechRemainingMs();
   if (wait > 0) {
-    setTimeout(() => playHint(lang, key, volume), wait);
+    const gen = speechGen;
+    setTimeout(() => {
+      if (gen === speechGen) playHint(lang, key, volume);
+    }, wait);
     return;
   }
   try {
