@@ -3,6 +3,8 @@ import type { ActivityKind } from "@/data/types";
 import { hasWordImage } from "@/data/letterWords";
 import { images } from "@/lib/images";
 import { hasLetterSound } from "@/lib/sfx";
+import { LETTERS } from "@/data/letters";
+import { useProgressStore } from "@/stores/progressStore";
 
 /**
  * Öğrenme döngüsü v2 — her harf için DEĞİŞKEN ders (2-3 mini-oyun).
@@ -73,8 +75,17 @@ export function buildLesson(letterId: number): ActivityKind[] {
     for (let i = 0; i < n; i++) lesson.push(practice[(start + i) % practice.length]);
   }
 
-  // Önceki harf varsa sonda kısa tekrar (SM-2)
-  if (letterId > 1) lesson.push("recall");
+  /**
+   * Önceki harf varsa sonda kısa tekrar (SM-2).
+   *
+   * Ama TEKRAR EDİLECEK harf yoksa adımı hiç ekleme: Abdulkadir'in ekran kaydında
+   * "Tekrar" ekranı açılıp "henüz tekrar edilecek bir şey yok" deyip hemen kapanıyor,
+   * talimatı da boşuna çalıp sonraki adımın talimatına biniyordu.
+   */
+  const hasEarlier = LETTERS.some(
+    (l) => l.id < letterId && useProgressStore.getState().isLetterComplete(l.id)
+  );
+  if (letterId > 1 && hasEarlier) lesson.push("recall");
 
   // Kaydet & karşılaştır — Abdulkadir video: dinleme/yazma/pratik BİTMEDEN konuşma
   // istenmemeli, dersin GERÇEK son adımı olsun (her harfte).
