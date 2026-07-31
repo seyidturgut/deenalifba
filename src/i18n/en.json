@@ -114,7 +114,8 @@
     "stepListen": "Listen 👂",
     "stepRecord": "Tap the mic and say it 🎤",
     "stepRecording": "Listening…",
-    "stepPlayback": "Hear yourself!"
+    "stepPlayback": "Hear yourself!",
+    "stepHearing": "Can you hear it? 👂"
   },
   "finale": {
     "title": "Maa shaa Allah!",

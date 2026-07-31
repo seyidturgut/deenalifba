@@ -114,7 +114,8 @@
     "stepListen": "Dinle 👂",
     "stepRecord": "Mikrofona dokun ve söyle 🎤",
     "stepRecording": "Dinliyorum…",
-    "stepPlayback": "Kendini dinle!"
+    "stepPlayback": "Kendini dinle!",
+    "stepHearing": "Duyuyor musun? 👂"
   },
   "finale": {
     "title": "Maşallah!",

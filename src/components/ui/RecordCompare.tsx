@@ -92,6 +92,8 @@ export function RecordCompare({ letterId, onRecordedChange }: { letterId: number
   const { t } = useTranslation();
   const [step, setStep] = useState<Step>("listen");
   const [recording, setRecording] = useState(false);
+  /** Harf tam ŞU AN çalıyor — dinleme butonu belirgin şekilde canlanır. */
+  const [hearing, setHearing] = useState(false);
   const youPlayerRef = useRef<AudioPlayer | null>(null);
   const stopTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -161,11 +163,17 @@ export function RecordCompare({ letterId, onRecordedChange }: { letterId: number
         // henüz kuyrukta beklerken sıfır görünüyor ve çocuk harfi duymadan
         // kayıt adımına atlıyordu.
         const queued = speechRemainingMs();
+        const dur = letterDurationMs(letterId);
         playLetter(letterId);
+        // Harf çalarken butonu canlandır: ses geliyor ama ekranda hiçbir şey
+        // olmuyordu, çocuk harfi duyduğunu fark etmiyordu.
+        timers.push(setTimeout(() => alive && setHearing(true), queued));
+        timers.push(setTimeout(() => alive && setHearing(false), queued + dur));
+        // Harf bittikten sonra çocuğun sindirmesi için rahat bir pay bırak.
         timers.push(
           setTimeout(() => {
             if (alive) setStep("record");
-          }, queued + letterDurationMs(letterId) + 900)
+          }, queued + dur + 1600)
         );
       }, 600)
     );
@@ -257,15 +265,15 @@ export function RecordCompare({ letterId, onRecordedChange }: { letterId: number
 
       {/* 1) DİNLE */}
       {step === "listen" && (
-        <Animated.View style={pulseStyle}>
+        <Animated.View style={[pulseStyle, hearing ? { transform: [{ scale: 1.12 }] } : null]}>
           <Pressable onPress={doListen} hitSlop={10} style={{ alignItems: "center", gap: 10 }}>
             <View
               style={{
                 width: MIC,
                 height: MIC,
                 borderRadius: MIC / 2,
-                backgroundColor: "#FFFFFF",
-                borderWidth: 4,
+                backgroundColor: hearing ? "#FFF3D6" : "#FFFFFF",
+                borderWidth: hearing ? 6 : 4,
                 borderColor: "#F5A524",
                 alignItems: "center",
                 justifyContent: "center",
@@ -277,7 +285,9 @@ export function RecordCompare({ letterId, onRecordedChange }: { letterId: number
             >
               <Image source={images.icListen} style={{ width: 58, height: 53 }} contentFit="contain" />
             </View>
-            <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 18, color: "#34618C" }}>{t("intro.stepListen")}</Text>
+            <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 18, color: hearing ? "#C97C10" : "#34618C" }}>
+              {t(hearing ? "intro.stepHearing" : "intro.stepListen")}
+            </Text>
           </Pressable>
         </Animated.View>
       )}
