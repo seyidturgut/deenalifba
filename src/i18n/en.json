@@ -230,7 +230,9 @@
     "salah": "Salah",
     "goalLabel": "GOAL",
     "soon": "Coming Soon",
-    "letterForms": "Start · Middle · End"
+    "letterForms": "Letters in Words",
+    "chapterLetters": "Learn the Letters",
+    "chapterWords": "Letters in Words"
   },
   "forms": {
     "prompt": "Which one is the same letter?",
@@ -246,7 +248,7 @@
     "posInitial": "At the beginning of the word",
     "posMedial": "In the middle of the word",
     "posFinal": "At the end of the word",
-    "bannerTitle": "Letter Positions",
+    "bannerTitle": "Letters in Words",
     "reversePrompt": "Which letter is this?"
   }
 }

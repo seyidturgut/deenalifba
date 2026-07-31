@@ -230,7 +230,9 @@
     "salah": "Namaz",
     "goalLabel": "HEDEF",
     "soon": "Yakında",
-    "letterForms": "Başta · Ortada · Sonda"
+    "letterForms": "Kelimelerde Harfler",
+    "chapterLetters": "Harfleri Öğren",
+    "chapterWords": "Kelimelerde Harfler"
   },
   "forms": {
     "prompt": "Aynı harfin başka hâli hangisi?",
@@ -246,7 +248,7 @@
     "posInitial": "Kelimenin başında",
     "posMedial": "Kelimenin ortasında",
     "posFinal": "Kelimenin sonunda",
-    "bannerTitle": "Harfin Yeri",
+    "bannerTitle": "Kelimelerde Harfler",
     "reversePrompt": "Bu hangi harf?"
   }
 }

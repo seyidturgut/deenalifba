@@ -23,6 +23,7 @@ import { LETTERS } from "@/data/letters";
 
 import type { Letter } from "@/data/types";
 import { GARDEN_STAGE_COUNT, gardenStage } from "@/lib/garden";
+import { Star8 } from "@/components/ui/IslamicMotifs";
 import { images } from "@/lib/images";
 import { playSfx, syncMusicWithSetting } from "@/lib/sfx";
 import { useFormsStore } from "@/stores/formsStore";
@@ -50,6 +51,41 @@ const JOURNEY_STAGES: { key: string; emoji: string; goal?: boolean; route?: stri
   { key: "surahs", emoji: "📿" },
   { key: "salah", emoji: "🕌", goal: true },
 ];
+
+/**
+ * Harita bölüm başlığı — Abdulkadir (madde 5): "ilk 28 seviyeyi 'Harfleri Öğren',
+ * sonrakini 'Kelimelerde Harfler' diye adlandıralım." Can'ın "seviyeleri temalı
+ * bölgelere ayır" maddesi de aynı şeyi istiyordu: çocuk nerede olduğunu görsün.
+ */
+function ChapterBanner({ label, cy, width }: { label: string; cy: number; width: number }) {
+  return (
+    <View
+      pointerEvents="none"
+      style={{ position: "absolute", left: 0, top: cy, width, alignItems: "center" }}
+    >
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          gap: 10,
+          backgroundColor: "rgba(255,255,255,0.94)",
+          borderRadius: 999,
+          paddingHorizontal: 18,
+          paddingVertical: 7,
+          shadowColor: "#1462B5",
+          shadowOpacity: 0.16,
+          shadowRadius: 7,
+          shadowOffset: { width: 0, height: 3 },
+        }}
+      >
+        <Star8 size={15} color="#F5A524" />
+        <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 17, color: "#0E5FC2" }}>{label}</Text>
+        <Star8 size={15} color="#F5A524" />
+      </View>
+    </View>
+  );
+}
+
 const INNER = 0.6; // çerçevenin iç krem penceresi (NODE oranı)
 // Krem pencere görselin tam merkezinde değil (3D lip): sağa/yukarı kaydır
 const WIN_DX = NODE * 0.023;
@@ -550,6 +586,11 @@ export default function Home() {
             <Polyline points={pathPoints} fill="none" stroke="#E8C766" strokeWidth={16} strokeLinecap="round" strokeLinejoin="round" />
             <Polyline points={pathPoints} fill="none" stroke="#FBE9A8" strokeWidth={6} strokeLinecap="round" strokeLinejoin="round" />
           </Svg>
+          <ChapterBanner label={t("journey.chapterLetters")} cy={6} width={contentW} />
+          {stageNodes[0] && (
+            <ChapterBanner label={t("journey.chapterWords")} cy={stageNodes[0].cy - V_GAP * 0.62} width={contentW} />
+          )}
+
           {nodes.map((n, i) => (
             <LevelNode
               key={n.letter.id}
@@ -580,7 +621,8 @@ export default function Home() {
                 cx={s.cx}
                 cy={s.cy}
                 emoji={s.emoji}
-                name={gi === undefined || gi === 0 ? t(`journey.${s.key}`) : ""}
+                // Harf Tanıma düğümlerinin adı üstteki bölüm başlığında zaten yazıyor
+                name={gi === undefined ? t(`journey.${s.key}`) : ""}
                 goal={s.goal}
                 soon={
                   s.route
