@@ -262,7 +262,9 @@ export function RecordCompare({ letterId, onRecordedChange }: { letterId: number
                 shadowOffset: { width: 0, height: 4 },
               }}
             >
-              <Image source={images.icListen} style={{ width: 58, height: 53 }} contentFit="contain" />
+              {/* Anlatım "kulağa dokun" diyor — buton da kulak olmalı; hoparlör
+                  görseli çocuğa başka bir şey işaret ediyordu. */}
+              <Text style={{ fontSize: 46 }}>👂</Text>
             </View>
             <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 18, color: hearing ? "#C97C10" : "#34618C" }}>
               {t(hearing ? "intro.stepHearing" : "intro.stepListen")}
