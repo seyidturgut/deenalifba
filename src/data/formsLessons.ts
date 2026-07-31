@@ -3,13 +3,20 @@ import { LETTERS } from "@/data/letters";
 /**
  * "Harf Tanıma" bölümü — haritada 29-35 arası YEDİ ayrı seviye.
  *
- * Abdulkadir (2. playtest turu): "içeriği 29-35 seviyelerine yayın, seviye başına 4-5 harf
- * verin — hepsini birden öğretmek bilişsel yükü artırıyor, çocuğa pratik için zaman kalmıyor."
- * Ayrıca 1-28'deki "bir düğüm = bir kısa ders" ritmi de böylece korunuyor.
+ * Abdulkadir (2. tur): "içeriği seviyelere yayın, hepsini birden öğretmek bilişsel yükü
+ * artırıyor." 3. turda daha da ileri gitti: seviye başına TEK harf — bölüm hâlâ uzundu.
+ * Böylece 1-28'deki "bir düğüm = bir kısa ders" ritmi bu bölümde de birebir korunuyor.
  */
-export const FORMS_GROUP_SIZE = 4;
+/**
+ * Seviye başına harf sayısı: 1.
+ *
+ * Abdulkadir (3. tur, madde 6): "Bu bölüm seviye başına çok uzun. 4 harfe indirdik
+ * ama bence 1-28'de olduğu gibi seviye başına TEK harf olmalı." Can/shib'in
+ * "kısa seviye, hızlı başarı" yaklaşımıyla da örtüşüyor.
+ */
+export const FORMS_GROUP_SIZE = 1;
 
-/** Harf id'lerinin 4'erli dilimleri (7 grup × 4 harf = 28). */
+/** Harf id'lerinin dilimleri (28 grup × 1 harf = 28). */
 export const FORMS_GROUPS: number[][] = (() => {
   const out: number[][] = [];
   for (let i = 0; i < LETTERS.length; i += FORMS_GROUP_SIZE) {

@@ -20,6 +20,7 @@ import { Mascot } from "@/components/ui/Mascot";
 import { StarBadge } from "@/components/ui/StarBadge";
 import { FORMS_GROUPS, formsGroup } from "@/data/formsLessons";
 import { LETTERS } from "@/data/letters";
+import { LEVELS, type Level } from "@/data/levels";
 
 import type { Letter } from "@/data/types";
 import { GARDEN_STAGE_COUNT, gardenStage } from "@/lib/garden";
@@ -378,6 +379,7 @@ export default function Home() {
   const musicEnabled = useSettingsStore((s) => s.musicEnabled);
   const unlocked = useProgressStore((s) => s.unlockedLetters);
   const isLetterComplete = useProgressStore((s) => s.isLetterComplete);
+  const isPartComplete = useProgressStore((s) => s.isPartComplete);
   // Harf Tanıma bölümü (Abdulkadir) — 28 harf bitince açılır
   const allLettersDone = useProgressStore((s) => LETTERS.every((l) => s.isLetterComplete(l.id)));
   const formsDoneIds = useFormsStore((s) => s.completed);
@@ -398,29 +400,30 @@ export default function Home() {
   // Aktif/rehber düğüm = ULAŞILAN EN İLERİ nokta (tamamlananların hemen ardındaki harf).
   // "İlk boşluğa" göre DEĞİL → çocuk bir harfi atlasa bile kuş geri seviyeye dönmez,
   // hep en ileride durur (Duolingo gibi parlar).
-  const lastDoneIndex = LETTERS.reduce((m, l, i) => (isLetterComplete(l.id) ? i : m), -1);
+  // Her harf iki seviyeye bölündü → harita 56 düğüm gösterir (data/levels.ts).
+  const lastDoneIndex = LEVELS.reduce((m, lv, i) => (isPartComplete(lv.letterId, lv.part) ? i : m), -1);
   // Rehberin durduğu düğüm. 28 harf bitmemişse sıradaki harf; bitmişse Harf Tanıma
   // gruplarının ilk tamamlanmamışı — yoksa Pırıl 28'de park kalıyor ve çocuk 28'i
   // bitirip haritaya dönünce "sıradaki burası" işaretini hiç görmüyordu.
-  const lettersAllDone = lastDoneIndex === LETTERS.length - 1;
+  const lettersAllDone = lastDoneIndex === LEVELS.length - 1;
   const firstOpenFormsGroup = FORMS_GROUPS.findIndex((g) => g.some((id) => !formsDoneIds.includes(id)));
   const activeIndex = lettersAllDone
-    ? LETTERS.length + (firstOpenFormsGroup === -1 ? FORMS_GROUPS.length - 1 : firstOpenFormsGroup)
-    : Math.min(lastDoneIndex + 1, LETTERS.length - 1);
-  const activeId = lettersAllDone ? -1 : LETTERS[activeIndex].id;
+    ? LEVELS.length + (firstOpenFormsGroup === -1 ? FORMS_GROUPS.length - 1 : firstOpenFormsGroup)
+    : Math.min(lastDoneIndex + 1, LEVELS.length - 1);
+  const activeLevel = lettersAllDone ? null : LEVELS[activeIndex];
 
   // Düğüm konumları (zig-zag)
-  const nodes = LETTERS.map((l, i) => ({
-    letter: l,
+  const nodes = LEVELS.map((lv, i) => ({
+    level: lv,
     cx: X_PATTERN[i % X_PATTERN.length] * contentW,
     cy: 88 + i * V_GAP,
   }));
   // 28 harften SONRA: büyük yolculuğun ileriki aşamaları (kilitli ama GÖRÜNÜR) — Sohail #7
   const stageNodes = JOURNEY_STAGES.map((s, j) => {
-    const i = LETTERS.length + j;
+    const i = LEVELS.length + j;
     return { ...s, cx: X_PATTERN[i % X_PATTERN.length] * contentW, cy: 88 + i * V_GAP };
   });
-  const totalNodes = LETTERS.length + JOURNEY_STAGES.length;
+  const totalNodes = LEVELS.length + JOURNEY_STAGES.length;
   const mapHeight = 88 + (totalNodes - 1) * V_GAP + 110;
   const pathPoints = [...nodes, ...stageNodes].map((n) => `${n.cx},${n.cy}`).join(" ");
 
@@ -515,10 +518,12 @@ export default function Home() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeIndex]);
 
-  const stateOf = (l: Letter): "done" | "active" | "open" | "locked" => {
-    if (isLetterComplete(l.id)) return "done";
-    if (l.id === activeId) return "active";
-    if (unlocked.includes(l.id)) return "open";
+  const stateOf = (lv: Level): "done" | "active" | "open" | "locked" => {
+    if (isPartComplete(lv.letterId, lv.part)) return "done";
+    if (activeLevel && lv.no === activeLevel.no) return "active";
+    // "Oyna" seviyesi ancak aynı harfin "öğren" seviyesi bitince açılır.
+    if (lv.part === "play" && !isPartComplete(lv.letterId, "learn")) return "locked";
+    if (unlocked.includes(lv.letterId)) return "open";
     return "locked";
   };
 
@@ -588,19 +593,19 @@ export default function Home() {
           </Svg>
           <ChapterBanner label={t("journey.chapterLetters")} cy={6} width={contentW} />
           {stageNodes[0] && (
-            <ChapterBanner label={t("journey.chapterWords")} cy={stageNodes[0].cy - V_GAP * 0.62} width={contentW} />
+            <ChapterBanner label={t("journey.chapterWords")} cy={stageNodes[0].cy - V_GAP * 0.68} width={contentW} />
           )}
 
-          {nodes.map((n, i) => (
+          {nodes.map((n) => (
             <LevelNode
-              key={n.letter.id}
-              levelNo={i + 1}
+              key={n.level.no}
+              levelNo={n.level.no}
               cx={n.cx}
               cy={n.cy}
-              state={stateOf(n.letter)}
+              state={stateOf(n.level)}
               onPress={() => {
-                if (stateOf(n.letter) === "locked") playSfx("locked_tap");
-                else router.push(`/learn/${n.letter.id}`);
+                if (stateOf(n.level) === "locked") playSfx("locked_tap");
+                else router.push(`/learn/${n.level.letterId}?part=${n.level.part}`);
               }}
             />
           ))}
@@ -628,12 +633,14 @@ export default function Home() {
                   s.route
                     ? !allLettersDone
                       ? t("forms.locked")
-                      : t("forms.progress", { n: groupDone, total: groupLetters.length })
+                      : groupLetters.length > 1
+                        ? t("forms.progress", { n: groupDone, total: groupLetters.length })
+                        : ""
                     : t("journey.soon")
                 }
                 goalLabel={t("journey.goalLabel")}
-                subtitle={t("forms.progress", { n: groupDone, total: groupLetters.length })}
-                levelNo={LETTERS.length + stageNodes.indexOf(s) + 1}
+                subtitle={groupLetters.length > 1 ? t("forms.progress", { n: groupDone, total: groupLetters.length }) : ""}
+                levelNo={LEVELS.length + stageNodes.indexOf(s) + 1}
                 isChapter={!!s.route}
                 onPress={playable ? () => { playSfx("ui_tap"); router.push(s.route as any); } : undefined}
               />

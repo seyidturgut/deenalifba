@@ -28,6 +28,7 @@ import { PaintTrace } from "@/features/trace/PaintTrace";
 import { dotSiblings, soundSiblings } from "@/data/confusables";
 import { ACTIVITY_META, newlyUnlockedGame } from "@/data/lesson";
 import { getLetter, TOTAL_LETTERS } from "@/data/letters";
+import type { LevelPart } from "@/data/levels";
 import type { ActivityKind } from "@/data/types";
 import { haptics } from "@/lib/haptics";
 import { mascotVars } from "@/lib/mascot";
@@ -141,15 +142,17 @@ function StepBar({ activities, activeIndex }: { activities: ActivityKind[]; acti
 export default function LearnScreen() {
   const { t } = useTranslation();
   const router = useRouter();
-  const { letterId } = useLocalSearchParams<{ letterId: string }>();
+  const { letterId, part: partParam } = useLocalSearchParams<{ letterId: string; part?: string }>();
   const id = Number(letterId);
+  // Her harf iki seviyeye bölündü: ?part=play ikinci seviye (oyunlar + konuş).
+  const part: LevelPart = partParam === "play" ? "play" : "learn";
   const letter = getLetter(id);
 
   const activities = useLearningStore((s) => s.activities);
   const activeIndex = useLearningStore((s) => s.activeIndex);
   const startLetter = useLearningStore((s) => s.startLetter);
   const nextStep = useLearningStore((s) => s.nextStep);
-  const completeLetter = useProgressStore((s) => s.completeLetter);
+  const completePart = useProgressStore((s) => s.completePart);
   const syncMosque = useMosqueStore((s) => s.syncWithProgress);
 
   const language = useSettingsStore((s) => s.language);
@@ -178,15 +181,15 @@ export default function LearnScreen() {
    */
   const wasComplete = useRef(false);
   useEffect(() => {
-    wasComplete.current = useProgressStore.getState().isLetterComplete(id);
-  }, [id]);
+    wasComplete.current = useProgressStore.getState().isPartComplete(id, part);
+  }, [id, part]);
 
   useEffect(() => {
-    startLetter(id);
+    startLetter(id, part);
     useStageStore.getState().resetIdle();
     setUnlockShownFor(null);
     resetCombo(); // seri harfe özeldir, önceki harften taşımasın
-  }, [id, startLetter]);
+  }, [id, part, startLetter]);
 
   /**
    * Abdulkadir (madde 2): her etkinliğin talimatı SESLİ söylenir — okuyamayan
@@ -218,7 +221,8 @@ export default function LearnScreen() {
   const finishLetter = () => {
     setCelebrate(false); // kutlamayı kapat → cami sahnesiyle çakışmasın
     // Tekrar turu: yeni cami parçası yok, final yok — kutlamayı gördü, haritaya dön.
-    if (wasComplete.current) {
+    // İlk seviye ("öğren") de cami vermez; harf ancak ikinci seviyede tamamlanır.
+    if (wasComplete.current || part === "learn") {
       goHome();
       return;
     }
@@ -254,7 +258,7 @@ export default function LearnScreen() {
       if (advanced) {
         playSfx("step_complete");
       } else {
-        completeLetter(id);
+        completePart(id, part);
         useStreakStore.getState().recordPractice(Date.now()); // bugünü zincire ekle (istikamet)
         setCelebrate(true);
       }

@@ -1,4 +1,5 @@
 import { hasDotConfusable, hasSoundConfusable } from "@/data/confusables";
+import type { LevelPart } from "@/data/levels";
 import type { ActivityKind } from "@/data/types";
 import { hasWordImage } from "@/data/letterWords";
 import { images } from "@/lib/images";
@@ -50,14 +51,30 @@ export function newlyUnlockedGame(letterId: number): ActivityKind | undefined {
 }
 
 /**
- * Harf için ders etkinlik listesini üretir (deterministik).
- * PEDAGOJİ: önce ÖĞRET (intro → trace), sonra 1-2 PRATİK (havuzdan, harfe göre
- * değişir → tekdüzelik kırılır), önceki harf varsa sonda kısa TEKRAR.
+ * Bir seviyede kaç pratik oyunu olacağı.
+ *
+ * shib (Can'ın oyun tasarımı notu üzerine): "İlk seviyelerde tek oyun olsun,
+ * sonra iki, sonra üç — çocuk başarıya çabuk ulaşsın." İlk harflerde tek oyun
+ * hem bu hızlı başarı hissini verir hem yeni mekanikleri tek tek tanıtır.
  */
-export function buildLesson(letterId: number): ActivityKind[] {
-  // Önce ÖĞRET (intro → boya/trace: gerçek glif konturunu parmakla boyama),
-  // sonra 2 değişen yazısız oyun, sonra tekrar.
-  const lesson: ActivityKind[] = ["intro", "trace"];
+function practiceCount(letterId: number): number {
+  if (letterId <= 2) return 1;
+  if (letterId <= 6) return 2;
+  return 3;
+}
+
+/**
+ * Harf için ders etkinlik listesini üretir (deterministik).
+ *
+ * Her harf İKİ seviyeye bölünür (data/levels.ts):
+ *   learn → tanı + boya      (öğren ve yaz)
+ *   play  → oyunlar + konuş  (pratik et ve söyle)
+ * Tek uzun ders yerine iki kısa seviye; toplam pratik aynı kalır.
+ */
+export function buildLesson(letterId: number, part: LevelPart = "learn"): ActivityKind[] {
+  if (part === "learn") return ["intro", "trace"];
+
+  const lesson: ActivityKind[] = [];
 
   // Uygun pratik oyunları — sesli oyunlar harf sesi gerektirir
   const practice = PRACTICE.filter((k) => {
@@ -68,9 +85,9 @@ export function buildLesson(letterId: number): ActivityKind[] {
     return hasLetterSound(letterId); // hearTap/match/drag/balloon/catch sesli
   });
 
-  // 2 pratik, harfe göre kaydırılarak (ardışık harfler farklı oyun alır → tekdüzelik yok)
+  // Harfe göre kaydırılarak seç (ardışık harfler farklı oyun alır → tekdüzelik yok)
   if (practice.length > 0) {
-    const n = Math.min(2, practice.length);
+    const n = Math.min(practiceCount(letterId), practice.length);
     const start = (letterId - 1) % practice.length;
     for (let i = 0; i < n; i++) lesson.push(practice[(start + i) % practice.length]);
   }
