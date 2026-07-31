@@ -32,10 +32,11 @@ import type { ActivityKind } from "@/data/types";
 import { haptics } from "@/lib/haptics";
 import { mascotVars } from "@/lib/mascot";
 import { images } from "@/lib/images";
-import { playLetter, playSfx, resetCombo } from "@/lib/sfx";
+import { playHint, playLetter, playSfx, resetCombo, type HintKey } from "@/lib/sfx";
 import { useLearningStore } from "@/stores/learningStore";
 import { useMosqueStore } from "@/stores/mosqueStore";
 import { useProgressStore } from "@/stores/progressStore";
+import { useSettingsStore } from "@/stores/settingsStore";
 import { useStageStore } from "@/stores/stageStore";
 import { useStreakStore } from "@/stores/streakStore";
 
@@ -151,6 +152,7 @@ export default function LearnScreen() {
   const completeLetter = useProgressStore((s) => s.completeLetter);
   const syncMosque = useMosqueStore((s) => s.syncWithProgress);
 
+  const language = useSettingsStore((s) => s.language);
   const [celebrate, setCelebrate] = useState(false);
   const [buildVisible, setBuildVisible] = useState(false);
   const [buildStage, setBuildStage] = useState(0);
@@ -185,6 +187,18 @@ export default function LearnScreen() {
     setUnlockShownFor(null);
     resetCombo(); // seri harfe özeldir, önceki harften taşımasın
   }, [id, startLetter]);
+
+  /**
+   * Abdulkadir (madde 2): her etkinliğin talimatı SESLİ söylenir — okuyamayan
+   * çocuk ne yapacağını balondaki yazıdan öğrenemiyordu. "Yeni oyun!" ekranı
+   * açıkken beklenir, yoksa Pırıl kendi üstüne konuşur.
+   */
+  useEffect(() => {
+    const current = activities[activeIndex];
+    if (!current || unlockVisible) return;
+    const tt = setTimeout(() => playHint(language, current as HintKey), 260);
+    return () => clearTimeout(tt);
+  }, [activities, activeIndex, unlockVisible, language]);
 
   // Bu harfte yeni açılan oyunun sırası geldiğinde, oyundan ÖNCE ödül ekranı.
   useEffect(() => {
@@ -291,14 +305,16 @@ export default function LearnScreen() {
         </View>
       </View>
 
-      <View
+      {/* Talimat balonu — dokununca Pırıl tekrar söyler (çocuk kaçırdıysa) */}
+      <Pressable
+        onPress={() => kind && playHint(language, kind as HintKey)}
         className="mt-1 self-center rounded-full bg-white/65 px-6 py-2"
         style={{ maxWidth: "92%", shadowColor: "#1462B5", shadowOpacity: 0.14, shadowRadius: 7, shadowOffset: { width: 0, height: 4 } }}
       >
         <Text style={{ fontFamily: "Fredoka_600SemiBold", fontSize: 17, lineHeight: 23, textAlign: "center", color: "#34618C" }}>
           {kind ? t(HINT_KEY[kind], mascotVars()) : ""}
         </Text>
-      </View>
+      </Pressable>
 
       {/* Görev paneli (çerçeve) + etkinlik — sahne zemininin ÜSTÜNDE */}
       <View style={{ flex: 1, marginTop: 10 }}>

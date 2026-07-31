@@ -115,6 +115,13 @@ export function playLetter(id: number, volume = 1) {
   if (!soundOn()) return;
   const src = LETTER_SOURCES[id];
   if (!src) return;
+  // Pırıl talimatı söylerken harfin sesi araya girmesin — oyunlar açılır açılmaz
+  // harfi çalıyor, talimat da o an başlıyordu. Beklemeyi burada tek noktada çözüyoruz.
+  const wait = hintRemainingMs();
+  if (wait > 0) {
+    setTimeout(() => playLetter(id, volume), wait + 180);
+    return;
+  }
   try {
     let p = letterPlayers[id];
     if (!p) {
@@ -327,4 +334,96 @@ export function resetCombo() {
 /** Şu anki seri uzunluğu (görsel efektin şiddetini ayarlamak için). */
 export function comboLevel(): number {
   return comboStep;
+}
+
+/**
+ * Etkinlik TALIMATLARI — Pırıl her oyunun ne yapılacağını sesli söyler.
+ *
+ * Abdulkadir (madde 2): "Bütün talimatlar sesli olmalı. Özellikle talimatı
+ * okuyamayan küçük çocuklar için ne yapması gerektiğini açıkça söylemeliyiz."
+ */
+export type HintKey =
+  | "intro"
+  | "trace"
+  | "hearTap"
+  | "match"
+  | "drag"
+  | "balloon"
+  | "catch"
+  | "word"
+  | "dots"
+  | "confuseSound"
+  | "recall"
+  | "speak"
+  | "formFind"
+  | "formWhich";
+
+const HINT_SOURCES: Record<"en" | "tr", Record<HintKey, number>> = {
+  en: {
+
+    intro: require("@/assets/audio/hint_intro_en.mp3"),
+    trace: require("@/assets/audio/hint_trace_en.mp3"),
+    hearTap: require("@/assets/audio/hint_hearTap_en.mp3"),
+    match: require("@/assets/audio/hint_match_en.mp3"),
+    drag: require("@/assets/audio/hint_drag_en.mp3"),
+    balloon: require("@/assets/audio/hint_balloon_en.mp3"),
+    catch: require("@/assets/audio/hint_catch_en.mp3"),
+    word: require("@/assets/audio/hint_word_en.mp3"),
+    dots: require("@/assets/audio/hint_dots_en.mp3"),
+    confuseSound: require("@/assets/audio/hint_confuseSound_en.mp3"),
+    recall: require("@/assets/audio/hint_recall_en.mp3"),
+    speak: require("@/assets/audio/hint_speak_en.mp3"),
+    formFind: require("@/assets/audio/hint_formFind_en.mp3"),
+    formWhich: require("@/assets/audio/hint_formWhich_en.mp3"),
+  },
+  tr: {
+
+    intro: require("@/assets/audio/hint_intro_tr.mp3"),
+    trace: require("@/assets/audio/hint_trace_tr.mp3"),
+    hearTap: require("@/assets/audio/hint_hearTap_tr.mp3"),
+    match: require("@/assets/audio/hint_match_tr.mp3"),
+    drag: require("@/assets/audio/hint_drag_tr.mp3"),
+    balloon: require("@/assets/audio/hint_balloon_tr.mp3"),
+    catch: require("@/assets/audio/hint_catch_tr.mp3"),
+    word: require("@/assets/audio/hint_word_tr.mp3"),
+    dots: require("@/assets/audio/hint_dots_tr.mp3"),
+    confuseSound: require("@/assets/audio/hint_confuseSound_tr.mp3"),
+    recall: require("@/assets/audio/hint_recall_tr.mp3"),
+    speak: require("@/assets/audio/hint_speak_tr.mp3"),
+    formFind: require("@/assets/audio/hint_formFind_tr.mp3"),
+    formWhich: require("@/assets/audio/hint_formWhich_tr.mp3"),
+  },
+};
+
+/** Talimat süreleri — harfin sesi talimat biterken çalsın diye (çakışma önleme). */
+const HINT_MS: Record<"en" | "tr", Record<HintKey, number>> = {
+  en: {"intro": 1638, "trace": 3813, "hearTap": 2261, "match": 2906, "drag": 2351, "balloon": 2533, "catch": 3910, "word": 2291, "dots": 7675, "confuseSound": 5404, "recall": 2179, "speak": 5549, "formFind": 4903, "formWhich": 4721},
+  tr: {"intro": 1639, "trace": 2909, "hearTap": 2104, "match": 2290, "drag": 2772, "balloon": 2890, "catch": 3613, "word": 2148, "dots": 4098, "confuseSound": 5214, "recall": 2431, "speak": 5323, "formFind": 3664, "formWhich": 3905},
+};
+
+const hintPlayers: Partial<Record<string, AudioPlayer>> = {};
+/** Talimat konuşurken harf sesi araya girmesin — playLetter bunu bekler. */
+let hintBusyUntil = 0;
+
+export function playHint(lang: "en" | "tr", key: HintKey, volume = 1) {
+  if (!soundOn()) return;
+  try {
+    const id = lang + ":" + key;
+    let p = hintPlayers[id];
+    if (!p) {
+      p = createAudioPlayer(HINT_SOURCES[lang][key]);
+      hintPlayers[id] = p;
+    }
+    p.volume = volume;
+    p.seekTo(0);
+    p.play();
+    hintBusyUntil = Date.now() + HINT_MS[lang][key];
+  } catch {
+    // ses kullanılamıyorsa sessizce geç
+  }
+}
+
+/** Talimatın bitmesine kalan süre (ms) — 0 ise serbest. */
+export function hintRemainingMs() {
+  return Math.max(0, hintBusyUntil - Date.now());
 }

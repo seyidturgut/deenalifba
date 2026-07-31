@@ -1,6 +1,6 @@
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 
@@ -23,8 +23,9 @@ import { formsGroup, FORMS_GROUP_SIZE } from "@/data/formsLessons";
 import { LETTERS } from "@/data/letters";
 import { haptics } from "@/lib/haptics";
 import { images } from "@/lib/images";
-import { playLetter, playSfx, resetCombo } from "@/lib/sfx";
+import { playHint, playLetter, playSfx, resetCombo, type HintKey } from "@/lib/sfx";
 import { useFormsStore } from "@/stores/formsStore";
+import { useSettingsStore } from "@/stores/settingsStore";
 import { useStageStore } from "@/stores/stageStore";
 import { MosqueBuild } from "@/features/mosque/MosqueBuild";
 import { gardenStage } from "@/lib/garden";
@@ -50,6 +51,7 @@ export default function FormsLevel() {
 
   const [idx, setIdx] = useState(0);
   const [taught, setTaught] = useState(false);
+  const language = useSettingsStore((s) => s.language);
   const [celebrate, setCelebrate] = useState(false);
   const [gardenVisible, setGardenVisible] = useState(false);
 
@@ -98,7 +100,22 @@ export default function FormsLevel() {
    * harfe dönerse aynı oyunu görür, kafası karışmaz.
    */
   const GAME_COUNT = 6;
+
   const gameIndex = (gi * FORMS_GROUP_SIZE + idx) % GAME_COUNT;
+
+  /**
+   * Talimat sesi (Abdulkadir madde 2). Öğretim (FormIntro) adımında değil, oyun
+   * başlarken çalar — öğretimde Pırıl zaten konuşuyor.
+   */
+  useEffect(() => {
+    if (!taught || showChapterIntro || !letterId) return;
+    const key: HintKey | null =
+      gameIndex === 0 ? "formFind" : gameIndex === 1 ? "formWhich"
+      : gameIndex === 2 ? "match" : gameIndex === 3 ? "balloon"
+      : gameIndex === 4 ? "catch" : "trace";
+    const tt = setTimeout(() => playHint(language, key), 260);
+    return () => clearTimeout(tt);
+  }, [taught, showChapterIntro, letterId, gameIndex, language]);
 
   // Oyunun göstereceği form: bu harfin gerçekten sahip olduğu pozisyonel formlardan biri
   // (bağlanmayan 6 harfte yalnız "son" vardır — var olmayan şekil gösterilmez).
