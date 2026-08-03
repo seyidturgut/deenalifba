@@ -20,7 +20,7 @@ import { useSettingsStore } from "@/stores/settingsStore";
  * Can (AdMob/Voodoo, Sohail üzerinden): "Yeni mini-oyunlar ilerleme ödülü olarak
  * açılsın — çocuğa devam etmek için sebep verir."
  */
-const AUTO_MS = 7000; // çocuk dokunmazsa kendiliğinden devam (Pırıl anlatımı ~3.9sn sürüyor)
+const AUTO_MS = 5000; // çocuk dokunmazsa kendiliğinden devam (Pırıl anlatımı ~3.4sn)
 
 export function NewGameUnlock({
   visible,
@@ -55,7 +55,7 @@ export function NewGameUnlock({
     playSfx("star_earned");
     playSfx("correct_ding", 0.6);
     // Pırıl: "Vay canına! Yeni bir oyun açıldı! Hadi hemen deneyelim!"
-    const nt = setTimeout(() => playNarration(language, "newGame"), 500);
+    const nt = setTimeout(() => playNarration(language, "newGame"), 250);
     const auto = setTimeout(() => finish(), AUTO_MS);
     return () => {
       clearTimeout(nt);

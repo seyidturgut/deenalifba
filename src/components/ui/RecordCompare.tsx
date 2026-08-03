@@ -17,7 +17,7 @@ import { Mascot } from "@/components/ui/Mascot";
 import { haptics } from "@/lib/haptics";
 import { images } from "@/lib/images";
 import { mascotVars } from "@/lib/mascot";
-import { letterDurationMs, playLetter, playNarration, playSfx, speechRemainingMs } from "@/lib/sfx";
+import { letterDurationMs, playLetter, playNarration, playSfx, speechRemainingMs, stopSpeech } from "@/lib/sfx";
 import { useSettingsStore } from "@/stores/settingsStore";
 
 const MAX_RECORD_MS = 3500;
@@ -228,12 +228,14 @@ export function RecordCompare({
   const doListen = () => {
     if (hearing) return;
     haptics.tap();
-    const queued = speechRemainingMs();
+    // Çocuk dokunduysa Pırıl SUSAR ve harf anında çalar. Sıraya girseydi, repliğin
+    // bitmesini beklerdi ve dokunuşuna cevap gelmemiş gibi hissederdi.
+    stopSpeech();
     const dur = letterDurationMs(letterId);
     playLetter(letterId);
-    setTimeout(() => setHearing(true), queued);
-    setTimeout(() => setHearing(false), queued + dur);
-    setTimeout(() => setStep((cur) => (cur === "listen" ? "record" : cur)), queued + dur + 900);
+    setHearing(true);
+    setTimeout(() => setHearing(false), dur);
+    setTimeout(() => setStep((cur) => (cur === "listen" ? "record" : cur)), dur + 600);
   };
 
   /**

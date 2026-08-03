@@ -93,7 +93,7 @@ export function Celebration({
     playSfx("star_earned", 0.8);
     playSfx("mashallah", 1.0); // Pırıl "Maşallah" der (sesli kutlama)
     if (hapticsEnabled) haptics.celebrate();
-    const t = setTimeout(onDone, 2600);
+    const t = setTimeout(onDone, 1800);
     return () => clearTimeout(t);
   }, [visible, hapticsEnabled, onDone]);
 

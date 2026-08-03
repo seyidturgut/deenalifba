@@ -4,6 +4,7 @@ import { View } from "react-native";
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withSequence, withTiming } from "react-native-reanimated";
 
 import { images } from "@/lib/images";
+import { stopSpeech } from "@/lib/sfx";
 import { Mascot, type MascotPose } from "./Mascot";
 import { Motif, type MotifKind } from "./IslamicMotifs";
 import { useStageStore } from "@/stores/stageStore";

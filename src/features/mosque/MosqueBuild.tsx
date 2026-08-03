@@ -15,17 +15,18 @@ import { useTranslation } from "react-i18next";
 
 import { haptics } from "@/lib/haptics";
 import { images } from "@/lib/images";
-import { NARRATION_DURATIONS_MS, playNarration, playSfx } from "@/lib/sfx";
+import { NARRATION_DURATIONS_MS, playNarration, playSfx, stopSpeech } from "@/lib/sfx";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { Mascot } from "@/components/ui/Mascot";
 import { Crescent, Star8 } from "@/components/ui/IslamicMotifs";
 
 const { width: SCREEN_W } = Dimensions.get("window");
 const GROW = 850; // parça belirme süresi
-const ADMIRE = 2400; // inşadan sonra hayran kalma süresi
+const ADMIRE = 1300; // inşadan sonra hayran kalma süresi (kısaltıldı — akış yavaştı)
 // Abdulkadir (video): "hiçbir şeye dokunmadım ve kendiliğinden geçti" — 5,2 sn
-// çocuğun parlayan işareti fark edip dokunmasına yetmiyordu.
-const AUTOBUILD = 11000;
+// çocuğun parlayan işareti fark edip dokunmasına yetmiyordu. 11 sn ise fazla
+// uzun kaçtı; anlatım zaten ayrıca bekletiliyor.
+const AUTOBUILD = 6500;
 
 /**
  * Seviye sonu cami anı — ETKİLEŞİMLİ "dokun ve inşa et" (Sohail #6):
@@ -74,11 +75,14 @@ export function MosqueBuild({
   const doBuild = () => {
     if (builtRef.current) return;
     builtRef.current = true;
+    // Çocuk dokunduysa açıklamayı KES — yoksa "camin büyüdü" onun arkasında
+    // sıra bekliyor ve inşa sessiz kalıyordu.
+    stopSpeech();
     setBuilt(true);
     playSfx("mosque_build");
     playSfx("star_earned", 0.7);
     // Pırıl: "Bak, camin büyüdü!" / bahçede "Bahçemiz bir adım daha güzelleşti!"
-    setTimeout(() => playNarration(language, isGarden ? "gardenGrown" : "mosqueBuilt"), 300);
+    setTimeout(() => playNarration(language, isGarden ? "gardenGrown" : "mosqueBuilt"), 150);
     if (hapticsEnabled) haptics.celebrate();
     newOpacity.value = withTiming(1, { duration: GROW, easing: Easing.out(Easing.cubic) });
     if (hasPrev) prevOpacity.value = withTiming(0, { duration: GROW * 0.7 });
@@ -126,7 +130,7 @@ export function MosqueBuild({
       ? NARRATION_DURATIONS_MS[language][tipKey]
       : 0;
     let tip: ReturnType<typeof setTimeout> | null = null;
-    if (tipMs) tip = setTimeout(() => playNarration(language, tipKey), 400);
+    if (tipMs) tip = setTimeout(() => playNarration(language, tipKey), 200);
 
     const auto = setTimeout(doBuild, AUTOBUILD + tipMs);
     return () => {
