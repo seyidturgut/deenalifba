@@ -301,8 +301,15 @@ function playNarrationRaw(lang: "en" | "tr", key: NarrationKey, volume = 1) {
  * Pırıl'ın anlatım repliğini çalar. Başka bir replik konuşuyorsa SIRAYA GİRER —
  * "Konuş" adımında talimat, adım anlatımı ve harf sesi üst üste biniyordu.
  */
+/** Şu an çalan replik — aynısı yeniden istenirse baştan başlatılmaz. */
+let speakingKey: string | null = null;
+
 export function playNarration(lang: "en" | "tr", key: NarrationKey, volume = 1) {
   if (!soundOn()) return;
+  // Aynı replik zaten çalıyorsa dokunma. Bir ekran iki kez kurulduğunda (React
+  // etkiyi yeniden çalıştırabilir) ikinci çağrı birincisini ortasından kesiyor
+  // ve çocuk cümlenin parçalarını duyuyordu: "Kul... harfi dinle".
+  if (speakingKey === `${lang}:${key}` && speechRemainingMs() > 0) return;
   const wait = speechRemainingMs();
   if (wait > 0) {
     const gen = speechGen;
@@ -311,6 +318,7 @@ export function playNarration(lang: "en" | "tr", key: NarrationKey, volume = 1) 
     }, wait);
     return;
   }
+  speakingKey = `${lang}:${key}`;
   playNarrationRaw(lang, key, volume);
 }
 
@@ -478,6 +486,7 @@ let speechGen = 0;
 export function stopSpeech() {
   speechGen++;
   speechBusyUntil = 0;
+  speakingKey = null;
   const stop = (p?: AudioPlayer) => {
     try {
       p?.pause();

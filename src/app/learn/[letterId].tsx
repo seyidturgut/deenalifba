@@ -352,7 +352,9 @@ export default function LearnScreen() {
             borderColor: "rgba(255,255,255,0.6)",
           }}
         />
-        <View style={{ flex: 1, marginBottom: FLOOR_H }}>
+        {/* overflow: hiçbir etkinlik bu alanın dışına taşıp üstteki balonu/başlığı
+            ezemesin — taşan yerde dokunuşlar da boşa gidiyordu. */}
+        <View style={{ flex: 1, marginBottom: FLOOR_H, overflow: "hidden" }}>
         {/* "Yeni oyun!" ekranı açıkken oyunu MOUNT ETME: her oyun açılışta hedef harfi
             sesli söylüyor, o ses Pırıl'ın "yeni bir oyun açıldı" anlatımına biniyordu. */}
         {unlockVisible ? null : kind === "intro" ? (
@@ -361,7 +363,9 @@ export default function LearnScreen() {
         </View>
       ) : kind === "trace" ? (
         <View className="flex-1 items-center justify-center pb-1">
-          <View style={{ width: "100%", maxWidth: 400, aspectRatio: 0.96, alignSelf: "center" }}>
+          {/* maxHeight olmadan panel en/boy oranına göre alandan taşıyor ve
+              yukarıdaki ipucu balonunun üstüne biniyordu (Samsung A17 ekran görüntüsü). */}
+          <View style={{ width: "100%", maxWidth: 400, maxHeight: "100%", aspectRatio: 0.96, alignSelf: "center" }}>
             <Image source={images.playPanel} style={StyleSheet.absoluteFill} contentFit="fill" />
             <View style={{ position: "absolute", left: "9%", right: "9%", top: "9%", bottom: "11%" }}>
               <PaintTrace key={`trace-${id}`} letterId={id} onComplete={onCompleteStep} />
