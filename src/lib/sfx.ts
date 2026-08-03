@@ -251,8 +251,8 @@ const NARRATION_SOURCES: Record<"en" | "tr", Record<"onboarding1" | "onboarding2
 
 /** Ölçülen anlatım klip süreleri (ms) — oto-ilerleyen ekranların zamanlaması için. */
 export const NARRATION_DURATIONS_MS: Record<"en" | "tr", Record<string, number>> = {
-  en: {"chForms1":2720,"chForms2":6230,"chForms3":4320,"gardenGrown":3562,"gardenHowto":7525,"speak1":6420,"speak2":1802,"level1Intro":8816,"mosqueBuilt":3071,"mosqueHowto":7291,"newGame":3108,"onboarding1":3620,"onboarding2":3000,"posFinal":1362,"posInitial":1250,"posMedial":1150,"stepListen":680,"stepPlayback":1269,"stepRecord":820},
-  tr: {"chForms1":2400,"chForms2":6741,"chForms3":4496,"gardenGrown":2529,"gardenHowto":6400,"speak1":3774,"speak2":1867,"level1Intro":8187,"mosqueBuilt":2537,"mosqueHowto":7455,"newGame":3438,"onboarding1":3050,"onboarding2":3190,"posFinal":1495,"posInitial":1240,"posMedial":1340,"stepListen":750,"stepPlayback":1206,"stepRecord":970},
+  en: {"chForms1":2720,"chForms2":6230,"chForms3":4320,"gardenGrown":3562,"gardenHowto":7525,"speak1":1351,"speak2":1802,"level1Intro":8816,"mosqueBuilt":3071,"mosqueHowto":7291,"newGame":3108,"onboarding1":3620,"onboarding2":3000,"posFinal":1362,"posInitial":1250,"posMedial":1150,"stepListen":680,"stepPlayback":1269,"stepRecord":820},
+  tr: {"chForms1":2400,"chForms2":6741,"chForms3":4496,"gardenGrown":2529,"gardenHowto":6400,"speak1":2036,"speak2":1867,"level1Intro":8187,"mosqueBuilt":2537,"mosqueHowto":7455,"newGame":3438,"onboarding1":3050,"onboarding2":3190,"posFinal":1495,"posInitial":1240,"posMedial":1340,"stepListen":750,"stepPlayback":1206,"stepRecord":970},
 };
 
 const narrationPlayers: Partial<Record<string, AudioPlayer>> = {};
@@ -450,8 +450,8 @@ const HINT_SOURCES: Record<"en" | "tr", Record<HintKey, number>> = {
 
 /** Talimat süreleri — harfin sesi talimat biterken çalsın diye (çakışma önleme). */
 const HINT_MS: Record<"en" | "tr", Record<HintKey, number>> = {
-  en: {"intro": 1638, "trace": 3813, "hearTap": 2261, "match": 2906, "drag": 2351, "balloon": 2533, "catch": 3910, "word": 2291, "dots": 7675, "confuseSound": 5404, "recall": 2179, "speak": 5549, "formFind": 4903, "formWhich": 4721},
-  tr: {"intro": 1639, "trace": 2909, "hearTap": 2104, "match": 2290, "drag": 2772, "balloon": 2890, "catch": 3613, "word": 2148, "dots": 4098, "confuseSound": 5214, "recall": 2431, "speak": 5323, "formFind": 3664, "formWhich": 3905},
+  en: {"intro": 1638, "trace": 1071, "hearTap": 2261, "match": 2906, "drag": 2351, "balloon": 2533, "catch": 1351, "word": 2291, "dots": 2032, "confuseSound": 2334, "recall": 2179, "speak": 5549, "formFind": 1274, "formWhich": 1174},
+  tr: {"intro": 1639, "trace": 1489, "hearTap": 2104, "match": 2290, "drag": 2772, "balloon": 2890, "catch": 1054, "word": 2148, "dots": 1958, "confuseSound": 2147, "recall": 2431, "speak": 5323, "formFind": 2105, "formWhich": 953},
 };
 
 const hintPlayers: Partial<Record<string, AudioPlayer>> = {};
