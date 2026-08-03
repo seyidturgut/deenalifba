@@ -12,6 +12,7 @@ import { Nunito_400Regular, Nunito_600SemiBold, Nunito_700Bold } from "@expo-goo
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
+import { setAudioModeAsync } from "expo-audio";
 import { AppState, Platform } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -37,6 +38,19 @@ export default function RootLayout() {
     if (fontsLoaded) SplashScreen.hideAsync();
   }, [fontsLoaded]);
 
+  /**
+   * Ses oturumunu her açılışta ÇALMA moduna al.
+   *
+   * Konuşma etkinliği kayıt için oturumu kayıt moduna geçiriyor. Kayıt beklenmedik
+   * bir yerde biterse (hata, çocuk geri çıkarsa, uygulama arkaya alınırsa) oturum
+   * kayıt modunda kalıyor ve iOS bütün çalma sesini susturuyordu — ayarlarda ses
+   * açık görünüyor ama hiçbir şey duyulmuyordu (Abdulkadir, 3. tur test).
+   * Bileşen tarafında da kapatılıyor; burası son güvenlik ağı.
+   */
+  useEffect(() => {
+    setAudioModeAsync({ allowsRecording: false }).catch(() => {});
+  }, []);
+
   // Uygulama arkaya alınınca müzik DURSUN (Abdulkadir: force-close'a kadar çalıyordu).
   // Web/WebView'da AppState "background" vermiyor → visibilitychange ile de dinliyoruz.
   useEffect(() => {
@@ -46,8 +60,12 @@ export default function RootLayout() {
     };
 
     const sub = AppState.addEventListener("change", (state) => {
-      if (state === "active") resume();
-      else pause();
+      if (state === "active") {
+        // Öne dönerken de oturumu çalma moduna al — kayıt sırasında arkaya
+        // alınmışsa mod kayıtta kalmış olabilir.
+        setAudioModeAsync({ allowsRecording: false }).catch(() => {});
+        resume();
+      } else pause();
     });
 
     let onVisibility: (() => void) | undefined;

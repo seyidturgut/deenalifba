@@ -127,6 +127,8 @@ export function RecordCompare({ letterId, onRecordedChange }: { letterId: number
       if (stopTimerRef.current) clearTimeout(stopTimerRef.current);
       youPlayerRef.current?.remove();
       youPlayerRef.current = null;
+      // Çocuk kayıt sürerken geri çıkabilir; ses oturumunu kayıt modunda bırakma.
+      setAudioModeAsync({ allowsRecording: false }).catch(() => {});
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [letterId]);
@@ -219,6 +221,13 @@ export function RecordCompare({ letterId, onRecordedChange }: { letterId: number
       }
     } catch (err) {
       console.error("RecordCompare: kayıt durdurulamadı", err);
+      // Kayıt modu açık kalırsa iOS çalma sesini tamamen susturuyor — çocuk
+      // uygulamayı kapatıp açsa bile "hiç ses yok" durumuna düşüyordu.
+      try {
+        await setAudioModeAsync({ allowsRecording: false });
+      } catch {
+        // ses oturumu erişilemiyorsa sessizce geç
+      }
       setRecording(false);
       setStep("record");
     }

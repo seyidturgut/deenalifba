@@ -87,6 +87,9 @@ function ChapterBanner({ label, cy, width }: { label: string; cy: number; width:
   );
 }
 
+/** Haritanın üst boşluğu — ilk düğümün üstünde bölüm başlığına yer bırakır. */
+const MAP_TOP = 122;
+
 const INNER = 0.6; // çerçevenin iç krem penceresi (NODE oranı)
 // Krem pencere görselin tam merkezinde değil (3D lip): sağa/yukarı kaydır
 const WIN_DX = NODE * 0.023;
@@ -416,15 +419,15 @@ export default function Home() {
   const nodes = LEVELS.map((lv, i) => ({
     level: lv,
     cx: X_PATTERN[i % X_PATTERN.length] * contentW,
-    cy: 88 + i * V_GAP,
+    cy: MAP_TOP + i * V_GAP,
   }));
   // 28 harften SONRA: büyük yolculuğun ileriki aşamaları (kilitli ama GÖRÜNÜR) — Sohail #7
   const stageNodes = JOURNEY_STAGES.map((s, j) => {
     const i = LEVELS.length + j;
-    return { ...s, cx: X_PATTERN[i % X_PATTERN.length] * contentW, cy: 88 + i * V_GAP };
+    return { ...s, cx: X_PATTERN[i % X_PATTERN.length] * contentW, cy: MAP_TOP + i * V_GAP };
   });
   const totalNodes = LEVELS.length + JOURNEY_STAGES.length;
-  const mapHeight = 88 + (totalNodes - 1) * V_GAP + 110;
+  const mapHeight = MAP_TOP + (totalNodes - 1) * V_GAP + 110;
   const pathPoints = [...nodes, ...stageNodes].map((n) => `${n.cx},${n.cy}`).join(" ");
 
 
@@ -436,6 +439,9 @@ export default function Home() {
   const guideSide = activeNode && activeNode.cx <= contentW / 2 ? 1 : -1;
   const guideX = activeNode ? activeNode.cx + guideSide * (NODE * 0.74) : 0;
   const guideTop = activeNode ? Math.max(4, activeNode.cy - GUIDE * 0.5) : 0;
+  // Rehber haritanın en üstündeyse balonu ALTINA al — yukarıda bölüm başlığı var ve
+  // balon onu kapatıyordu (Abdulkadir 3. tur).
+  const bubbleBelow = guideTop < GUIDE * 0.95;
 
   // Bir düğüm konumunun "rehber" yerleşimi (uçuş başlangıcı için)
   const guidePosOf = (i: number) => {
@@ -591,7 +597,7 @@ export default function Home() {
             <Polyline points={pathPoints} fill="none" stroke="#E8C766" strokeWidth={16} strokeLinecap="round" strokeLinejoin="round" />
             <Polyline points={pathPoints} fill="none" stroke="#FBE9A8" strokeWidth={6} strokeLinecap="round" strokeLinejoin="round" />
           </Svg>
-          <ChapterBanner label={t("journey.chapterLetters")} cy={6} width={contentW} />
+          <ChapterBanner label={t("journey.chapterLetters")} cy={18} width={contentW} />
           {stageNodes[0] && (
             <ChapterBanner label={t("journey.chapterWords")} cy={stageNodes[0].cy - V_GAP * 0.68} width={contentW} />
           )}
@@ -658,7 +664,13 @@ export default function Home() {
             >
               {/* Pırıl'ın mini balonu (camiye/hedefe atıf) — uçarken gizle */}
               {tipShown && !flying && (
-                <View pointerEvents="none" style={{ position: "absolute", bottom: GUIDE * 0.88, left: -30, right: -30, alignItems: "center" }}>
+                <View
+                  pointerEvents="none"
+                  style={[
+                    { position: "absolute", left: -30, right: -30, alignItems: "center" },
+                    bubbleBelow ? { top: GUIDE * 0.92 } : { bottom: GUIDE * 0.88 },
+                  ]}
+                >
                   <View
                     style={{ maxWidth: 192, backgroundColor: "#FFFFFF", borderRadius: 16, paddingHorizontal: 12, paddingVertical: 7, shadowColor: "#1462B5", shadowOpacity: 0.16, shadowRadius: 6, shadowOffset: { width: 0, height: 3 } }}
                   >

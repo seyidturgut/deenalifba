@@ -220,6 +220,10 @@ export default function LearnScreen() {
 
   const finishLetter = () => {
     setCelebrate(false); // kutlamayı kapat → cami sahnesiyle çakışmasın
+    // Ders biterken konuşma kuyruğunu boşalt: konuşma adımının replikleri kanalda
+    // yer ayırmış oluyor ve cami sahnesinin "camin büyüdü" sesi sıra bekliyordu
+    // (Abdulkadir 3. tur: "seviye bitince sesi duymadan önce gözle görülür gecikme").
+    stopSpeech();
     // Tekrar turu: yeni cami parçası yok, final yok — kutlamayı gördü, haritaya dön.
     // İlk seviye ("öğren") de cami vermez; harf ancak ikinci seviyede tamamlanır.
     if (wasComplete.current || part === "learn") {

@@ -1,5 +1,5 @@
 import { Image } from "expo-image";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming } from "react-native-reanimated";
 import Svg, { G, Path } from "react-native-svg";
@@ -29,6 +29,12 @@ const GLYPH = 176; // kart içi glif alanı (altın çerçeveye değmesin)
  * bildirimi: konuşma pratiği, öğretme/pratik BİTMEDEN istenmemeli).
  */
 export function LetterIntro({ letterId, onComplete }: { letterId: number; onComplete: () => void }) {
+  /**
+   * Abdulkadir (3. tur): "'Hazırım' ancak istenen iş yapılınca tıklanabilir olmalı —
+   * 'Dinle ve harfi tanı'da çocuk harfi DİNLEDİKTEN sonra." Önceden çocuk hiç
+   * dinlemeden geçebiliyordu, yani adımın amacı atlanabiliyordu.
+   */
+  const [heard, setHeard] = useState(false);
   const letter = getLetter(letterId);
   const lp = getLetterPath(letterId);
   const sc = GLYPH / PATH_BOX;
@@ -52,7 +58,11 @@ export function LetterIntro({ letterId, onComplete }: { letterId: number; onComp
         ? NARRATION_DURATIONS_MS[useSettingsStore.getState().language].level1Intro
         : 0;
     if (intro) playNarration(useSettingsStore.getState().language, "level1Intro");
-    const tt = setTimeout(() => playLetter(letterId), 350 + intro);
+    setHeard(false);
+    const tt = setTimeout(() => {
+      playLetter(letterId);
+      setHeard(true);
+    }, 350 + intro);
     return () => clearTimeout(tt);
   }, [letterId]);
 
@@ -62,7 +72,13 @@ export function LetterIntro({ letterId, onComplete }: { letterId: number; onComp
     <View style={{ flex: 1, width: "100%", alignItems: "center", justifyContent: "center", gap: 20 }}>
       {/* Büyük harf kartı — dokununca harfin sesi tekrar çalar (etiketsiz) */}
       <Floating distance={8} duration={2200}>
-        <Pressable onPress={() => playLetter(letterId)} style={{ width: CARD, height: CARD }}>
+        <Pressable
+          onPress={() => {
+            playLetter(letterId);
+            setHeard(true);
+          }}
+          style={{ width: CARD, height: CARD }}
+        >
           <Image source={images.playPanel} style={StyleSheet.absoluteFill} contentFit="fill" />
           <View style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, alignItems: "center", justifyContent: "center" }}>
             {lp ? (
@@ -87,7 +103,7 @@ export function LetterIntro({ letterId, onComplete }: { letterId: number; onComp
 
       {/* Latin ad GÖSTERİLMEZ (Ismail: Arapça harf + ses; transliterasyona dayanma). */}
 
-      <JuicyButton label={t("intro.continue")} tone="success" onPress={onComplete} />
+      <JuicyButton label={t("intro.continue")} tone="success" onPress={onComplete} disabled={!heard} />
     </View>
   );
 }
