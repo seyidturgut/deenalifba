@@ -209,7 +209,8 @@
     "unlockAllTitle": "Team Test Code 🔓",
     "unlockAllBody": "Marks all letters complete and opens the later chapters. (Testing only.)",
     "unlockAllPlaceholder": "Enter code",
-    "unlockAllConfirm": "Unlock"
+    "unlockAllConfirm": "Unlock",
+    "jumpToLetterNote": "Letter number (1-28) — not the level number. Each letter is two levels."
   },
   "a11y": {
     "musicToggle": "Toggle music",

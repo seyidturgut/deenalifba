@@ -191,6 +191,9 @@ export default function Settings() {
         {/* Harfe Atla (test/QA) — kilit/ilerleme beklemeden herhangi bir harfe git */}
         <View className="rounded-2xl bg-white px-5 py-4" style={cardStyle}>
           <Text className="text-lg font-bold text-ink">{t("settings.jumpToLetter")}</Text>
+          {/* Her harf iki seviyeye bölününce seviye no ile harf sırası ayrıştı;
+              test eden kişi 8'i "8. seviye" sanıp yanlış harfi dinliyordu. */}
+          <Text className="mt-1 text-sm font-bold text-muted">{t("settings.jumpToLetterNote")}</Text>
           <View className="mt-3 flex-row items-center gap-3">
             <TextInput
               className="w-20 rounded-full border-2 border-primary-soft bg-canvas px-3 py-2 text-center text-xl font-bold"

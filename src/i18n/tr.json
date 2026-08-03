@@ -209,7 +209,8 @@
     "unlockAllTitle": "Ekip Test Kodu 🔓",
     "unlockAllBody": "Tüm harfleri tamamlanmış işaretler ve sonraki bölümleri açar. (Yalnız test içindir.)",
     "unlockAllPlaceholder": "Kodu gir",
-    "unlockAllConfirm": "Aç"
+    "unlockAllConfirm": "Aç",
+    "jumpToLetterNote": "Harf sırası (1-28) — seviye numarası değil. Her harf iki seviyedir."
   },
   "a11y": {
     "musicToggle": "Müzik aç/kapat",
