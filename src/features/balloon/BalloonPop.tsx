@@ -160,14 +160,16 @@ export function BalloonPop({
   /** Verilirse balonlarda harfin bu POZİSYONEL formu görünür (Harf Tanıma bölümü). */
   formKind?: LetterFormKind;
 }) {
-  const { width } = useWindowDimensions();
+  const { width, height } = useWindowDimensions();
   const target = getLetter(letterId);
   const [count, setCount] = useState(0);
   const [done, setDone] = useState(false);
   const finishedRef = useRef(false);
 
   const areaW = Math.min(width - 24, 360);
-  const areaH = 410;
+  // Sabit 410 küçük ekranlarda oyun alanından taşıyordu (üst başlıklar + sahne
+  // zemini çıkınca ~360 kalıyor). Ekrana göre ölçekleniyor.
+  const areaH = Math.max(240, Math.min(410, height - 452));
 
   // 4 hedef + 4 çeldirici balon, sütunlara dağıtılmış
   const balloons = useMemo(() => {

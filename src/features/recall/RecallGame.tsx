@@ -177,12 +177,6 @@ export function RecallGame({ letterId, onComplete }: { letterId: number; onCompl
   return (
     <View className="flex-1 items-center justify-center gap-4">
       <View className="flex-row items-center gap-2 px-2">
-        <View
-          className="rounded-3xl rounded-bl-md bg-white/92 px-4 py-2"
-          style={{ shadowColor: "#1462B5", shadowOpacity: 0.1, shadowRadius: 5, shadowOffset: { width: 0, height: 3 } }}
-        >
-          <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 17, color: "#208AEF" }}>{t("recall.prompt")}</Text>
-        </View>
       </View>
 
       {/* Dinle kartı — hedef harfin sesini (tekrar) çalar; çocuk duyduğunu seçer */}
