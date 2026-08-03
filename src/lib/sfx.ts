@@ -251,8 +251,8 @@ const NARRATION_SOURCES: Record<"en" | "tr", Record<"onboarding1" | "onboarding2
 
 /** Ölçülen anlatım klip süreleri (ms) — oto-ilerleyen ekranların zamanlaması için. */
 export const NARRATION_DURATIONS_MS: Record<"en" | "tr", Record<string, number>> = {
-  en: {"chForms1":2720,"chForms2":6230,"chForms3":4320,"gardenGrown":3562,"gardenHowto":7525,"speak1":6420,"speak2":2737,"level1Intro":8816,"mosqueBuilt":3071,"mosqueHowto":7291,"newGame":3108,"onboarding1":3620,"onboarding2":3000,"posFinal":1362,"posInitial":1250,"posMedial":1150,"stepListen":680,"stepPlayback":1269,"stepRecord":820},
-  tr: {"chForms1":2400,"chForms2":6741,"chForms3":4496,"gardenGrown":2529,"gardenHowto":6400,"speak1":3774,"speak2":2839,"level1Intro":8187,"mosqueBuilt":2537,"mosqueHowto":7455,"newGame":3438,"onboarding1":3050,"onboarding2":3190,"posFinal":1495,"posInitial":1240,"posMedial":1340,"stepListen":750,"stepPlayback":1206,"stepRecord":970},
+  en: {"chForms1":2720,"chForms2":6230,"chForms3":4320,"gardenGrown":3562,"gardenHowto":7525,"speak1":6420,"speak2":1802,"level1Intro":8816,"mosqueBuilt":3071,"mosqueHowto":7291,"newGame":3108,"onboarding1":3620,"onboarding2":3000,"posFinal":1362,"posInitial":1250,"posMedial":1150,"stepListen":680,"stepPlayback":1269,"stepRecord":820},
+  tr: {"chForms1":2400,"chForms2":6741,"chForms3":4496,"gardenGrown":2529,"gardenHowto":6400,"speak1":3774,"speak2":1867,"level1Intro":8187,"mosqueBuilt":2537,"mosqueHowto":7455,"newGame":3438,"onboarding1":3050,"onboarding2":3190,"posFinal":1495,"posInitial":1240,"posMedial":1340,"stepListen":750,"stepPlayback":1206,"stepRecord":970},
 };
 
 const narrationPlayers: Partial<Record<string, AudioPlayer>> = {};
