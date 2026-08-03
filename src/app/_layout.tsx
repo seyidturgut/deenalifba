@@ -17,6 +17,7 @@ import { AppState, Platform } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
+import { AppErrorBoundary } from "@/components/ui/AppErrorBoundary";
 import { startMusic, stopMusic } from "@/lib/sfx";
 import { useSettingsStore } from "@/stores/settingsStore";
 
@@ -100,6 +101,7 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
+        <AppErrorBoundary language={useSettingsStore.getState().language}>
         <Stack
           screenOptions={{
             headerShown: false,
@@ -115,6 +117,7 @@ export default function RootLayout() {
           <Stack.Screen name="mosque" options={{ animation: "slide_from_bottom" }} />
           <Stack.Screen name="settings" options={{ presentation: "modal" }} />
         </Stack>
+        </AppErrorBoundary>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );

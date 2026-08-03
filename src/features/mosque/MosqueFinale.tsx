@@ -63,8 +63,10 @@ export function MosqueFinale({ visible, onDone }: { visible: boolean; onDone: ()
       withRepeat(withSequence(withTiming(1, { duration: 420, easing: Easing.out(Easing.quad) }), withTiming(0, { duration: 420 })), 3, false)
     );
     playSfx("star_earned", 0.7);
-    setTimeout(() => playSfx("mosque_build", 0.6), 250);
+    // Temizlenmeyen zamanlayıcı, final kapandıktan sonra sesi arkadan çalıyordu.
+    const fanfare = setTimeout(() => playSfx("mosque_build", 0.6), 250);
     haptics.celebrate();
+    return () => clearTimeout(fanfare);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible]);
 
