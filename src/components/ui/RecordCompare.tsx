@@ -117,14 +117,48 @@ export function RecordCompare({ letterId, onRecordedChange }: { letterId: number
   const ringStyle = useAnimatedStyle(() => ({ opacity: recording ? 1 : 0 }));
   const countdownProps = useAnimatedProps(() => ({ strokeDashoffset: CIRC * (1 - countdown.value) }));
 
+  /**
+   * Mikrofon izni PEŞİNEN alınır.
+   *
+   * Eskiden izin ilk kayıt denemesinde soruluyordu: çocuk mikrofona basıyor,
+   * karşısına sistem penceresi çıkıyor, ne olduğunu anlamıyor ve kayıt hiç
+   * başlamıyordu (Abdulkadir 3. tur, çocuk videosu).
+   */
+  const permRef = useRef<boolean | null>(null);
+  useEffect(() => {
+    let alive = true;
+    requestRecordingPermissionsAsync()
+      .then((p) => {
+        if (!alive) return;
+        permRef.current = p.granted;
+        if (!p.granted) {
+          setStep("unsupported");
+          onRecordedChange?.(true); // izin yok — akışı kilitli bırakma
+        }
+      })
+      .catch(() => {
+        if (!alive) return;
+        permRef.current = false;
+        setStep("unsupported");
+        onRecordedChange?.(true);
+      });
+    return () => {
+      alive = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   useEffect(() => {
     setStep("listen");
     setRecording(false);
+    recordedOnceRef.current = false;
     onRecordedChange?.(false);
     youPlayerRef.current?.remove();
     youPlayerRef.current = null;
     return () => {
       if (stopTimerRef.current) clearTimeout(stopTimerRef.current);
+      timersRef.current.forEach(clearTimeout);
+      timersRef.current = [];
       youPlayerRef.current?.remove();
       youPlayerRef.current = null;
       // Çocuk kayıt sürerken geri çıkabilir; ses oturumunu kayıt modunda bırakma.
@@ -148,6 +182,30 @@ export function RecordCompare({ letterId, onRecordedChange }: { letterId: number
     return () => clearTimeout(tt);
   }, [step, recording, language]);
 
+  /**
+   * Kayıt, Pırıl'ın "şimdi sen söyle" repliği BİTİNCE başlar — daha erken başlarsa
+   * çocuğun sesi yerine Pırıl'ın sesi kaydediliyor.
+   */
+  useEffect(() => {
+    if (step !== "record" || recording || recordedOnceRef.current) return;
+    let alive = true;
+    const t = setTimeout(() => {
+      if (!alive) return;
+      const wait = speechRemainingMs();
+      if (wait > 0) {
+        const t2 = setTimeout(() => alive && startRecording(), wait + 300);
+        timersRef.current.push(t2);
+        return;
+      }
+      startRecording();
+    }, 400);
+    timersRef.current.push(t);
+    return () => {
+      alive = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step, recording]);
+
   // Harfi otomatik duyur, sonra kayıt adımına kendiliğinden geç (çocuk beklemesin).
   // playLetter konuşma kuyruğunda bekler: talimat bitmeden harf çalmaz.
   /**
@@ -169,13 +227,27 @@ export function RecordCompare({ letterId, onRecordedChange }: { letterId: number
     setTimeout(() => setStep((cur) => (cur === "listen" ? "record" : cur)), queued + dur + 900);
   };
 
-  /** 2) Kaydet */
+  /**
+   * 2) Kaydet — ÇOCUK BASMAZ, kayıt kendiliğinden başlar.
+   *
+   * Videoda çocuk mikrofona basıyor, ekranda hiçbir şey değişmiyor (izin +
+   * hazırlık birkaç yüz milisaniye sürüyor), tepki göremeyince tekrar basıyor
+   * ve ya başlatmayı bozuyor ya da yeni başlamış kaydı durduruyordu. Ayrıca
+   * "kayıt başlat" çocuk için anlamı olan bir eylem değil — asıl iş konuşmak.
+   * Pırıl "şimdi sen söyle" dedikten sonra kayıt kendi başlıyor.
+   */
+  const startingRef = useRef(false);
+  /** Bu harfte bir kez kaydedildiyse otomatik yeniden başlatma (tekrar kaydet elle). */
+  const recordedOnceRef = useRef(false);
+  const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+
   const startRecording = async () => {
+    if (startingRef.current || recording) return; // çift tetikleme koruması
+    startingRef.current = true;
     try {
-      const perm = await requestRecordingPermissionsAsync();
-      if (!perm.granted) {
+      if (permRef.current === false) {
         setStep("unsupported");
-        onRecordedChange?.(true); // izin yok — akışı kilitli bırakma
+        onRecordedChange?.(true);
         return;
       }
       await setAudioModeAsync({ allowsRecording: true });
@@ -191,6 +263,8 @@ export function RecordCompare({ letterId, onRecordedChange }: { letterId: number
       console.error("RecordCompare: kayıt başlatılamadı", err);
       setStep("unsupported");
       onRecordedChange?.(true);
+    } finally {
+      startingRef.current = false;
     }
   };
 
@@ -204,6 +278,7 @@ export function RecordCompare({ letterId, onRecordedChange }: { letterId: number
       await setAudioModeAsync({ allowsRecording: false });
       setRecording(false);
       if (recorder.uri) {
+        recordedOnceRef.current = true;
         youPlayerRef.current?.remove();
         youPlayerRef.current = createAudioPlayer(recorder.uri);
         setStep("playback");
@@ -245,6 +320,7 @@ export function RecordCompare({ letterId, onRecordedChange }: { letterId: number
   };
   const recordAgain = () => {
     haptics.tap();
+    recordedOnceRef.current = false;
     setStep("record");
     onRecordedChange?.(false);
   };
@@ -286,8 +362,9 @@ export function RecordCompare({ letterId, onRecordedChange }: { letterId: number
       )}
 
       {/* 2) KAYDET — halka geri sayar, bitişi görünür */}
+      {/* Kayıt kendiliğinden başlar — buton değil, DURUM göstergesi. Çocuk yalnız konuşur. */}
       {step === "record" && (
-        <Pressable onPress={recording ? stopRecording : startRecording} hitSlop={10} style={{ alignItems: "center", gap: 10 }}>
+        <View style={{ alignItems: "center", gap: 10 }}>
           <View style={{ width: RING, height: RING, alignItems: "center", justifyContent: "center" }}>
             <Animated.View style={[{ position: "absolute", width: RING, height: RING }, ringStyle]}>
               <Svg width={RING} height={RING}>
@@ -328,9 +405,9 @@ export function RecordCompare({ letterId, onRecordedChange }: { letterId: number
             </Animated.View>
           </View>
           <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 18, color: recording ? "#D8493F" : "#2E7D5B" }}>
-            {recording ? t("intro.stepRecording") : t("intro.stepRecord")}
+            {recording ? t("intro.stepRecording") : t("intro.stepRecordWait")}
           </Text>
-        </Pressable>
+        </View>
       )}
 
       {/* 3) KENDİNİ DİNLE — kendi sesi BÜYÜK, karşılaştırma ikincil */}

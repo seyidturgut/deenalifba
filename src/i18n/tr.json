@@ -112,10 +112,11 @@
     "playPiril": "{{mascot}}",
     "recordAgain": "Tekrar kaydet",
     "stepListen": "Dinle",
-    "stepRecord": "Mikrofona dokun ve söyle",
-    "stepRecording": "Dinliyorum…",
+    "stepRecord": "Şimdi sen söyle",
+    "stepRecording": "Şimdi söyle! 🎤",
     "stepPlayback": "Kendini dinle!",
-    "stepHearing": "Duyuyor musun?"
+    "stepHearing": "Duyuyor musun?",
+    "stepRecordWait": "Hazırlanıyor…"
   },
   "finale": {
     "title": "Maşallah!",
