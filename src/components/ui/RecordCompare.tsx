@@ -92,7 +92,16 @@ function StepDots({ step }: { step: Step }) {
   );
 }
 
-export function RecordCompare({ letterId, onRecordedChange }: { letterId: number; onRecordedChange?: (recorded: boolean) => void }) {
+export function RecordCompare({
+  letterId,
+  onRecordedChange,
+  onStepChange,
+}: {
+  letterId: number;
+  onRecordedChange?: (recorded: boolean) => void;
+  /** Dış kabuk, adıma göre yer açabilsin diye (son adımda içerik en uzun). */
+  onStepChange?: (step: "listen" | "record" | "playback" | "unsupported") => void;
+}) {
   const { t } = useTranslation();
   const [step, setStep] = useState<Step>("listen");
   const [recording, setRecording] = useState(false);
@@ -325,16 +334,25 @@ export function RecordCompare({ letterId, onRecordedChange }: { letterId: number
     onRecordedChange?.(false);
   };
 
-  if (step === "unsupported") return null;
+  useEffect(() => {
+    onStepChange?.(step);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step]);
+
+  /**
+   * Mikrofon izni yoksa bileşen tamamen gizleniyordu — çocuk harfi bir kez daha
+   * dinleyemeden adımı geçiyordu. Artık dinleme kısmı duruyor, yalnız kayıt yok.
+   */
+  const micDenied = step === "unsupported";
 
   return (
     <View style={{ alignItems: "center", gap: 14 }}>
-      <StepDots step={step} />
+      {!micDenied && <StepDots step={step} />}
 
-      {/* 1) DİNLE */}
-      {step === "listen" && (
+      {/* 1) DİNLE — mikrofon izni olmasa da çalışır */}
+      {(step === "listen" || micDenied) && (
         <Animated.View style={[pulseStyle, hearing ? { transform: [{ scale: 1.12 }] } : null]}>
-          <Pressable onPress={doListen} hitSlop={10} style={{ alignItems: "center", gap: 10 }}>
+          <Pressable onPress={doListen} hitSlop={24} style={{ alignItems: "center", gap: 10 }}>
             <View
               style={{
                 width: MIC,
@@ -363,7 +381,7 @@ export function RecordCompare({ letterId, onRecordedChange }: { letterId: number
 
       {/* 2) KAYDET — halka geri sayar, bitişi görünür */}
       {/* Kayıt kendiliğinden başlar — buton değil, DURUM göstergesi. Çocuk yalnız konuşur. */}
-      {step === "record" && (
+      {step === "record" && !micDenied && (
         <View style={{ alignItems: "center", gap: 10 }}>
           <View style={{ width: RING, height: RING, alignItems: "center", justifyContent: "center" }}>
             <Animated.View style={[{ position: "absolute", width: RING, height: RING }, ringStyle]}>
@@ -411,7 +429,7 @@ export function RecordCompare({ letterId, onRecordedChange }: { letterId: number
       )}
 
       {/* 3) KENDİNİ DİNLE — kendi sesi BÜYÜK, karşılaştırma ikincil */}
-      {step === "playback" && (
+      {step === "playback" && !micDenied && (
         <View style={{ alignItems: "center", gap: 10 }}>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
             <Mascot size={46} pose="celebrate" />
@@ -419,7 +437,7 @@ export function RecordCompare({ letterId, onRecordedChange }: { letterId: number
           </View>
 
           <Animated.View style={pulseStyle}>
-            <Pressable onPress={playYou} hitSlop={10} style={{ alignItems: "center", gap: 8 }}>
+            <Pressable onPress={playYou} hitSlop={24} style={{ alignItems: "center", gap: 8 }}>
               <View
                 style={{
                   width: MIC,
@@ -444,11 +462,11 @@ export function RecordCompare({ letterId, onRecordedChange }: { letterId: number
 
           {/* İkincil: Pırıl'la karşılaştır + tekrar kaydet */}
           <View style={{ flexDirection: "row", alignItems: "center", gap: 18, marginTop: 2 }}>
-            <Pressable onPress={playPiril} hitSlop={8} style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+            <Pressable onPress={playPiril} hitSlop={16} style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
               <Image source={images.icSpeaker} style={{ width: 28, height: 28 }} contentFit="contain" />
               <Text style={{ fontFamily: "Fredoka_600SemiBold", fontSize: 14, color: "#5B6470" }}>{t("intro.playPiril", mascotVars())}</Text>
             </Pressable>
-            <Pressable onPress={recordAgain} hitSlop={8}>
+            <Pressable onPress={recordAgain} hitSlop={16}>
               <Text style={{ fontFamily: "Fredoka_600SemiBold", fontSize: 14, color: "#7A8593" }}>{t("intro.recordAgain")}</Text>
             </Pressable>
           </View>

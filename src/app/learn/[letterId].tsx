@@ -320,6 +320,7 @@ export default function LearnScreen() {
       {/* Talimat balonu — dokununca Pırıl tekrar söyler (çocuk kaçırdıysa) */}
       <Pressable
         onPress={() => kind && playHint(language, kind as HintKey)}
+        hitSlop={10}
         className="mt-1 self-center rounded-full bg-white/65 px-6 py-2"
         style={{ maxWidth: "92%", shadowColor: "#1462B5", shadowOpacity: 0.14, shadowRadius: 7, shadowOffset: { width: 0, height: 4 } }}
       >

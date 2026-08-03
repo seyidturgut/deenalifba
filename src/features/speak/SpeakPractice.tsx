@@ -22,6 +22,13 @@ export function SpeakPractice({ letterId, onComplete }: { letterId: number; onCo
   const letter = getLetter(letterId);
   const lp = getLetterPath(letterId);
   const [hasRecorded, setHasRecorded] = useState(false);
+  /**
+   * Son adımda (kendini dinle) içerik en uzun hâline geliyor ve ekrana sığmıyordu:
+   * harf kartı yukarı taşıp ipucu balonunun üstüne biniyor, çakışan yerlerde
+   * dokunma ölü alana düşüyordu. O adımda kart gizleniyor — çocuk zaten kendi
+   * kaydını dinliyor, harfe bakmıyor.
+   */
+  const [speakStep, setSpeakStep] = useState<"listen" | "record" | "playback" | "unsupported">("listen");
 
   // Konuşma adımı boyunca müzik DURUR — çocuğun kendi kaydı net duyulsun (Abdulkadir).
   useEffect(() => {
@@ -34,6 +41,7 @@ export function SpeakPractice({ letterId, onComplete }: { letterId: number; onCo
   return (
     <View style={{ flex: 1, width: "100%", alignItems: "center", justifyContent: "center", gap: 16 }}>
       {/* Hangi harfi söyleyeceği — sabit referans (dinleme akışın 1. adımında) */}
+      {speakStep !== "playback" && (
       <View
         style={{
           width: 88,
@@ -56,8 +64,9 @@ export function SpeakPractice({ letterId, onComplete }: { letterId: number; onCo
           <Text style={{ fontFamily: "Amiri_700Bold", fontSize: 46, color: "#2A2A33" }}>{letter.char}</Text>
         )}
       </View>
+      )}
 
-      <RecordCompare letterId={letterId} onRecordedChange={setHasRecorded} />
+      <RecordCompare letterId={letterId} onRecordedChange={setHasRecorded} onStepChange={setSpeakStep} />
 
       <JuicyButton label={t("intro.continue")} tone="success" onPress={onComplete} disabled={!hasRecorded} />
     </View>
