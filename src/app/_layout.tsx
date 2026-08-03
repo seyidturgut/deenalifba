@@ -1,14 +1,14 @@
 import "@/global.css";
 import "@/i18n";
 
-import { Amiri_400Regular, Amiri_700Bold } from "@expo-google-fonts/amiri";
-import {
-  Fredoka_500Medium,
-  Fredoka_600SemiBold,
-  Fredoka_700Bold,
-  useFonts,
-} from "@expo-google-fonts/fredoka";
-import { Nunito_400Regular, Nunito_600SemiBold, Nunito_700Bold } from "@expo-google-fonts/nunito";
+// Font'lar TEK TEK, alt yoldan alınıyor: paketin kökünden import edilince Metro
+// ailenin BÜTÜN ağırlıklarını pakete koyuyor (25 dosya, ~4 MB) — oysa dördü
+// kullanılıyor. Alt yol sadece o dosyayı getirir.
+import Amiri_700Bold from "@expo-google-fonts/amiri/700Bold/Amiri_700Bold.ttf";
+import Fredoka_600SemiBold from "@expo-google-fonts/fredoka/600SemiBold/Fredoka_600SemiBold.ttf";
+import Fredoka_700Bold from "@expo-google-fonts/fredoka/700Bold/Fredoka_700Bold.ttf";
+import Nunito_700Bold from "@expo-google-fonts/nunito/700Bold/Nunito_700Bold.ttf";
+import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
@@ -24,13 +24,9 @@ SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
-    Fredoka_500Medium,
     Fredoka_600SemiBold,
     Fredoka_700Bold,
-    Nunito_400Regular,
-    Nunito_600SemiBold,
     Nunito_700Bold,
-    Amiri_400Regular,
     Amiri_700Bold,
   });
 
