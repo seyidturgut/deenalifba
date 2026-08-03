@@ -1,6 +1,6 @@
 import { Image } from "expo-image";
 import { useFocusEffect, useRouter } from "expo-router";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Pressable, Text, useWindowDimensions, View } from "react-native";
 import Animated, {
   Easing,
@@ -58,7 +58,7 @@ const JOURNEY_STAGES: { key: string; emoji: string; goal?: boolean; route?: stri
  * sonrakini 'Kelimelerde Harfler' diye adlandıralım." Can'ın "seviyeleri temalı
  * bölgelere ayır" maddesi de aynı şeyi istiyordu: çocuk nerede olduğunu görsün.
  */
-function ChapterBanner({ label, cy, width }: { label: string; cy: number; width: number }) {
+const ChapterBanner = memo(function ChapterBanner({ label, cy, width }: { label: string; cy: number; width: number }) {
   return (
     <View
       pointerEvents="none"
@@ -85,7 +85,7 @@ function ChapterBanner({ label, cy, width }: { label: string; cy: number; width:
       </View>
     </View>
   );
-}
+});
 
 /** Haritanın üst boşluğu — ilk düğümün üstünde bölüm başlığına yer bırakır. */
 const MAP_TOP = 122;
@@ -95,7 +95,7 @@ const INNER = 0.6; // çerçevenin iç krem penceresi (NODE oranı)
 const WIN_DX = NODE * 0.023;
 const WIN_DY = NODE * -0.053;
 
-function LevelNode({
+const LevelNode = memo(function LevelNode({
   levelNo,
   cx,
   cy,
@@ -202,7 +202,7 @@ function LevelNode({
 
     </Pressable>
   );
-}
+});
 
 /** Üst bar: öğrenilen harf sayacı + ayar. (Cami ilerlemesi "My Mosque" kartında — tekrar yok.) */
 function TopBar() {
@@ -266,7 +266,7 @@ function BottomNav() {
  * `onPress` verilirse aşama OYNANABİLİR demektir (kilit rozeti yok, "Yakında" yerine kendi
  * durumu) — şu an yalnız "Harf Tanıma" böyle (28 harf bitince açılır).
  */
-function StageGate({
+const StageGate = memo(function StageGate({
   cx,
   cy,
   emoji,
@@ -370,7 +370,7 @@ function StageGate({
       {body}
     </View>
   );
-}
+});
 
 export default function Home() {
   const { t } = useTranslation();
@@ -416,19 +416,24 @@ export default function Home() {
   const activeLevel = lettersAllDone ? null : LEVELS[activeIndex];
 
   // Düğüm konumları (zig-zag)
-  const nodes = LEVELS.map((lv, i) => ({
+  // 84 düğümün konumu ve yol çizgisi her render'da yeniden hesaplanıyordu.
+  const nodes = useMemo(() => LEVELS.map((lv, i) => ({
     level: lv,
     cx: X_PATTERN[i % X_PATTERN.length] * contentW,
     cy: MAP_TOP + i * V_GAP,
-  }));
+  })), [contentW]);
   // 28 harften SONRA: büyük yolculuğun ileriki aşamaları (kilitli ama GÖRÜNÜR) — Sohail #7
-  const stageNodes = JOURNEY_STAGES.map((s, j) => {
-    const i = LEVELS.length + j;
-    return { ...s, cx: X_PATTERN[i % X_PATTERN.length] * contentW, cy: MAP_TOP + i * V_GAP };
-  });
+  const stageNodes = useMemo(
+    () =>
+      JOURNEY_STAGES.map((s, j) => {
+        const i = LEVELS.length + j;
+        return { ...s, cx: X_PATTERN[i % X_PATTERN.length] * contentW, cy: MAP_TOP + i * V_GAP };
+      }),
+    [contentW]
+  );
   const totalNodes = LEVELS.length + JOURNEY_STAGES.length;
   const mapHeight = MAP_TOP + (totalNodes - 1) * V_GAP + 110;
-  const pathPoints = [...nodes, ...stageNodes].map((n) => `${n.cx},${n.cy}`).join(" ");
+  const pathPoints = useMemo(() => [...nodes, ...stageNodes].map((n) => `${n.cx},${n.cy}`).join(" "), [nodes, stageNodes]);
 
 
   // Rehber karakterin durduğu aktif düğüm (harf düğümleri VE bölüm düğümleri dahil)
@@ -569,6 +574,8 @@ export default function Home() {
       <Animated.ScrollView
         ref={scrollRef}
         showsVerticalScrollIndicator={false}
+        // 84 düğümün hepsi aynı anda bağlı duruyordu; görünmeyenler ayrılsın.
+        removeClippedSubviews
         contentContainerStyle={{ paddingBottom: 96 }}
         onScroll={onScroll}
         scrollEventThrottle={16}
