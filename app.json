@@ -1,23 +1,35 @@
 {
   "expo": {
     "name": "Alif",
-    "slug": "AlifBa-Game",
+    "slug": "deen-studios",
     "version": "1.25.4",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "alifbagame",
     "userInterfaceStyle": "light",
     "ios": {
-      "icon": "./assets/images/icon.png"
+      "icon": "./assets/images/icon.png",
+      "bundleIdentifier": "com.deenstudios.alif",
+      "appleTeamId": "LCG4CPKM9M",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
+      "package": "com.deenstudios.alif",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"
+      ]
     },
     "web": {
       "output": "single",
@@ -44,14 +56,27 @@
         {
           "microphonePermission": "Alif harfleri kendi sesinle tekrarlayıp dinleyebilmen için mikrofona erişir. Kayıtlar cihazından hiç çıkmaz."
         }
-      ]
+      ],
+      "expo-image",
+      "expo-asset"
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
     },
     "extra": {
-      "build": "2026.08.04"
+      "build": "2026.08.04",
+      "router": {},
+      "eas": {
+        "projectId": "75596d6b-d032-4671-b2ea-14d4f0bde46b"
+      }
+    },
+    "owner": "deen-studios-llc-fz",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/75596d6b-d032-4671-b2ea-14d4f0bde46b"
     }
   }
 }
